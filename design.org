@@ -1,0 +1,17 @@
+* Summary
+
+A roguelike where you're one participant of many. Think a single footsoldier in
+a Lord's retinue, or a legionary in a legion.
+
+* Pre-Comp Design Notes
+
++ Turn ordering is going to be a HUGE issue; simultaneous turns seems like the
+  best option here
++ The lethality model has to be different than the "fight until 0 HP", given
+  that most people didn't straight-up die unless they were unlucky, badly
+  overmatched, or in a rout
++ Stamina should be extremely important, in that rotating, disengaging, and
+  other forms of relief should be a thing
++ Terrain is almost certainly going to be "huge flat plains" for most of this,
+  because that's much easier to deal with than obstructions
++ We'll have to build some formation marching AI
