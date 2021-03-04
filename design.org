@@ -29,3 +29,169 @@ or something similar. So you need the "mode" and then you also need a way of
 saying "given a mode, here's where I, some random soldier, should stand".
 
 So that's a TALL order! That aside from making the game, you know. fun.
+
+** How would you even possibly implement formation movement though?
+
+Well, this is apparently a primer on how to solve this in the RTS context:
+https://www.gamasutra.com/view/feature/3314/coordinated_unit_movement.php?print=1
+which, plainly, is outta scope for a 7DRL!
+
+Also, see: The War of 1812 from 2020.
+
+I think you can get...80% of the way there by:
++ each unit paths individually
++ units can pack 2 to a square when not in combat
+
+*** Formations
+
++ Most of the times, lines won't be in contact!
++ Lines that *are* in contact will reasonably quickly fall *out* of contact, as
+  people are injured, die, or rotate backwards but fewer people rotate
+  forwards. Anybody who's opening the battle alone is going to be extremely
+  vulnerable because they'll be 1v3-ing!
++ This will allow for unit rotations
+
+Let's go with manipules since they're reasonably familiar. Right now, we'll
+ignore cavalry, and we'll ignore the socii, because lol.
+
+So, we'll have:
+
+Velites (no formation?)
+
+Hastati (~120 per manipule)
+
+Principes (~120 per manipule)
+
+Triarii (~60 per manipule)
+
+Who friggin' knows if they actually fought in a checkerboard, but we'll assume
+for the purposes of this game that they formed the a line.
+
+** Who's the general?
+
+You *could* play it out like an autobattler, where the whole thing's set out at
+deployment and you just mash your armies against each other with their
+pre-deployment orders. God knows some ancient battles turned out like that.
+
+I think that's probably the best we're gonna get with the timeframe.
+
+** Combat mechanics and movement
+
+1. Charges should be possible
+2. Withdrawals should be possible
+3. "Line pushes" should be possible
+
+We can actually do a "movement" phase and a "combat" phase, instead of single
+turns. Or, we can do a movement + "combat intent" - like, you say "I move
+forward and I try and stab this person if I can reach them".
+
+Thinking about this "intent" design a bit. This would be, like:
++ Choose a square to move in
++ Choose an action and a target to prioritize
+  - "I'm gonna try and shield bash the red soldier to my right"
+  - "I'm gonna feint out the soldier in front of me"
++ Choose a stance to determine how to respond to others' actions
+  - "I'll prioritize defense over executing my action"
+  - "I'll prioritize attacks of opportunity over executing my action"
+
+Then the turn could execute like:
++ Everybody moves or tries to move
+  - Movements into or out of contested squares provoke attacks of opportunity
++ Everybody recognizes any actions coming towards them
++ Everybody responds to the actions
+
+Thinking on it further, we can collapse "move" into "action". For example,
+"march," "withdraw," and "charge" are all actions. It's basically just turning
+your MOVE/ATTACK basics into activated abilities, no different from TOME's Dodge
+move or something. That simplifies it a lot:
+
++ Action
++ Stance
+  - Execute <- always execute your action
+  - Defense <- execute your action if nobody is attacking you, otherwise defend
+    (what happens if two duelists back do action=attack, stance=defend? they
+    both...defend...?)
+  - Opportunity <- switch your action to an attack if you see an opening (what
+    is an opening? a provoked attack of opportunity? somebody losing their
+    footing?)
+
+See the issue with this is it doesn't actually solve the "you need to put people
+into an ordered list and resolve them" issue, because...after each combatant
+announces their 'intent' to use a move, Defend or Opportunity lets them attack
+cancel out of it and do something completely different. So, if you have Heavy
+Attack + Defense, and Heavy Attack provokes an AOA, but then the attack cancels
+into a defense, does the guy who was gonna AOA the Heavy Attack do...what?
+
+I think a better way to do this is:
++ Action
+  - Aggressive <- Always execute
+  - Defensive <- Only execute if you look 'safe'
++ Stance
+  - Aggressive <- Take first AOA
+  - Selective <- Take AOA only if it would kill
+  - Conservative <- Take no AOAs
+
+What happens if an enemy has an aggressive backwards move, and you have an
+aggressive quick attack? Does the move resolve before, or after, the attack? I
+think that both the attack and the move should resolve, and it should *also*
+provke an AOA - I guess this makes withdrawing insanely dangerous!
+
+How does the game handle two or more combatants ENDING their turns in the same
+square?
++ They CLASH
+  - Each gets an AOA against each other combatant
+  - They roll an opposed Melee Attack check (repeated until victor), and the
+    loser is ejected into a random friendly square, taking a significant amount
+    of Footing damage. If there are no friendly squares present, the loser loses
+    all Footing and is knocked down.
+  - If all the combatants in the square are friendly, the first occupant of the
+    square has the option to move to an adjacent unoccupied or friendly square;
+    the process does NOT repeat, however!
+
+How does the game handle two or more combatants STARTING their turns in the same
+square?
++ Exactly the same as normal, EXCEPT:
+  - Each combatant gets an AOA against each other combatant
+  - Each combatant gets a significant penalty to all stats
+  - If they end their turns in the same square, they CLASH
+
+Actions:
++ Charge <- moves and attacks the target in the direction of movement with a momentum bonus
++ Covered Move <- moves and defends
++ Move <- moves and provokes an AOA from all adjacent to source square
++ Feint <- looks like an attack and reduces Footing
++ Quick Attack <- attack that does minor damage
++ Heavy Attack <- attack that does major damage and has a bonus to hit, but reduces Footing and provkes AOAs
++ Reposition <- significantly restores Footing
++ Defend <- significantly raises melee defense
+
+*** Game Turn Phases
+
+- Queue every action + Stance
+- Resolve every stance
+- Resolve every non-movement action
+  - Resolve AOAs
+- Resolve every movement action
+  - Resolve AOAs
+- Resolve collisions
+
+*** Stats
+Defensive
+|---------+------------------------------------------------------------------------------------------|
+| stat    | description                                                                              |
+|---------+------------------------------------------------------------------------------------------|
+| HP      | you run outta this you die                                                               |
+| Armor   | modeled as another HP bar                                                                |
+| Footing | if you run outta this you can get crit easy                                              |
+| Stamina | similar to Total War, ALL actions cost this, resting regens, having less gives penalties |
+| Wounds  | Not really a stat, but like BB wounds (cut this if you're running outta time)            |
+|---------+------------------------------------------------------------------------------------------|
+Offensive
+|----------------+------------------------------------------+---------------------------------------------------------------------|
+| stat           | usage                                    | description                                                         |
+|----------------+------------------------------------------+---------------------------------------------------------------------|
+| Melee Attack   | (melee attack - melee defense) < 1d100   | The % chance to hit a 'normal' enemy in combat; should start at ~50 |
+| Ranged Attack  | (ranged attack - ranged defense) < 1d100 | The % chance to hit a 'normal' enemy in combat; should start at ~35 |
+| Melee Defense  | static melee defense                     | Should start at ~15 for most troops                                 |
+| Ranged Defense | static ranged defense                    | Should start at ~15 for most troops                                 |
+|----------------+------------------------------------------+---------------------------------------------------------------------|
