@@ -34,7 +34,7 @@ namespace SpaceDodgeRL.library.encounter {
         var currentPosition = frontier.Dequeue();
         var adjacentPositions = state.AdjacentPositions(currentPosition);
 
-        if (adjacentPositions.Contains(end)) {
+        if (currentPosition == end || (state.IsPositionBlocked(end) && adjacentPositions.Contains(end))) {
           var path = new List<EncounterPosition>() { currentPosition };
 
           EncounterPosition cameFromPos;
