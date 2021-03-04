@@ -15,3 +15,17 @@ a Lord's retinue, or a legionary in a legion.
 + Terrain is almost certainly going to be "huge flat plains" for most of this,
   because that's much easier to deal with than obstructions
 + We'll have to build some formation marching AI
+
+* Formation & Movement
+
+I suspect that this is biting off more than I can chew.
+
+Each soldier has a designated rank and file, and you form up in the rank and
+file and wait. Gaps in the file are filled when the march starts.
+
+The issue is complex formations, like the manipular line. You want essentially
+"modal" formations that self-heal, so you can say "circle up" or "open the line"
+or something similar. So you need the "mode" and then you also need a way of
+saying "given a mode, here's where I, some random soldier, should stand".
+
+So that's a TALL order! That aside from making the game, you know. fun.
