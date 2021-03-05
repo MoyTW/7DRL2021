@@ -39,8 +39,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public int MapHeight { get; set; }
     // TODO: Come back to the builder & access levels
     public EncounterTile[,] _encounterTiles;
-    public List<EncounterZone> _zones;
-    public ReadOnlyCollection<EncounterZone> Zones { get => _zones.AsReadOnly(); }
     public int LevelsInDungeon { get => 10; } // TODO: Properly pass this in!
     public int DungeonLevel { get; private set; }
 
@@ -91,19 +89,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       } else {
         return null;
       }
-    }
-
-    public EncounterZone GetZoneById(string zoneId) {
-      // Yes we're iterating them all at one time but there's only, like...10 zones, so...computers are fast right?
-      foreach (EncounterZone zone in _zones) {
-        if (zone.ZoneId == zoneId) {
-          return zone;
-        }
-      }
-      // This should never be hit, but it sometimes does get hit, apparently!
-      throw new NotImplementedException(
-        String.Format("Attempting to fetch zone id {0} but could not. Contents of zones: {1}", zoneId, JsonSerializer.Serialize(this._zones))
-      );
     }
 
     /**
@@ -439,7 +424,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       public int MapHeight { get; set; }
       public List<Entity> Entities { get; set; }
       public string EncounterTileExploration { get; set; }
-      public List<EncounterZone> Zones { get; set; }
       public Dictionary<string, bool> ActivationTracker { get; set; }
       public string RunStatus { get; set; }
       public ActionTimeline.SaveData ActionTimeline { get; set; }
@@ -491,7 +475,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         }
       }
 
-      state._zones = data.Zones;
       state._entitiesById = entitiesById;
       foreach (var entity in data.Entities) {
         state.AddChild(entity);
@@ -554,7 +537,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       }
       data.EncounterTileExploration = builder.ToString();
 
-      data.Zones = this._zones;
       data.Entities = this._entitiesById.Values.ToList();
       data.ActivationTracker = this._activationTracker;
       data.RunStatus = this.RunStatus;

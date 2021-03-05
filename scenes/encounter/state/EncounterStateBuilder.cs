@@ -12,41 +12,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public static int ZONE_MIN_SIZE = 20;
     public static int ZONE_MAX_SIZE = 40;
 
-    private static void PopulateZone(EncounterZone zone, int dungeonLevel, Random seededRand, EncounterState state, bool safe=false) {
-      // Add satellites
-      int numSatellites = LevelData.GetNumberOfSatellites(dungeonLevel);
-      for (int i = 0; i < numSatellites; i++) {
-        var unblockedPosition = zone.RandomEmptyPosition(seededRand, state);
-        var satellite = EntityBuilder.CreateSatelliteEntity();
-        state.PlaceEntity(satellite, unblockedPosition);
-      }
-
-      EncounterDef encounterDef;
-      if (safe) {
-        encounterDef = LevelData.GetEncounterDefById(EncounterDefId.EMPTY_ENCOUNTER);
-      } else {
-        encounterDef = LevelData.ChooseEncounter(dungeonLevel, seededRand);
-      }
-      zone.ReadoutEncounterName = encounterDef.Name;
-
-      if (encounterDef.EntityDefIds.Count > 0) {
-        string activationGroupId = Guid.NewGuid().ToString();
-        foreach (string entityDefId in encounterDef.EntityDefIds) {
-          var unblockedPosition = zone.RandomEmptyPosition(seededRand, state);
-          var newEntity = EntityBuilder.CreateEnemyByEntityDefId(entityDefId, activationGroupId, state.CurrentTick);
-          state.PlaceEntity(newEntity, unblockedPosition);
-        }
-      }
-
-      var chosenItemDefs = LevelData.ChooseItemDefs(dungeonLevel, seededRand);
-      foreach(string chosenItemDefId in chosenItemDefs) {
-        var unblockedPosition = zone.RandomEmptyPosition(seededRand, state);
-        var newEntity = EntityBuilder.CreateItemByEntityDefId(chosenItemDefId);
-        state.PlaceEntity(newEntity, unblockedPosition);
-        zone.AddItemToReadout(newEntity);
-      }
-    }
-
     private static void InitializeMapAndAddBorderWalls(EncounterState state, int width, int height) {
       // Initialize the map with empty tiles
       state.MapWidth = width;
@@ -71,8 +36,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public static void PopulateStateForLevel(Entity player, int dungeonLevel, EncounterState state, Random seededRand,
         int width = 300, int height = 300, int maxZoneGenAttempts = 100) {
       InitializeMapAndAddBorderWalls(state, width, height);
-
-      state._zones = new List<EncounterZone>();
 
       // Add the player to the map
       state.PlaceEntity(player, new EncounterPosition(width / 2, height / 2));
