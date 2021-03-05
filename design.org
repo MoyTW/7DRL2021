@@ -195,3 +195,13 @@ Offensive
 | Melee Defense  | static melee defense                     | Should start at ~15 for most troops                                 |
 | Ranged Defense | static ranged defense                    | Should start at ~15 for most troops                                 |
 |----------------+------------------------------------------+---------------------------------------------------------------------|
+
+* Feature Priority List
+
+1. Formation Deployment & Movement
+2. Simple HP-Based Combat
+3. Formation Reformation & Complex Movement
+4. Agent-Based Movement
+5. Player Win Condition
+6. Procedural Battlefields
+7. Complex Combat
