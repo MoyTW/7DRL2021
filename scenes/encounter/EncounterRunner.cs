@@ -80,7 +80,6 @@ namespace SpaceDodgeRL.scenes.encounter {
       // After the player executes their turn we need to update the UI
       EmitSignal(nameof(EncounterRunner.TurnEnded));
       state.UpdatePlayerOverlays();
-      state.UpdateDangerMap();
     }
 
     private void PlayerMove(EncounterState state, int dx, int dy) {
@@ -241,7 +240,6 @@ namespace SpaceDodgeRL.scenes.encounter {
             break;
           }
         }
-        state.UpdateDangerMap();
       }
     }
 

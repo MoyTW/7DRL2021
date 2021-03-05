@@ -288,11 +288,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     // ##########################################################################################################################
     #region Display caches
 
-    public void UpdateDangerMap() {
-      var dangerMap = GetNode<DangerMap>("CanvasLayer/DangerMap");
-      dangerMap.UpdateAllTiles(this);
-    }
-
     public void UpdatePlayerOverlays() {
       var overlaysMap = GetNode<TileMap>("PlayerOverlays");
       overlaysMap.Clear();
@@ -368,7 +363,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         camera.Current = true;
         this.Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(camera);
       }
-      this.UpdateDangerMap();
 
       // Set the background image - stretch it out so that it covers visible OOB areas too.
       var background = GetNode<Sprite>("Background");
@@ -427,9 +421,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       // Populate all our initial caches
       this.LogMessage(string.Format("Level {0} started!", dungeonLevel));
       this.UpdatePlayerOverlays();
-      if (this.IsInsideTree()) {
-        this.UpdateDangerMap();
-      }
     }
 
     public void NotifyPlayerVictory() {
