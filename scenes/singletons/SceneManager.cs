@@ -13,7 +13,6 @@ namespace SpaceDodgeRL.scenes.singletons {
     private Viewport root;
     private List<Node> sceneStack;
 
-    private AutopilotMenu _autopilotMenu;
     private CharacterMenu _characterMenu;
     private CreditsMenu _creditsMenu;
     private DefeatMenu _defeatMenu;
@@ -22,13 +21,11 @@ namespace SpaceDodgeRL.scenes.singletons {
     private InventoryMenu _inventoryMenu;
     private SettingsMenu _settingsMenu;
     private VictoryMenu _victoryMenu;
-    private ReadOnlyCollection<EncounterZone> _autopilotMenuZones;
 
     public override void _Ready() {
       root = GetTree().Root;
       sceneStack = new List<Node>();
 
-      _autopilotMenu = GD.Load<PackedScene>("res://scenes/encounter/AutopilotMenu.tscn").Instance() as AutopilotMenu;
       _characterMenu = GD.Load<PackedScene>("res://scenes/encounter/CharacterMenu.tscn").Instance() as CharacterMenu;
       _creditsMenu = GD.Load<PackedScene>("res://scenes/CreditsMenu.tscn").Instance() as CreditsMenu;
       _defeatMenu = GD.Load<PackedScene>("res://scenes/encounter/DefeatMenu.tscn").Instance() as DefeatMenu;
@@ -38,25 +35,6 @@ namespace SpaceDodgeRL.scenes.singletons {
       _settingsMenu = GD.Load<PackedScene>("res://scenes/SettingsMenu.tscn").Instance() as SettingsMenu;
       _victoryMenu = GD.Load<PackedScene>("res://scenes/encounter/VictoryMenu.tscn").Instance() as VictoryMenu;
     }
-
-    #region Autopilot Menu
-
-    public void ShowAutopilotMenu(EncounterState state) {
-      _autopilotMenu.PrepMenu(state);
-      CallDeferred(nameof(DeferredSwitchScene), _autopilotMenu);
-    }
-
-    public void CloseAutopilotMenu(string selectedZoneId) {
-      CallDeferred(nameof(DeferredCloseAutopilotMenu), selectedZoneId);
-    }
-
-    private void DeferredCloseAutopilotMenu(string selectedZoneId) {
-      var previousScene = sceneStack[sceneStack.Count - 1] as EncounterScene;
-      DeferredReturnToPreviousScene();
-      previousScene.HandleAutopilotMenuClosed(selectedZoneId);
-    }
-
-    #endregion
 
     #region Character Menu
 

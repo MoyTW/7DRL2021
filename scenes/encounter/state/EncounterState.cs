@@ -196,35 +196,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       });
     }
 
-    public EncounterZone ClosestZone(int x, int y) {
-      if (!IsInBounds(x, y)) {
-        throw new NotImplementedException("out of bounds");
-      }
-
-      EncounterZone closestZone = null;
-      float smallestDistance = float.MaxValue;
-      foreach (EncounterZone zone in this.Zones) {
-        var distance = zone.Center.DistanceTo(x, y);
-        if (distance < smallestDistance) {
-          smallestDistance = distance;
-          closestZone = zone;
-        }
-      }
-      return closestZone;
-    }
-
-    /**
-     * Returns the zone containing the position. Returns null if the position is not inside a zone.
-     */
-    public EncounterZone ContainingZone(int x, int y) {
-      var closest = this.ClosestZone(x, y);
-      if (closest.Contains(x, y)) {
-        return closest;
-      } else {
-        return null;
-      }
-    }
-
     #endregion
     // ##########################################################################################################################
 

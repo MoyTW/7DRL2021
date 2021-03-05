@@ -63,54 +63,9 @@ namespace SpaceDodgeRL.scenes.encounter {
       string newPositionZoneText = string.Format("Point: ({0}, {1})", playerPos.X, playerPos.Y);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/PositionLabel").Text = newPositionZoneText;
 
-      var containingZone = state.ContainingZone(playerPos.X, playerPos.Y);
-      if (containingZone == null) {
-        GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneHeaderLabel").Text = "Not In Zone";
-        GetNode<VBoxContainer>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneBlock").Hide();
-      } else {
-        GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneHeaderLabel").Text = containingZone.ZoneName;
-        GetNode<VBoxContainer>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneBlock").Show();
-        // ...that's a really long line, am I abusing the layout?
-        GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneBlock/EnemiesWarningContainer/EnemiesWarningLabel").Text = containingZone.ReadoutEncounterName;
-
-        // This is very fragile!
-        var itemsBasePath = "SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneBlock/ItemsFeatureReadout/ZoneItemReadout/ZoneItems/ZoneItem";
-        var itemReadouts = new List<EntityReadout>(containingZone.ReadoutItems);
-        for (int i = 0; i < 3; i++) {
-          var textureRect = GetNode<TextureRect>(itemsBasePath + (i + 1));
-          if (itemReadouts.Count >= i + 1) {
-            var readout = itemReadouts[i];
-            textureRect.Show();
-            var entity = state.GetEntityById(readout.EntityId);
-            if (entity != null) {
-              textureRect.Texture = GD.Load<Texture>(entity.GetComponent<DisplayComponent>().TexturePath);
-            } else {
-              textureRect.Texture = GD.Load<Texture>("res://resources/checkmark_18x18.png");
-            }
-          } else {
-            textureRect.Hide();
-          }
-        }
-
-        var featuresBasePath = "SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneBlock/ItemsFeatureReadout/ZoneFeaturesReadout/ZoneFeatures/ZoneFeature";
-        var featureReadouts = new List<EntityReadout>(containingZone.ReadoutFeatures);
-        for (int i = 0; i < 2; i++) {
-          var textureRect = GetNode<TextureRect>(featuresBasePath + (i + 1));
-          if (featureReadouts.Count >= i + 1) {
-            var readout = featureReadouts[i];
-            textureRect.Show();
-            var entity = state.GetEntityById(readout.EntityId);
-            if (entity != null) {
-              textureRect.Texture = GD.Load<Texture>(entity.GetComponent<DisplayComponent>().TexturePath);
-            } else {
-              textureRect.Texture = GD.Load<Texture>("res://resources/checkmark_18x18.png");
-            }
-          } else {
-            textureRect.Hide();
-          }
-        }
-        
-      }
+      
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneHeaderLabel").Text = "Not In Zone";
+      GetNode<VBoxContainer>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneBlock").Hide();
     }
 
     public void DisplayScannedEntity(int x, int y, Entity entity) {

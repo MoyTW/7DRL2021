@@ -150,16 +150,10 @@ namespace SpaceDodgeRL.scenes.encounter {
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.WAIT) {
           PlayerWait(state);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.AUTOPILOT) {
-          this._sceneManager.ShowAutopilotMenu(state);
+          state.LogMessage("Autopilot is no longer a thing!", failed: true);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.AUTOEXPLORE) {
-          var playerPos = entity.GetComponent<PositionComponent>().EncounterPosition;
-          var containingZone = state.ContainingZone(playerPos.X, playerPos.Y);
-          if (containingZone != null) {
-            Rulebook.ResolveAction(new AutopilotBeginAction(entity.EntityId, containingZone.ZoneId, AutopilotMode.EXPLORE), this._encounterState);
-            Rulebook.ResolveEndTurn(this._encounterState.Player.EntityId, this._encounterState);
-          } else {
-            state.LogMessage("Player is not within zone!", failed: true);
-          }
+          // TODO: Delete
+          state.LogMessage("Player is not within zone!", failed: true);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.CHARACTER) {
           this._sceneManager.ShowCharacterMenu(state);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.ESCAPE_MENU) {

@@ -76,13 +76,6 @@ namespace SpaceDodgeRL.scenes {
       this.inputHandler.TryInsertInputAction(new InputHandler.InputAction(actionMapping));
     }
 
-    // This could probably be a signal.
-    public void HandleAutopilotMenuClosed(string selectedZoneId) {
-      if (selectedZoneId != null) {
-        encounterRunner.HandleAutopilotSelection(selectedZoneId);
-      }
-    }
-
     // TODO: The many layers of indirection for these menus are vexing but feature-complete first
     public void HandleItemToUseSelected(string itemIdToUse) {
       encounterRunner.HandleUseItemSelection(itemIdToUse);
