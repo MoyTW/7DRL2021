@@ -32,12 +32,10 @@ namespace SpaceDodgeRL.scenes.encounter {
     private float msUntilTurn = 0;
 
     public override void _Process(float delta) {
-      // Special-case for fast (1 frame per action) autopiloting
-      var isAutopiloting = this._encounterState.Player.GetComponent<PlayerComponent>().ActiveAutopilotMode != AutopilotMode.OFF;
       // If it's the player's turn, and there are no animating sprites, we don't need to wait on input for the whole timer
       var isReadyForPlayerInput = IsPlayerTurn(this._encounterState) && !this._encounterState.HasAnimatingSprites;
 
-      if (isAutopiloting || msUntilTurn <= 0 || isReadyForPlayerInput) {
+      if (msUntilTurn <= 0 || isReadyForPlayerInput) {
         RunTurn(this._encounterState, inputHandlerRef);
         msUntilTurn = this._gameSettings.TurnTimeMs / 1000f;
       } else {
@@ -122,11 +120,6 @@ namespace SpaceDodgeRL.scenes.encounter {
 
         var action = inputHandler.PopQueue();
 
-        // If you interrupt autopilot in any way it immediately shuts off
-        if (action != null && entity.GetComponent<PlayerComponent>().ActiveAutopilotMode != AutopilotMode.OFF) {
-          Rulebook.ResolveAction(new AutopilotEndAction(entity.EntityId, AutopilotEndReason.PLAYER_INPUT), state);
-        }
-
         // Super not a fan of the awkwardness of checking this twice! Switch string -> enum, maybe?
         // TODO: this is a jank if & the conditions are hard to read
         if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_N) {
@@ -147,11 +140,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           PlayerMove(state, -1, -1);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.WAIT) {
           PlayerWait(state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.AUTOPILOT) {
-          state.LogMessage("Autopilot is no longer a thing!", failed: true);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.AUTOEXPLORE) {
-          // TODO: Delete
-          state.LogMessage("Player is not within zone!", failed: true);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.CHARACTER) {
           this._sceneManager.ShowCharacterMenu(state);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.ESCAPE_MENU) {
@@ -187,11 +175,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           } else {
             EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, null);
           }
-        } else if (entity.GetComponent<PlayerComponent>().ActiveAutopilotMode == AutopilotMode.TRAVEL) {
-          // TODO: The player sprite lags the true position significantly because the Tween can't keep up
-          PlayerExecuteTurnEndingAction(new AutopilotContinueAction(entity.EntityId), state);
-        } else if (entity.GetComponent<PlayerComponent>().ActiveAutopilotMode == AutopilotMode.EXPLORE) {
-          PlayerExecuteTurnEndingAction(new AutopilotContinueAction(entity.EntityId), state);
         } else if (action != null) {
           GD.Print("No handler yet for ", action);
         }
@@ -241,13 +224,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           }
         }
       }
-    }
-
-    // Instead of calling into runner like this, put it into InputHandler!
-    public void HandleAutopilotSelection(string selectedZoneId) {
-      var playerId = this._encounterState.Player.EntityId;
-      Rulebook.ResolveAction(new AutopilotBeginAction(playerId, selectedZoneId, AutopilotMode.TRAVEL), this._encounterState);
-      Rulebook.ResolveEndTurn(this._encounterState.Player.EntityId, this._encounterState);
     }
 
     public void HandleUseItemSelection(string itemIdToUse) {

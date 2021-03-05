@@ -20,7 +20,6 @@ namespace SpaceDodgeRL.scenes.encounter {
     public override void _Ready() {
       this.GetNode<Button>("VBoxContainer/TopButtonBar/GetButton").Connect("pressed", this, nameof(OnGetButtonPressed));
       this.GetNode<Button>("VBoxContainer/TopButtonBar/JumpButton").Connect("pressed", this, nameof(OnJumpButtonPressed));
-      this.GetNode<Button>("VBoxContainer/TopButtonBar/ExploreZoneButton").Connect("pressed", this, nameof(OnExploreZoneButtonPressed));
       this.GetNode<Button>("VBoxContainer/TopButtonBar/HelpButton").Connect("pressed", this, nameof(OnHelpButtonPressed));
       this.GetNode<Button>("VBoxContainer/BottomButtonBar/CharacterButton").Connect("pressed", this, nameof(OnCharacterButtonPressed));
       this.GetNode<Button>("VBoxContainer/BottomButtonBar/InventoryButton").Connect("pressed", this, nameof(OnInventoryButtonPressed));
@@ -33,10 +32,6 @@ namespace SpaceDodgeRL.scenes.encounter {
 
     private void OnJumpButtonPressed() {
       this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.USE_STAIRS));
-    }
-
-    private void OnExploreZoneButtonPressed() {
-      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.AUTOEXPLORE));
     }
 
     private void OnHelpButtonPressed() {

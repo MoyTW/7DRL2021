@@ -42,7 +42,6 @@ bbcode_text = "[b]Controls[/b]
 Movement: Numpads 1-4, 6-9 or yubnhjkl
 Wait: Numpad 5 or Space
 Autopilot: a
-Autoexplore Current Zone: x
 Get Item: g
 Jump to next sector: <, >
 Character Menu: c
@@ -56,7 +55,6 @@ text = "Controls
 Movement: Numpads 1-4, 6-9 or yubnhjkl
 Wait: Numpad 5 or Space
 Autopilot: a
-Autoexplore Current Zone: x
 Get Item: g
 Jump to next sector: <, >
 Character Menu: c

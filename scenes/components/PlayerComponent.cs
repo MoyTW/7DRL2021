@@ -9,12 +9,6 @@ using SpaceDodgeRL.scenes.entities;
 
 namespace SpaceDodgeRL.scenes.components {
 
-  public static class AutopilotMode {
-    public static string OFF = "AUTOPILOT_MODE_OFF";
-    public static string TRAVEL = "AUTOPILOT_MODE_TRAVEL";
-    public static string EXPLORE = "AUTOPILOT_MODE_EXPLORE";
-  }
-
   public class PlayerComponent : Component {
     public static readonly string ENTITY_GROUP = "PLAYER_COMPONENT_GROUP";
     public string EntityGroup => ENTITY_GROUP;
@@ -40,13 +34,6 @@ namespace SpaceDodgeRL.scenes.components {
     [JsonInclude] public int BaseCuttingLaserPower;
     [JsonIgnore] public int CuttingLaserPower { get => BaseCuttingLaserPower + _TrackerComponent.GetTotalBoost(StatusEffectType.BOOST_POWER); }
 
-    // Autopilot data
-    // Autopilot refers specifically to A -> B movement, whereas autoexplore refers to automatic hoovering of a zone. They are
-    // distinct internally but should both be referred to as "autopilot".
-    [JsonInclude] public string ActiveAutopilotMode { get; private set; } = AutopilotMode.OFF;
-    [JsonInclude] public EncounterPath AutopilotPath { get; private set; }
-    [JsonInclude] public string AutopilotZoneId { get; private set; }
-
     public static PlayerComponent Create(
       int baseCuttingLaserPower = 26,
       int cuttingLaserRange = 3
@@ -55,7 +42,6 @@ namespace SpaceDodgeRL.scenes.components {
 
       component.BaseCuttingLaserPower = baseCuttingLaserPower;
       component.CuttingLaserRange = cuttingLaserRange;
-      component.AutopilotPath = null;
       component.DungeonLevelsWithIntel = new HashSet<int>() { DungeonLevel.ONE };
 
       return component;
@@ -75,29 +61,6 @@ namespace SpaceDodgeRL.scenes.components {
 
     public bool KnowsIntel(int dungeonLevel) {
       return DungeonLevelsWithIntel.Contains(dungeonLevel);
-    }
-
-    public void BeginAutoexploring(string zoneId) {
-      this.ActiveAutopilotMode = AutopilotMode.EXPLORE;
-      this.AutopilotZoneId = zoneId;
-    }
-
-    public void ClearAutopilotPath() {
-      this.AutopilotPath = null;
-    }
-
-    public void LayInAutopilotPathForTravel(EncounterPath path) {
-      this.ActiveAutopilotMode = AutopilotMode.TRAVEL;
-      this.AutopilotPath = path;
-    }
-
-    public void LayInAutopilotPathForExploration(EncounterPath path) {
-      this.AutopilotPath = path;
-    }
-
-    public void StopAutopiloting() {
-      this.ActiveAutopilotMode = AutopilotMode.OFF;
-      this.AutopilotPath = null;
     }
 
     public string Save() {
