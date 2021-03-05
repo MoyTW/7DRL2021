@@ -98,18 +98,11 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       }
     }
 
-    private static bool PlayerSeesEnemies(EncounterState state) {
-      return state.FoVCache.VisibleCells
-          .Select(cell => state.EntitiesAtPosition(cell.X, cell.Y))
-          .Any(entitiesAtPosition => entitiesAtPosition.Any(e => e.GetComponent<AIComponent>() != null &&
-                                                                 !(e.GetComponent<PathAIComponent>() is PathAIComponent)));
-    }
-
     private static bool ResolveAutopilotContinueTravel(EncounterState state) {
       var player = state.Player;
       var path = state.Player.GetComponent<PlayerComponent>().AutopilotPath;
 
-      if (PlayerSeesEnemies(state)) {
+      if (true) {
         ResolveAction(new AutopilotEndAction(player.EntityId, AutopilotEndReason.ENEMY_DETECTED), state);
         return false;
       } else if (!path.AtEnd) {
@@ -150,7 +143,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         state.GetEntityById(r.EntityId).GetComponent<PositionComponent>().EncounterPosition != playerPos
       );
 
-      if (PlayerSeesEnemies(state)) {
+      if (true) {
         ResolveAction(new AutopilotEndAction(player.EntityId, AutopilotEndReason.ENEMY_DETECTED), state);
         return false;
       } // If you are already on a path, progress on the path
@@ -300,9 +293,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         }
         if (actorCollision.OnCollisionSelfDestruct) {
           state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: true);
-          if (state.FoVCache.IsVisible(action.TargetPosition)) {
-            positionComponent.PlayExplosion();
-          }
+          positionComponent.PlayExplosion();
           ResolveAction(new DestroyAction(action.ActorId), state);
         }
         return true;

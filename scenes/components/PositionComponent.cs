@@ -51,6 +51,8 @@ namespace SpaceDodgeRL.scenes.components {
       var explosionSprite = component.GetNode<AnimatedSprite>("ExplosionSprite");
       explosionSprite.Connect("animation_finished", component, nameof(OnExplosionAnimationFinished));
 
+      component.Show();
+
       return component;
     }
 
@@ -67,11 +69,8 @@ namespace SpaceDodgeRL.scenes.components {
       _encounterPosition = position;
       Tween(IndexToVector(position.X, position.Y));
 
-      if (show) {
-        this.Show();
-      } else {
-        this.Hide();
-      }
+      this.Show();
+      
     }
 
     public void Show() {

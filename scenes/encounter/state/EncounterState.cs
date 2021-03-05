@@ -56,7 +56,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public Entity Player { get; private set; }
 
     // Transitory data
-    public FoVCache FoVCache { get; private set; }
     public Random EncounterRand { get; private set; }
     private List<PositionComponent> _animatingSprites = new List<PositionComponent>();
     private DynamicFont _damageFont;
@@ -270,8 +269,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       var oldPosition = positionComponent.EncounterPosition;
 
       this._encounterTiles[oldPosition.X, oldPosition.Y].RemoveEntity(entity);
-      bool shouldBeVisible = entity.GetComponent<DisplayComponent>().VisibleInFoW || this.FoVCache.IsVisible(targetPosition);
-      positionComponent.SetEncounterPosition(targetPosition, shouldBeVisible);
+      positionComponent.SetEncounterPosition(targetPosition, true);
       this._encounterTiles[targetPosition.X, targetPosition.Y].AddEntity(entity);
     }
 
@@ -293,65 +291,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public void UpdateDangerMap() {
       var dangerMap = GetNode<DangerMap>("CanvasLayer/DangerMap");
       dangerMap.UpdateAllTiles(this);
-    }
-
-    private void UpdateFoWForTile(TileMap overlaysMap, int x, int y) {
-      if (!this.IsInBounds(x, y)) {
-        // If you're out of bounds no-op
-      } else if (this.FoVCache.IsVisible(x, y)) {
-        overlaysMap.SetCell(x, y, -1);
-      } else if (this._encounterTiles[x, y].Explored) {
-        overlaysMap.SetCell(x, y, 1);
-      } else {
-        overlaysMap.SetCell(x, y, 2);
-      }
-    }
-
-    private void InitFoWOverlay() {
-      var overlaysMap = GetNode<TileMap>("FoWOverlay");
-
-      for (int x = 0; x < this.MapWidth; x++) {
-        for (int y = 0; y < this.MapWidth; y++) {
-          this.UpdateFoWForTile(overlaysMap, x, y);
-        }
-      }
-    }
-
-    private void UpdateFoWOverlay() {
-      var overlaysMap = GetNode<TileMap>("FoWOverlay");
-      var playerPos = this.Player.GetComponent<PositionComponent>().EncounterPosition;
-
-      // TODO: When you move sometimes long vertical lines appear, there was something about that in a tutorial - hunt that down
-      for (int x = playerPos.X - PLAYER_VISION_RADIUS - 1; x <= playerPos.X + PLAYER_VISION_RADIUS + 1; x++) {
-        for (int y = playerPos.Y - PLAYER_VISION_RADIUS - 1; y <= playerPos.Y + PLAYER_VISION_RADIUS + 1; y++) {
-          this.UpdateFoWForTile(overlaysMap, x, y);
-        }
-      }
-    }
-
-    // Those are very similar but the same, but anywhere you'd want to update your FoV you'd want to update your FoW;
-    // contemplating just eliding one of the two in names?
-    public void UpdateFoVAndFoW() {
-      HashSet<EncounterPosition> oldVisibleCells = this.FoVCache != null ? this.FoVCache.VisibleCells : new HashSet<EncounterPosition>();
-      this.FoVCache = FoVCache.ComputeFoV(this, this.Player.GetComponent<PositionComponent>().EncounterPosition, PLAYER_VISION_RADIUS);
-      var newVisibleCells = FoVCache.VisibleCells;
-
-      // When we recalculate FoW we forcefully show/hide entities in the new FoV
-      foreach (EncounterPosition position in newVisibleCells) {
-        this._encounterTiles[position.X, position.Y].Explored = true;
-        foreach (Entity entity in this._encounterTiles[position.X, position.Y].Entities) {
-          entity.GetComponent<PositionComponent>().Show();
-        }
-      }
-      foreach (EncounterPosition position in oldVisibleCells.Except(newVisibleCells)) {
-        foreach (Entity entity in this._encounterTiles[position.X, position.Y].Entities) {
-          if (!entity.GetComponent<DisplayComponent>().VisibleInFoW) {
-            entity.GetComponent<PositionComponent>().Hide();
-          }
-        }
-      }
-
-      this.UpdateFoWOverlay();
     }
 
     public void UpdatePlayerOverlays() {
@@ -487,8 +426,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       // Populate all our initial caches
       this.LogMessage(string.Format("Level {0} started!", dungeonLevel));
-      this.UpdateFoVAndFoW();
-      this.InitFoWOverlay();
       this.UpdatePlayerOverlays();
       if (this.IsInsideTree()) {
         this.UpdateDangerMap();
@@ -584,8 +521,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       camera.Current = true;
       state.Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(camera);
 
-      state.UpdateFoVAndFoW();
-      state.InitFoWOverlay();
       state.UpdatePlayerOverlays();
 
       stopwatch.Stop();

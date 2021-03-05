@@ -49,7 +49,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         var dangerPositions = CalcDangerPositions(pathEntity, timeToNextPlayerMove);
 
         RotateSpriteTowardsDestination(pathEntity, dangerPositions);
-        foreach (EncounterPosition dangerPosition in dangerPositions.Where(p => state.FoVCache.IsVisible(p))) {
+        foreach (EncounterPosition dangerPosition in dangerPositions) {
           // If we have a fully immobile, invincible entity at the position we stop the path - otherwise we still draw it.
           var blockingEntity = state.BlockingEntityAtPosition(dangerPosition.X, dangerPosition.Y);
           if (blockingEntity != null &&
@@ -128,7 +128,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       return aiComponent != null &&
         !(aiComponent is PathAIComponent) &&
-        state.FoVCache.IsVisible(entityPos) &&
         entity.GetComponent<ActionTimeComponent>().NextTurnAtTick < nextPlayerTick;
     }
 

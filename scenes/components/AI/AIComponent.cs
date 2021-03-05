@@ -21,15 +21,6 @@ namespace SpaceDodgeRL.scenes.components.AI {
     public abstract List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent);
 
     public List<EncounterAction> DecideNextAction(EncounterState state, Entity parent) {
-      if (!state.GroupActivated(this.ActivationGroupId)) {
-        var position = parent.GetComponent<PositionComponent>().EncounterPosition;
-        if (state.FoVCache.IsVisible(position.X, position.Y)) {
-          state.ActivateGroup(this.ActivationGroupId);
-        } else {
-          return new List<EncounterAction>() { new WaitAction(parent.EntityId) };
-        }
-      }
-
       return _DecideNextAction(state, parent);
     }
 

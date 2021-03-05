@@ -79,7 +79,6 @@ namespace SpaceDodgeRL.scenes.encounter {
 
       // After the player executes their turn we need to update the UI
       EmitSignal(nameof(EncounterRunner.TurnEnded));
-      state.UpdateFoVAndFoW();
       state.UpdatePlayerOverlays();
       state.UpdateDangerMap();
     }
