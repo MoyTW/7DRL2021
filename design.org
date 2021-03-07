@@ -1,3 +1,5 @@
+Commenced at Saturday March 6, 8pm Pacific time.
+
 * Summary
 
 A roguelike where you're one participant of many. Think a single footsoldier in
