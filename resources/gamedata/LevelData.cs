@@ -5,6 +5,7 @@ namespace SpaceDodgeRL.resources.gamedata {
 
   public static class EntityDefId {
     // Enemies
+    public static string MARCHER = "ENTITY_DEF_ID_MARCHER";
     public static string SCOUT = "ENTITY_DEF_ID_SCOUT";
     public static string FIGHTER = "ENTITY_DEF_ID_FIGHTER";
     public static string GUNSHIP = "ENTITY_DEF_ID_GUNSHIP";

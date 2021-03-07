@@ -43,7 +43,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public int DungeonLevel { get; private set; }
 
     // Entity tracking
-    private Dictionary<string, bool> _activationTracker;
+    private Dictionary<string, Unit> _unitTracker;
     private Dictionary<string, Entity> _entitiesById;
 
     // Time & runner state
@@ -143,7 +143,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     }
 
     public bool IsPositionBlocked(int x, int y) {
-      return BlockingEntityAtPosition(x, y) != null;
+      return false; // TODO: Trees or something, maybe.
     }
 
     public bool IsPositionVisible(int x, int y) {
@@ -258,15 +258,15 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       this._encounterTiles[targetPosition.X, targetPosition.Y].AddEntity(entity);
     }
 
-    public bool GroupActivated(string activationGroupId) {
-      if (!this._activationTracker.ContainsKey(activationGroupId)) {
-        this._activationTracker[activationGroupId] = false;
-      }
-      return this._activationTracker[activationGroupId];
+    public void AddUnit(string unitId, Unit unit) {
+      this._unitTracker[unitId] = unit;
     }
 
-    public void ActivateGroup(string activationGroupId) {
-      this._activationTracker[activationGroupId] = true;
+    public Unit GetUnit(string unitId) {
+      if (!this._unitTracker.ContainsKey(unitId)) {
+        throw new NotImplementedException();
+      }
+      return this._unitTracker[unitId];
     }
 
     #endregion
@@ -381,7 +381,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       // This class is kinda becoming a monster WRT "here's a cached thing for perf/getting around Godot reasons!"
       this._encounterLog = new List<string>();
       this._entitiesById = new Dictionary<string, Entity>();
-      this._activationTracker = new Dictionary<string, bool>();
+      this._unitTracker = new Dictionary<string, Unit>();
       this.RunStatus = EncounterState.RUN_STATUS_RUNNING;
       this._actionTimeline = new ActionTimeline(0);
       // We also need to reset the player's action time
@@ -424,7 +424,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       public int MapHeight { get; set; }
       public List<Entity> Entities { get; set; }
       public string EncounterTileExploration { get; set; }
-      public Dictionary<string, bool> ActivationTracker { get; set; }
+      public Dictionary<string, Unit> UnitTracker { get; set; }
       public string RunStatus { get; set; }
       public ActionTimeline.SaveData ActionTimeline { get; set; }
       public string PlayerId { get; set; }
@@ -479,7 +479,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       foreach (var entity in data.Entities) {
         state.AddChild(entity);
       }
-      state._activationTracker = data.ActivationTracker;
+      state._unitTracker = data.UnitTracker;
       state.RunStatus = data.RunStatus != null ? data.RunStatus : EncounterState.RUN_STATUS_RUNNING;
       state._actionTimeline = ActionTimeline.FromSaveData(data.ActionTimeline, entitiesById);
       state.Player = entitiesById[data.PlayerId];
@@ -538,7 +538,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       data.EncounterTileExploration = builder.ToString();
 
       data.Entities = this._entitiesById.Values.ToList();
-      data.ActivationTracker = this._activationTracker;
+      data.UnitTracker = this._unitTracker;
       data.RunStatus = this.RunStatus;
       data.ActionTimeline = this._actionTimeline.ToSaveData();
       data.PlayerId = this.Player.EntityId;

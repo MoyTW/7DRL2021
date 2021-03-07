@@ -10,13 +10,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
     List<EncounterAction> DecideNextAction(EncounterState state, Entity parent);
   }
 
-  public abstract class ActivatableAIComponent : AIComponent {
+  public abstract class DeciderAIComponent : AIComponent {
     public abstract string EntityGroup { get; }
-    public string ActivationGroupId { get; protected set; }
-
-    public ActivatableAIComponent(string activationGroupId) {
-      this.ActivationGroupId = activationGroupId;
-    }
 
     public abstract List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent);
 

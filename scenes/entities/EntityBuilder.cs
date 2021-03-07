@@ -69,6 +69,26 @@ namespace SpaceDodgeRL.scenes.entities {
       return newEntity;
     }
 
+    public static Entity CreateManipularEntity(int currentTick, int formationNumber, Unit unit) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "marcher");
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      e.AddComponent(new ManipularAIComponent(formationNumber, unit.UnitId));
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 10));
+      e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
+      e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(XPValueComponent.Create(xpValue: 30));
+
+      unit.BattleReadyEntities.Add(e.EntityId);
+
+      return e;
+    }
+
     private static Entity CreateExtraBatteryEntity() {
       var e = CreateEntity(Guid.NewGuid().ToString(), "extra battery");
 

@@ -38,7 +38,23 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       InitializeMapAndAddBorderWalls(state, width, height);
 
       // Add the player to the map
-      state.PlaceEntity(player, new EncounterPosition(width / 2, height / 2));
+      var playerPos = new EncounterPosition(width / 2, height / 2);
+      state.PlaceEntity(player, playerPos);
+      
+      string uid = "unit";
+      var unit = new Unit(uid, playerPos, FormationType.MANIPULE_OPENED, FormationFacing.EAST);
+      state.AddUnit(uid, unit);
+
+      for (int x = 0; x < 10; x++) {
+        for (int y = 0; y < 12; y++) {
+          if (!(x == 0 && y == 1)) {
+            var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, unit);
+            var nextToPlayer = new EncounterPosition(playerPos.X + x * 3 - 7, playerPos.Y + y * 3);
+            state.PlaceEntity(marcher, nextToPlayer);
+          }
+        }
+      }
+      
       /*
       var nextToPlayer = new EncounterPosition(zones[playerZoneIdx].Center.X + 2, zones[playerZoneIdx].Center.Y + 1);
       state.PlaceEntity(EntityBuilder.CreateItemByEntityDefId(EntityDefId.ITEM_RED_PAINT), nextToPlayer);
