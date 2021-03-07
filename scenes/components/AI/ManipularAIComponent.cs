@@ -136,10 +136,15 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
       this.TestTimer += 1;
-      if (this.TestTimer == 15) {
-        state.GetUnit(this.UnitId).UnitFormation = FormationType.MANIPULE_OPENED;
+      if (this.TestTimer == 20 && this.FormationNumber == 0) {
+        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
       }
-      if (this.TestTimer == 25) {
+      if (this.TestTimer == 30 && this.FormationNumber == 0) {
+        state.GetUnit(this.UnitId).UnitFormation = FormationType.MANIPULE_OPENED;
+        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.REFORM;
+        state.GetUnit(this.UnitId).CenterPosition = parent.GetComponent<PositionComponent>().EncounterPosition;
+      }
+      if (this.TestTimer == 40 && this.FormationNumber == 0) {
         state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
       }
 

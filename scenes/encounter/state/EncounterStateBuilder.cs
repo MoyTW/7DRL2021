@@ -34,6 +34,33 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       }
     }
 
+    private static void CreateUnit(Random seededRand, EncounterState state, string unitId, FactionName faction, EncounterPosition center,
+        UnitOrder order, FormationType type, FormationFacing facing, int size) {
+      var unit = new Unit(unitId, center, order, type, facing);
+      state.AddUnit(unit);
+
+      var width = (int)Math.Ceiling(Math.Sqrt(size));
+      
+      List<EncounterPosition> positions = new List<EncounterPosition>();
+      for (int x = 0 - width; x < width; x++) {
+        for (int y = 0 - width; y < width; y++) {
+          positions.Add(new EncounterPosition(x, y));
+        }
+      }
+      for (int i = positions.Count - 1; i > 1; i--) {
+        int rnd = seededRand.Next(i + 1);  
+
+        EncounterPosition value = positions[rnd];  
+        positions[rnd] = positions[i];  
+        positions[i] = value;
+      }
+
+      for (int i = 0; i < size; i++) {
+        var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, i, unit, faction);
+        state.PlaceEntity(marcher, new EncounterPosition(center.X + positions[i].X, center.Y + positions[i].Y));
+      }
+    }
+
     public static void PopulateStateForLevel(Entity player, int dungeonLevel, EncounterState state, Random seededRand,
         int width = 300, int height = 300, int maxZoneGenAttempts = 100) {
       InitializeMapAndAddBorderWalls(state, width, height);
@@ -41,30 +68,21 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       // Add the player to the map
       var playerPos = new EncounterPosition(width / 2, height / 2);
       state.PlaceEntity(player, playerPos);
-      
-      var punit = new Unit("player test unit", playerPos, UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH);
-      state.AddUnit(punit);
 
-      for (int x = 0; x < 10; x++) {
-        for (int y = 0; y < 9; y++) {
-          if (!(x == 0 && y == 1)) {
-            var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, punit, FactionName.PLAYER);
-            var nextToPlayer = new EncounterPosition(playerPos.X + x - 7, playerPos.Y - y * 2);
-            state.PlaceEntity(marcher, nextToPlayer);
-          }
-        }
-      }
+      CreateUnit(seededRand, state, "test player center", FactionName.PLAYER, new EncounterPosition(playerPos.X + 20, playerPos.Y - 15),
+        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 64);
+      CreateUnit(seededRand, state, "test player left", FactionName.PLAYER, new EncounterPosition(playerPos.X, playerPos.Y - 15),
+        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 95);
+      CreateUnit(seededRand, state, "test player right", FactionName.PLAYER, new EncounterPosition(playerPos.X - 20, playerPos.Y - 15),
+        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 34);
 
-      var eunit = new Unit("enemy test unit", new EncounterPosition(playerPos.X, playerPos.Y + 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.NORTH);
-      state.AddUnit(eunit);
+      CreateUnit(seededRand, state, "test enemy center", FactionName.ENEMY, new EncounterPosition(playerPos.X, playerPos.Y + 40),
+        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.NORTH, 78);
+      CreateUnit(seededRand, state, "test enemy left", FactionName.ENEMY, new EncounterPosition(playerPos.X - 20, playerPos.Y + 40),
+        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.NORTH, 70);
+      CreateUnit(seededRand, state, "test enemy right", FactionName.ENEMY, new EncounterPosition(playerPos.X + 20, playerPos.Y + 40),
+        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.NORTH, 57);
 
-      for (int x = 0; x < 10; x++) {
-        for (int y = 0; y < 9; y++) {
-          var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, eunit, FactionName.ENEMY);
-            var nextToPlayer = new EncounterPosition(playerPos.X + x - 7, playerPos.Y + 15 + y * 2);
-            state.PlaceEntity(marcher, nextToPlayer);
-        }
-      }
       
       /*
       var nextToPlayer = new EncounterPosition(zones[playerZoneIdx].Center.X + 2, zones[playerZoneIdx].Center.Y + 1);
