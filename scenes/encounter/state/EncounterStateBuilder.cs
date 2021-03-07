@@ -48,8 +48,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       for (int x = 0; x < 10; x++) {
         for (int y = 0; y < 9; y++) {
           if (!(x == 0 && y == 1)) {
-            var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, punit, Faction.PLAYER);
-            var nextToPlayer = new EncounterPosition(playerPos.X + x * 3 - 7, playerPos.Y + y * 2);
+            var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, punit, FactionName.PLAYER);
+            var nextToPlayer = new EncounterPosition(playerPos.X + x * 2 - 7, playerPos.Y + y * 2);
             state.PlaceEntity(marcher, nextToPlayer);
           }
         }
@@ -60,8 +60,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       for (int x = 0; x < 10; x++) {
         for (int y = 0; y < 9; y++) {
-          var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, eunit, Faction.ENEMY);
-            var nextToPlayer = new EncounterPosition(playerPos.X + x * 3 - 7, playerPos.Y + y * 2);
+          var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, eunit, FactionName.ENEMY);
+            var nextToPlayer = new EncounterPosition(playerPos.X + x * 2 - 7, playerPos.Y + y * 2);
             state.PlaceEntity(marcher, nextToPlayer);
         }
       }

@@ -6,7 +6,7 @@ using SpaceDodgeRL.scenes.entities;
 
 namespace SpaceDodgeRL.scenes.components {
 
-  public enum Faction {
+  public enum FactionName {
     PLAYER,
     ENEMY
   }
@@ -15,9 +15,9 @@ namespace SpaceDodgeRL.scenes.components {
     public static readonly string ENTITY_GROUP = "FACTION_COMPONENT_GROUP";
     public string EntityGroup => ENTITY_GROUP;
 
-    [JsonInclude] public Faction Faction { get; private set; }
+    [JsonInclude] public FactionName Faction { get; private set; }
     
-    public static FactionComponent Create(Faction faction) {
+    public static FactionComponent Create(FactionName faction) {
       var component = new FactionComponent();
 
       component.Faction = faction;
@@ -25,8 +25,8 @@ namespace SpaceDodgeRL.scenes.components {
       return component;
     }
 
-    public static DisplayComponent Create(string saveData) {
-      return JsonSerializer.Deserialize<DisplayComponent>(saveData);
+    public static FactionComponent Create(string saveData) {
+      return JsonSerializer.Deserialize<FactionComponent>(saveData);
     }
 
     public string Save() {

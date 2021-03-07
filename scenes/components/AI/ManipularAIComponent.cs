@@ -108,17 +108,29 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var actions = new List<EncounterAction>();
 
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+      var thisFaction = parent.GetComponent<FactionComponent>().Faction;
 
-      var movement = Rotate(0, -1, state.GetUnit(this.UnitId).UnitFacing);
-      actions.Add(new MoveAction(parent.EntityId, new EncounterPosition(parentPos.X + movement.Item1, parentPos.Y + movement.Item2)));
-
-      /*for (int x = parentPos.X - 2; x <= parentPos.X + 2; x++) {
+      // TODO: build a danger map?
+      for (int x = parentPos.X - 2; x <= parentPos.X + 2; x++) {
         for (int y = parentPos.Y - 2; y <= parentPos.Y + 2; y++) {
           foreach (Entity e in state.EntitiesAtPosition(x, y)) {
+            var factionComponent = e.GetComponent<FactionComponent>();
+            if (factionComponent != null && factionComponent.Faction != thisFaction) {
+              actions.Add(new WaitAction(parent.EntityId));
+              return actions;
+            }
           }
         }
-      }*/
+      }
 
+      var moveVec = Rotate(0, -1, state.GetUnit(this.UnitId).UnitFacing);
+      var targetPos = new EncounterPosition(parentPos.X + moveVec.Item1, parentPos.Y + moveVec.Item2);
+      if (state.EntitiesAtPosition(targetPos.X, targetPos.Y).Count == 0) {
+        actions.Add(new MoveAction(parent.EntityId, targetPos));
+      } else {
+        actions.Add(new WaitAction(parent.EntityId));
+      }
+      
       return actions;
     }
 

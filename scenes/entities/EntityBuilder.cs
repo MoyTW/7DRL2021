@@ -69,7 +69,7 @@ namespace SpaceDodgeRL.scenes.entities {
       return newEntity;
     }
 
-    public static Entity CreateManipularEntity(int currentTick, int formationNumber, Unit unit, Faction faction) {
+    public static Entity CreateManipularEntity(int currentTick, int formationNumber, Unit unit, FactionName faction) {
       var e = CreateEntity(Guid.NewGuid().ToString(), "marcher");
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
@@ -162,7 +162,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: false));
       e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 100, isInvincible: false));
       e.AddComponent(DisplayComponent.Create(_texPlayerPath, "It's you!", false, ENTITY_Z_INDEX));
-      e.AddComponent(FactionComponent.Create(Faction.PLAYER));
+      e.AddComponent(FactionComponent.Create(FactionName.PLAYER));
       e.AddComponent(InventoryComponent.Create(inventorySize: 26));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.PLAYER_DEFEAT }));
       e.AddComponent(PlayerComponent.Create());
