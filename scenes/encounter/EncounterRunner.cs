@@ -52,27 +52,6 @@ namespace SpaceDodgeRL.scenes.encounter {
         return;
       }
 
-      // Picks a target in range & fires a projectile
-      // PERF: Iterating literally every action entity every time is very silly
-      var playerPosition = player.GetComponent<PositionComponent>().EncounterPosition;
-      PositionComponent closestEnemyPosition = null;
-      float closestEnemyDistance = int.MaxValue;
-      foreach (Entity actionEntity in state.ActionEntities()) {
-        if (actionEntity.GetComponent<AIComponent>() != null && actionEntity.GetComponent<PathAIComponent>() == null) {
-          var actionEntityPositionComponent = actionEntity.GetComponent<PositionComponent>();
-          var distance = actionEntityPositionComponent.EncounterPosition.DistanceTo(playerPosition);
-          if (distance < closestEnemyDistance) {
-            closestEnemyPosition = actionEntityPositionComponent;
-            closestEnemyDistance = distance;
-          }
-        }
-      }
-      var playerComponent = player.GetComponent<PlayerComponent>();
-      if (closestEnemyPosition != null && closestEnemyDistance <= playerComponent.CuttingLaserRange) {
-        var fireAction = FireProjectileAction.CreateCuttingLaserAction(
-          player.EntityId, playerComponent.CuttingLaserPower, closestEnemyPosition.EncounterPosition);
-        Rulebook.ResolveAction(fireAction, state);
-      }
       Rulebook.ResolveEndTurn(player.EntityId, state);
 
       // After the player executes their turn we need to update the UI
