@@ -258,8 +258,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       this._encounterTiles[targetPosition.X, targetPosition.Y].AddEntity(entity);
     }
 
-    public void AddUnit(string unitId, Unit unit) {
-      this._unitTracker[unitId] = unit;
+    public void AddUnit(Unit unit) {
+      this._unitTracker[unit.UnitId] = unit;
     }
 
     public Unit GetUnit(string unitId) {

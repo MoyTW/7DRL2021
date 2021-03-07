@@ -6,6 +6,7 @@ using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -18,9 +19,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
     [JsonInclude] public int FormationNumber { get; private set; }
     [JsonInclude] public string UnitId { get; private set; }
 
+    public int TestTimer { get; set; }
+
     public ManipularAIComponent(int formationNumber, string unitId) {
       this.FormationNumber = formationNumber;
       this.UnitId = unitId;
+
+      this.TestTimer = 0;
     }
 
     public static ManipularAIComponent Create(string saveData) {
@@ -76,7 +81,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
     }
 
-    public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
+    private List<EncounterAction> _ActionsForUnitReform(EncounterState state, Entity parent) {
       var actions = new List<EncounterAction>();
 
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
@@ -97,6 +102,40 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
 
       return actions;
+    }
+
+    private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent) {
+      var actions = new List<EncounterAction>();
+
+      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+
+      var movement = Rotate(0, -1, state.GetUnit(this.UnitId).UnitFacing);
+      actions.Add(new MoveAction(parent.EntityId, new EncounterPosition(parentPos.X + movement.Item1, parentPos.Y + movement.Item2)));
+
+      /*for (int x = parentPos.X - 2; x <= parentPos.X + 2; x++) {
+        for (int y = parentPos.Y - 2; y <= parentPos.Y + 2; y++) {
+          foreach (Entity e in state.EntitiesAtPosition(x, y)) {
+          }
+        }
+      }*/
+
+      return actions;
+    }
+
+    public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
+      this.TestTimer += 1;
+      if (this.TestTimer > 20) {
+        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
+      }
+
+      var unit = state.GetUnit(this.UnitId);
+      if (unit.StandingOrder == UnitOrder.REFORM) {
+        return _ActionsForUnitReform(state, parent);
+      } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
+        return _ActionsForUnitAdvance(state, parent);
+      } else {
+        throw new NotImplementedException();
+      }
     }
 
     public override string Save() {
