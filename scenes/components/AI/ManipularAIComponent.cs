@@ -136,7 +136,10 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
       this.TestTimer += 1;
-      if (this.TestTimer > 20) {
+      if (this.TestTimer == 15) {
+        state.GetUnit(this.UnitId).UnitFormation = FormationType.MANIPULE_OPENED;
+      }
+      if (this.TestTimer == 25) {
         state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
       }
 

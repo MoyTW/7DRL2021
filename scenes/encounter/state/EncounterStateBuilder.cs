@@ -42,26 +42,26 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       var playerPos = new EncounterPosition(width / 2, height / 2);
       state.PlaceEntity(player, playerPos);
       
-      var punit = new Unit("player test unit", playerPos, UnitOrder.REFORM, FormationType.MANIPULE_OPENED, FormationFacing.SOUTH);
+      var punit = new Unit("player test unit", playerPos, UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH);
       state.AddUnit(punit);
 
       for (int x = 0; x < 10; x++) {
         for (int y = 0; y < 9; y++) {
           if (!(x == 0 && y == 1)) {
             var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, punit, FactionName.PLAYER);
-            var nextToPlayer = new EncounterPosition(playerPos.X + x * 2 - 7, playerPos.Y + y * 2);
+            var nextToPlayer = new EncounterPosition(playerPos.X + x - 7, playerPos.Y - y * 2);
             state.PlaceEntity(marcher, nextToPlayer);
           }
         }
       }
 
-      var eunit = new Unit("enemy test unit", new EncounterPosition(playerPos.X, playerPos.Y + 15), UnitOrder.REFORM, FormationType.MANIPULE_OPENED, FormationFacing.NORTH);
+      var eunit = new Unit("enemy test unit", new EncounterPosition(playerPos.X, playerPos.Y + 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.NORTH);
       state.AddUnit(eunit);
 
       for (int x = 0; x < 10; x++) {
         for (int y = 0; y < 9; y++) {
           var marcher = EntityBuilder.CreateManipularEntity(state.CurrentTick, x + 10 * y, eunit, FactionName.ENEMY);
-            var nextToPlayer = new EncounterPosition(playerPos.X + x * 2 - 7, playerPos.Y + y * 2);
+            var nextToPlayer = new EncounterPosition(playerPos.X + x - 7, playerPos.Y + 15 + y * 2);
             state.PlaceEntity(marcher, nextToPlayer);
         }
       }
