@@ -75,11 +75,12 @@ namespace SpaceDodgeRL.scenes.entities {
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
-      e.AddComponent(new ManipularAIComponent(formationNumber, unit.UnitId));
+      e.AddComponent(new HastatusAIComponent(formationNumber, unit.UnitId));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 3));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 10));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 25));
       e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));

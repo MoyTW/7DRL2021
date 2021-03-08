@@ -14,6 +14,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
   public static class Rulebook {
     // ...can't I just do <> like I can in Kotlin? C# why you no let me do this. Probably because "evolving languages are hard".
     private static Dictionary<ActionType, Func<EncounterAction, EncounterState, bool>> _actionMapping = new Dictionary<ActionType, Func<EncounterAction, EncounterState, bool>>() {
+      { ActionType.MELEE_ATTACK, (a, s) => ResolveMeleeAttack(a as MeleeAttackAction, s) },
       { ActionType.MOVE, (a, s) => ResolveMove(a as MoveAction, s) },
       { ActionType.FIRE_PROJECTILE, (a, s) => ResolveFireProjectile(a as FireProjectileAction, s) },
       { ActionType.GET_ITEM, (a, s) => ResolveGetItem(a as GetItemAction, s) },
@@ -62,7 +63,10 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       }
     }
 
-    private static void Attack(Entity attacker, Entity defender, EncounterState state) {
+    private static bool ResolveMeleeAttack(MeleeAttackAction action, EncounterState state) {
+      Entity attacker = state.GetEntityById(action.ActorId);
+      Entity defender = action.TargetEntity;
+
       var attackerComponent = attacker.GetComponent<AttackerComponent>();
       var defenderComponent = defender.GetComponent<DefenderComponent>();
 
@@ -94,6 +98,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
             LogAttack(defenderComponent, logMessage, state);
         }
       }
+      return true;
     }
 
     private static bool ResolveMove(MoveAction action, EncounterState state) {
@@ -103,20 +108,22 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       if (positionComponent.EncounterPosition == action.TargetPosition) {
         GD.PrintErr(string.Format("Entity {0}:{1} tried to move to its current position {2}", actor.EntityName, actor.EntityId, action.TargetPosition));
         return false;
-      } else if (state.IsPositionBlocked(action.TargetPosition)) {
-        var blocker = state.BlockingEntityAtPosition(action.TargetPosition.X, action.TargetPosition.Y);
-        var actorCollision = actor.GetComponent<CollisionComponent>();
+      }
+      // else if (state.IsPositionBlocked(action.TargetPosition)) {
+      //   var blocker = state.BlockingEntityAtPosition(action.TargetPosition.X, action.TargetPosition.Y);
+      //   var actorCollision = actor.GetComponent<CollisionComponent>();
 
-        if (actorCollision.OnCollisionAttack) {
-          Attack(actor, blocker, state);
-        }
-        if (actorCollision.OnCollisionSelfDestruct) {
-          state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: true);
-          positionComponent.PlayExplosion();
-          ResolveAction(new DestroyAction(action.ActorId), state);
-        }
-        return true;
-      } else {
+      //   if (actorCollision.OnCollisionAttack) {
+      //     Attack(actor, blocker, state);
+      //   }
+      //   if (actorCollision.OnCollisionSelfDestruct) {
+      //     state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: true);
+      //     positionComponent.PlayExplosion();
+      //     ResolveAction(new DestroyAction(action.ActorId), state);
+      //   }
+      //   return true;
+      // } 
+      else {
         state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: false);
         return true;
       }

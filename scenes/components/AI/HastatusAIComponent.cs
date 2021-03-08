@@ -1,4 +1,3 @@
-using Godot;
 using SpaceDodgeRL.library.encounter;
 using SpaceDodgeRL.library.encounter.rulebook;
 using SpaceDodgeRL.library.encounter.rulebook.actions;
@@ -12,72 +11,33 @@ using System.Text.Json.Serialization;
 
 namespace SpaceDodgeRL.scenes.components.AI {
 
-  public class ManipularAIComponent : DeciderAIComponent {
+  public class HastatusAIComponent : DeciderAIComponent {
     public static readonly string ENTITY_GROUP = "MARCHER_AI_COMPONENT_GROUP";
     public override string EntityGroup => ENTITY_GROUP;
 
     [JsonInclude] public int FormationNumber { get; private set; }
     [JsonInclude] public string UnitId { get; private set; }
+    [JsonInclude] public int PilasRemaining { get; private set; }
 
     public int TestTimer { get; set; }
 
-    public ManipularAIComponent(int formationNumber, string unitId) {
+    public HastatusAIComponent(int formationNumber, string unitId) {
       this.FormationNumber = formationNumber;
       this.UnitId = unitId;
+      this.PilasRemaining = 1;
 
       this.TestTimer = 0;
     }
 
-    public static ManipularAIComponent Create(string saveData) {
-      return JsonSerializer.Deserialize<ManipularAIComponent>(saveData);
-    }
-
-    private static Tuple<int, int> Rotate(int x, int y, FormationFacing facing) {
-      if (facing == FormationFacing.NORTH) {
-        return new Tuple<int, int>(x, y);
-      } else if (facing == FormationFacing.EAST) {
-        return new Tuple<int, int>(-y, x);
-      } else if (facing == FormationFacing.SOUTH) {
-        return new Tuple<int, int>(-x, -y);
-      } else if (facing == FormationFacing.WEST) {
-        return new Tuple<int, int>(y, -x);
-      } else {
-        throw new NotImplementedException();
-      }
-    }
-
-    private static EncounterPosition PositionInManipuleClosed(int formationNumber, Unit unit) {
-      EncounterPosition center = unit.CenterPosition;
-      
-      int dx = formationNumber % 10;
-      int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
-      Tuple<int, int> rotated = Rotate(dx, dy, unit.UnitFacing);
-      return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
-    }
-
-    private static EncounterPosition PositionInManipuleOpened(int formationNumber, Unit unit) {
-      int numInFormation = unit.BattleReadyEntities.Count;
-      EncounterPosition center = unit.CenterPosition;
-      int halfFormation = numInFormation / 2 + 1;
-
-      if (formationNumber < halfFormation) {
-        int dx = formationNumber % 10;
-        int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
-        var rotated = Rotate(dx, dy, unit.UnitFacing);
-        return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
-      } else {
-        int dx = formationNumber % 10 - 10;
-        int dy = Mathf.FloorToInt((formationNumber - halfFormation) / 10) - 1;
-        var rotated = Rotate(dx, dy, unit.UnitFacing);
-        return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
-      }
+    public static HastatusAIComponent Create(string saveData) {
+      return JsonSerializer.Deserialize<HastatusAIComponent>(saveData);
     }
 
     private static EncounterPosition _DecideFormationPosition(int formationNumber, EncounterPosition center, Unit unit) {
       if (unit.UnitFormation == FormationType.MANIPULE_CLOSED) {
-        return PositionInManipuleClosed(formationNumber, unit);
+        return AIUtils.PositionInManipuleClosed(formationNumber, unit);
       } else {
-        return PositionInManipuleOpened(formationNumber, unit);
+        return AIUtils.PositionInManipuleOpened(formationNumber, unit);
       }
     }
 
@@ -104,32 +64,65 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return actions;
     }
 
+    private static List<Entity> HostilesInPosition(EncounterState state, FactionName parentFaction, int x, int y) {
+      var hostiles = new List<Entity>();
+      foreach (Entity e in state.EntitiesAtPosition(x, y)) {
+        var factionComponent = e.GetComponent<FactionComponent>();
+        if (factionComponent != null && factionComponent.Faction != parentFaction) {
+          hostiles.Add(e);
+        }
+      }
+      return hostiles;
+    }
+
     private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent) {
       var actions = new List<EncounterAction>();
 
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
-      var thisFaction = parent.GetComponent<FactionComponent>().Faction;
+      var parentFaction = parent.GetComponent<FactionComponent>().Faction;
 
       // TODO: build a danger map?
-      for (int x = parentPos.X - 2; x <= parentPos.X + 2; x++) {
-        for (int y = parentPos.Y - 2; y <= parentPos.Y + 2; y++) {
-          foreach (Entity e in state.EntitiesAtPosition(x, y)) {
-            var factionComponent = e.GetComponent<FactionComponent>();
-            if (factionComponent != null && factionComponent.Faction != thisFaction) {
-              //actions.Add(new WaitAction(parent.EntityId));
-              actions.Add(FireProjectileAction.CreatePilaAction(parent.EntityId, e));
-              return actions;
+      // TODO: throw OVER the heads of the engaged line
+      if (this.PilasRemaining > 0) {
+        for (int x = parentPos.X - 3; x <= parentPos.X + 3; x++) {
+          for (int y = parentPos.Y - 3; y <= parentPos.Y + 3; y++) {
+            var possibleHostiles = HostilesInPosition(state, parentFaction, x, y);
+            if (possibleHostiles.Count > 0) {
+              actions.Add(FireProjectileAction.CreatePilaAction(parent.EntityId, possibleHostiles[0]));
+                this.PilasRemaining -= 1;
+                return actions;
             }
           }
         }
       }
 
-      var moveVec = Rotate(0, -1, state.GetUnit(this.UnitId).UnitFacing);
+      var moveVec = AIUtils.Rotate(0, -1, state.GetUnit(this.UnitId).UnitFacing);
       var targetPos = new EncounterPosition(parentPos.X + moveVec.Item1, parentPos.Y + moveVec.Item2);
       if (state.EntitiesAtPosition(targetPos.X, targetPos.Y).Count == 0) {
+        // Move
         actions.Add(new MoveAction(parent.EntityId, targetPos));
+        // Attack TODO: replace this with charge
+        var adjacentHostiles = new List<Entity>();
+        foreach (var newpos in state.AdjacentPositions(targetPos)) {
+          adjacentHostiles.AddRange(HostilesInPosition(state, parentFaction, newpos.X, newpos.Y));
+        }
+        // TODO: don't attack randomly
+        if (adjacentHostiles.Count > 0) {
+          var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
+          actions.Add(new MeleeAttackAction(parent.EntityId, target));
+        }
       } else {
-        actions.Add(new WaitAction(parent.EntityId));
+        var adjacentHostiles = new List<Entity>();
+        foreach (var newpos in state.AdjacentPositions(parentPos)) {
+          adjacentHostiles.AddRange(HostilesInPosition(state, parentFaction, newpos.X, newpos.Y));
+        }
+        // TODO: don't attack randomly
+        if (adjacentHostiles.Count > 0) {
+          var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
+          actions.Add(new MeleeAttackAction(parent.EntityId, target));
+        } else {
+          actions.Add(new WaitAction(parent.EntityId));
+        }
       }
       
       return actions;

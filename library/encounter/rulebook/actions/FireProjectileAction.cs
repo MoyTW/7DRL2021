@@ -45,7 +45,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook.actions {
       return new FireProjectileAction(
         actorId,
         ProjectileType.PILA,
-        power: 5, // TODO: Pila power
+        power: 2, // TODO: Pila power
         (sourcePos) => EncounterPathBuilder.BuildArcingPath(sourcePos, targetPosition),
         target,
         speed: 1
