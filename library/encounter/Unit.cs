@@ -5,7 +5,8 @@ namespace SpaceDodgeRL.library.encounter {
 
   public enum FormationType {
     MANIPULE_CLOSED,
-    MANIPULE_OPENED
+    MANIPULE_OPENED,
+    LINE_20
   }
 
   public enum FormationFacing {

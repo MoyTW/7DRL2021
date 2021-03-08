@@ -70,11 +70,24 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
     }
 
+    private static EncounterPosition _PositionInLine20(int formationNumber, Unit unit) {
+      EncounterPosition center = unit.CenterPosition;
+      
+      int dx = formationNumber % 20 - 10;
+      int dy = Mathf.FloorToInt(formationNumber / 20) - 1;
+      Tuple<int, int> rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+      return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
+    }
+
     private static EncounterPosition _DecideFormationPosition(int formationNumber, EncounterPosition center, Unit unit) {
       if (unit.UnitFormation == FormationType.MANIPULE_CLOSED) {
         return AIUtils._PositionInManipuleClosed(formationNumber, unit);
-      } else {
+      } else if (unit.UnitFormation == FormationType.MANIPULE_OPENED) {
         return AIUtils._PositionInManipuleOpened(formationNumber, unit);
+      } else if (unit.UnitFormation == FormationType.LINE_20) {
+        return AIUtils._PositionInLine20(formationNumber, unit);
+      } else {
+        throw new NotImplementedException();
       }
     }
 

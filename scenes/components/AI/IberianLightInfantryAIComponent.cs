@@ -67,14 +67,6 @@ namespace SpaceDodgeRL.scenes.components.AI {
       if (this.TestTimer == 20 && this.FormationNumber == 0) {
         state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
       }
-      if (this.TestTimer == 30 && this.FormationNumber == 0) {
-        state.GetUnit(this.UnitId).UnitFormation = FormationType.MANIPULE_OPENED;
-        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.REFORM;
-        state.GetUnit(this.UnitId).CenterPosition = parent.GetComponent<PositionComponent>().EncounterPosition;
-      }
-      if (this.TestTimer == 40 && this.FormationNumber == 0) {
-        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
-      }
 
       var unit = state.GetUnit(this.UnitId);
       if (unit.StandingOrder == UnitOrder.REFORM) {
