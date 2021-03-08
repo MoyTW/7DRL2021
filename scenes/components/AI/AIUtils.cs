@@ -25,7 +25,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       
       int dx = formationNumber % 10;
       int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
-      Tuple<int, int> rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+      Tuple<int, int> rotated = AIUtils.RotateForFormation(dx, dy, unit.UnitFacing);
       return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
     }
 
@@ -49,12 +49,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
       if (formationNumber < halfFormation) {
         int dx = formationNumber % 10;
         int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
-        var rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+        var rotated = AIUtils.RotateForFormation(dx, dy, unit.UnitFacing);
         return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
       } else {
         int dx = formationNumber % 10 - 10;
         int dy = Mathf.FloorToInt((formationNumber - halfFormation) / 10) - 1;
-        var rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+        var rotated = AIUtils.RotateForFormation(dx, dy, unit.UnitFacing);
         return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
       }
     }
@@ -77,7 +77,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       
       int dx = formationNumber % 20 - 10;
       int dy = Mathf.FloorToInt(formationNumber / 20) - 1;
-      Tuple<int, int> rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+      Tuple<int, int> rotated = AIUtils.RotateForFormation(dx, dy, unit.UnitFacing);
       return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
     }
 
@@ -105,7 +105,21 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return new EncounterPosition(origin.X + vec.Item1, origin.Y + vec.Item2);
     }
 
-    public static Tuple<int, int> Rotate(int x, int y, FormationFacing facing) {
+    public static Tuple<int, int> RotateForFormation(int x, int y, FormationFacing facing) {
+      if (facing == FormationFacing.NORTH) {
+        return new Tuple<int, int>(x, y);
+      } else if (facing == FormationFacing.EAST) {
+        return new Tuple<int, int>(-y, x);
+      } else if (facing == FormationFacing.SOUTH) {
+        return new Tuple<int, int>(-x - 1, -y);
+      } else if (facing == FormationFacing.WEST) {
+        return new Tuple<int, int>(y, -x - 1);
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+
+    private static Tuple<int, int> Rotate(int x, int y, FormationFacing facing) {
       if (facing == FormationFacing.NORTH) {
         return new Tuple<int, int>(x, y);
       } else if (facing == FormationFacing.EAST) {

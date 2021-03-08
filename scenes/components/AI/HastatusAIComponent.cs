@@ -94,7 +94,15 @@ namespace SpaceDodgeRL.scenes.components.AI {
       if (this.TestTimer == 30 && this.FormationNumber == 0) {
         unit.UnitFormation = FormationType.MANIPULE_OPENED;
         unit.StandingOrder = UnitOrder.REFORM;
-        unit.RallyPoint = parent.GetComponent<PositionComponent>().EncounterPosition;
+        // TODO: dumb hack to make blocks line up
+        var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+        if (unit.UnitFacing == FormationFacing.SOUTH) {
+          unit.RallyPoint = new EncounterPosition(parentPos.X + 1, parentPos.Y);
+        } else if (unit.UnitFacing == FormationFacing.WEST) {
+          unit.RallyPoint = new EncounterPosition(parentPos.X, parentPos.Y + 1);
+        } else {
+          unit.RallyPoint = parentPos;
+        }
       }
       if (this.TestTimer == 50 && this.FormationNumber == 0) {
         unit.StandingOrder = UnitOrder.ADVANCE;

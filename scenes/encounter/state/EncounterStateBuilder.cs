@@ -74,7 +74,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 95, hastatusFn);
       CreateUnit(seededRand, state, "test player right", FactionName.PLAYER, new EncounterPosition(playerPos.X - 20, playerPos.Y - 15),
         UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 34, hastatusFn); */
-
+      
       CreateUnit(seededRand, state, "test enemy center", FactionName.ENEMY, new EncounterPosition(playerPos.X, playerPos.Y + 40),
         UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 250, iberianLightInfantryFn, leftFlank: false, rightFlank: false);
       /* CreateUnit(seededRand, state, "test enemy left", FactionName.ENEMY, new EncounterPosition(playerPos.X - 20, playerPos.Y + 40),

@@ -34,8 +34,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var parentFaction = parent.GetComponent<FactionComponent>().Faction;
 
-      var moveVec = AIUtils.Rotate(0, -1, unit.UnitFacing);
-      var targetPos = new EncounterPosition(parentPos.X + moveVec.Item1, parentPos.Y + moveVec.Item2);
+      var targetPos = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
       if (state.EntitiesAtPosition(targetPos.X, targetPos.Y).Count == 0) {
         // Move
         actions.Add(new MoveAction(parent.EntityId, targetPos));
