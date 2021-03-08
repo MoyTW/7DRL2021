@@ -64,8 +64,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
       
       foreach (var forwardPos in forwardPositions) {
         if (state.EntitiesAtPosition(forwardPos.X, forwardPos.Y).Count == 0) {
-          targetEndPos = forwardPos;
-          break;
+          // Never go into a square unless it's adjacent to an existing friendly
+          if (AIUtils.AdjacentFriendlies(state, parent, parentFaction, forwardPos).Count > 0) {
+            targetEndPos = forwardPos;
+            break;
+          }
         }
       }
       if (targetEndPos != parentPos) {

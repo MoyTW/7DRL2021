@@ -133,6 +133,27 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
     }
 
+    public static List<Entity> FriendliesInPosition(EncounterState state, Entity entity, FactionName parentFaction, int x, int y) {
+      var friendlies = new List<Entity>();
+      foreach (Entity e in state.EntitiesAtPosition(x, y)) {
+        if (e != entity) {
+          var factionComponent = e.GetComponent<FactionComponent>();
+          if (factionComponent != null && factionComponent.Faction == parentFaction) {
+            friendlies.Add(e);
+          }
+        }
+      }
+      return friendlies;
+    }
+    
+    public static List<Entity> AdjacentFriendlies(EncounterState state, Entity entity, FactionName parentFaction, EncounterPosition position) {
+      var adjacentFriendlies = new List<Entity>();
+      foreach (var newpos in state.AdjacentPositions(position)) {
+        adjacentFriendlies.AddRange(AIUtils.FriendliesInPosition(state, entity, parentFaction, newpos.X, newpos.Y));
+      }
+      return adjacentFriendlies;
+    }
+
     public static List<Entity> HostilesInPosition(EncounterState state, FactionName parentFaction, int x, int y) {
       var hostiles = new List<Entity>();
       foreach (Entity e in state.EntitiesAtPosition(x, y)) {
