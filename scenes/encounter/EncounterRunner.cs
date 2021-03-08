@@ -197,7 +197,7 @@ namespace SpaceDodgeRL.scenes.encounter {
           }
           // Special case for projectiles which are about to hit the player - always start a new turn for these so the player can
           // see what's hitting them.
-          var pathAIComponent = entity.GetComponent<PathAIComponent>();
+          var pathAIComponent = entity.GetComponent<ProjectileAIComponent>();
           if (pathAIComponent != null && pathAIComponent.Path.Project(1).Any(p => p == playerPos)) {
             break;
           }

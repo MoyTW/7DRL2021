@@ -10,27 +10,37 @@ using System.Text.Json.Serialization;
 
 namespace SpaceDodgeRL.scenes.components.AI {
 
-  public class PathAIComponent : AIComponent {
+  public class ProjectileAIComponent : AIComponent {
     public static readonly string ENTITY_GROUP = "PATH_AI_COMPONENT_GROUP";
     public string EntityGroup => ENTITY_GROUP;
 
     [JsonInclude] public EncounterPath Path { get; private set; }
+    [JsonInclude] public string TargetId { get; private set; }
 
-    public static PathAIComponent Create(EncounterPath path) {
-      var component = new PathAIComponent();
+    public static ProjectileAIComponent Create(EncounterPath path, string targetId) {
+      var component = new ProjectileAIComponent();
 
       component.Path = path;
+      component.TargetId = targetId;
 
       return component;
     }
 
-    public static PathAIComponent Create(string saveData) {
-      return JsonSerializer.Deserialize<PathAIComponent>(saveData);
+    public static ProjectileAIComponent Create(string saveData) {
+      return JsonSerializer.Deserialize<ProjectileAIComponent>(saveData);
     }
 
     public List<EncounterAction> DecideNextAction(EncounterState state, Entity parent) {
       if (Path.AtEnd) {
-        return new List<EncounterAction>() { new DestroyAction(parent.EntityId) };
+        var actions = new List<EncounterAction>();
+
+        var target = state.GetEntityById(this.TargetId);
+        if (target != null) {
+          actions.Add(new RangedAttackAction(parent.EntityId, state.GetEntityById(this.TargetId)));
+        }
+        
+        actions.Add(new DestroyAction(parent.EntityId));
+        return actions; ;
       } else {
         var nextPosition = Path.Step();
         return new List<EncounterAction>() { new MoveAction(parent.EntityId, nextPosition) };

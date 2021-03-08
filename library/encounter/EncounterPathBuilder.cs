@@ -5,6 +5,10 @@ namespace SpaceDodgeRL.library.encounter {
 
   public static class EncounterPathBuilder {
 
+    public static EncounterPath BuildArcingPath(EncounterPosition start, EncounterPosition target) {
+      return new EncounterPath(new List<EncounterPosition>() { start, target });
+    }
+
     public static EncounterPath BuildStraightLinePath(EncounterPosition start, EncounterPosition target, int maxSteps=100, bool endsAtTarget=false) {
       return new EncounterPath(StraightLine(start, target, maxSteps, endsAtTarget));
     }

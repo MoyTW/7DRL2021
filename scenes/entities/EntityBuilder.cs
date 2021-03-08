@@ -56,6 +56,7 @@ namespace SpaceDodgeRL.scenes.entities {
     }
 
     private static Dictionary<ProjectileType, ProjectileDisplayData> projectileTypeToProjectileDisplay = new Dictionary<ProjectileType, ProjectileDisplayData>() {
+      { ProjectileType.PILA, new ProjectileDisplayData(ProjectileType.CUTTING_LASER, "cutting laser beam", _texCuttingLaserPath) },
       { ProjectileType.CUTTING_LASER, new ProjectileDisplayData(ProjectileType.CUTTING_LASER, "cutting laser beam", _texCuttingLaserPath) },
       { ProjectileType.SMALL_CANNON, new ProjectileDisplayData(ProjectileType.SMALL_CANNON, "small cannon shell", _texSmallCannonPath) },
       { ProjectileType.SMALL_GATLING, new ProjectileDisplayData(ProjectileType.SMALL_GATLING, "small gatling shell", _texSmallGatlingPath) },
@@ -173,12 +174,12 @@ namespace SpaceDodgeRL.scenes.entities {
       return e;
     }
 
-    public static Entity CreateProjectileEntity(Entity source, ProjectileType type, int power, EncounterPath path, int speed, int currentTick) {
+    public static Entity CreateProjectileEntity(Entity source, ProjectileType type, int power, EncounterPath path, Entity target, int speed, int currentTick) {
       var displayData = projectileTypeToProjectileDisplay[type];
 
       var e = CreateEntity(Guid.NewGuid().ToString(), displayData.Name);
 
-      e.AddComponent(PathAIComponent.Create(path));
+      e.AddComponent(ProjectileAIComponent.Create(path, target.EntityId));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick)); // Should it go instantly or should it wait for its turn...?
       e.AddComponent(AttackerComponent.Create(source.EntityId, power));

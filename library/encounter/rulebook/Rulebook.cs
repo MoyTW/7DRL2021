@@ -18,6 +18,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       { ActionType.FIRE_PROJECTILE, (a, s) => ResolveFireProjectile(a as FireProjectileAction, s) },
       { ActionType.GET_ITEM, (a, s) => ResolveGetItem(a as GetItemAction, s) },
       { ActionType.DESTROY, (a, s) => ResolveDestroy(a as DestroyAction, s) },
+      { ActionType.RANGED_ATTACK, (a, s) => ResolveRangedAttack(a as RangedAttackAction, s) },
       { ActionType.SPAWN_ENTITY, (a, s) => ResolveSpawnEntity(a as SpawnEntityAction, s) },
       { ActionType.USE, (a, s) => ResolveUse(a as UseAction, s) },
       { ActionType.USE_STAIRS, (a, s) => ResolveUseStairs(a as UseStairsAction, s) },
@@ -128,6 +129,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         action.ProjectileType,
         action.Power,
         action.PathFunction(actorPosition),
+        action.Target,
         action.Speed,
         state.CurrentTick
       );
@@ -199,6 +201,44 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       } else {
         return false;
       }
+    }
+
+    private static bool ResolveRangedAttack(RangedAttackAction action, EncounterState state) {
+      Entity attacker = state.GetEntityById(action.ActorId);
+      Entity defender = action.TargetEntity;
+
+      var attackerComponent = attacker.GetComponent<AttackerComponent>();
+      var defenderComponent = defender.GetComponent<DefenderComponent>();
+
+      if(defenderComponent.IsInvincible) {
+        var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b], but the attack has no effect!",
+          attacker.EntityName, defender.EntityName);
+        LogAttack(defenderComponent, logMessage, state);
+      } else {
+        // We don't allow underflow damage, though that could be a pretty comical mechanic...
+        int damage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
+        defenderComponent.RemoveHp(damage);
+        if (defenderComponent.CurrentHp <= 0) {
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, destroying it!",
+            attacker.EntityName, defender.EntityName, damage);
+
+          // Assign XP to the entity that fired the projectile
+          var projectileSource = state.GetEntityById(attackerComponent.SourceEntityId);
+          var xpValueComponent = defender.GetComponent<XPValueComponent>();
+          if (projectileSource != null && xpValueComponent != null && projectileSource.GetComponent<XPTrackerComponent>() != null) {
+            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue);
+            logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", projectileSource.EntityName, xpValueComponent.XPValue);
+          }
+
+          LogAttack(defenderComponent, logMessage, state);
+          ResolveAction(new DestroyAction(defender.EntityId), state);
+        } else {
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage!",
+            attacker.EntityName, defender.EntityName, damage);
+            LogAttack(defenderComponent, logMessage, state);
+        }
+      }
+      return true;
     }
 
     private static bool ResolveSpawnEntity(SpawnEntityAction action, EncounterState state) {

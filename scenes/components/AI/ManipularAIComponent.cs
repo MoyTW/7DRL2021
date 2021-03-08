@@ -116,7 +116,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
           foreach (Entity e in state.EntitiesAtPosition(x, y)) {
             var factionComponent = e.GetComponent<FactionComponent>();
             if (factionComponent != null && factionComponent.Faction != thisFaction) {
-              actions.Add(new WaitAction(parent.EntityId));
+              //actions.Add(new WaitAction(parent.EntityId));
+              actions.Add(FireProjectileAction.CreatePilaAction(parent.EntityId, e));
               return actions;
             }
           }
