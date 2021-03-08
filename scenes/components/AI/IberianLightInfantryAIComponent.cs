@@ -10,26 +10,24 @@ using System.Text.Json.Serialization;
 
 namespace SpaceDodgeRL.scenes.components.AI {
 
-  public class HastatusAIComponent : DeciderAIComponent {
-    public static readonly string ENTITY_GROUP = "HASTATUS_AI_COMPONENT_GROUP";
+  public class IberianLightInfantryAIComponent : DeciderAIComponent {
+    public static readonly string ENTITY_GROUP = "IBERIAN_LIGHT_INFANTRY_AI_COMPONENT_GROUP";
     public override string EntityGroup => ENTITY_GROUP;
 
     [JsonInclude] public int FormationNumber { get; private set; }
     [JsonInclude] public string UnitId { get; private set; }
-    [JsonInclude] public int PilasRemaining { get; private set; }
 
     public int TestTimer { get; set; }
 
-    public HastatusAIComponent(int formationNumber, string unitId) {
+    public IberianLightInfantryAIComponent(int formationNumber, string unitId) {
       this.FormationNumber = formationNumber;
       this.UnitId = unitId;
-      this.PilasRemaining = 1;
 
       this.TestTimer = 0;
     }
 
-    public static HastatusAIComponent Create(string saveData) {
-      return JsonSerializer.Deserialize<HastatusAIComponent>(saveData);
+    public static IberianLightInfantryAIComponent Create(string saveData) {
+      return JsonSerializer.Deserialize<IberianLightInfantryAIComponent>(saveData);
     }
 
     private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent) {
@@ -37,21 +35,6 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var parentFaction = parent.GetComponent<FactionComponent>().Faction;
-
-      // TODO: build a danger map?
-      // TODO: throw OVER the heads of the engaged line
-      if (this.PilasRemaining > 0) {
-        for (int x = parentPos.X - 3; x <= parentPos.X + 3; x++) {
-          for (int y = parentPos.Y - 3; y <= parentPos.Y + 3; y++) {
-            var possibleHostiles = AIUtils.HostilesInPosition(state, parentFaction, x, y);
-            if (possibleHostiles.Count > 0) {
-              actions.Add(FireProjectileAction.CreatePilaAction(parent.EntityId, possibleHostiles[0]));
-                this.PilasRemaining -= 1;
-                return actions;
-            }
-          }
-        }
-      }
 
       var moveVec = AIUtils.Rotate(0, -1, state.GetUnit(this.UnitId).UnitFacing);
       var targetPos = new EncounterPosition(parentPos.X + moveVec.Item1, parentPos.Y + moveVec.Item2);

@@ -70,8 +70,8 @@ namespace SpaceDodgeRL.scenes.entities {
       return newEntity;
     }
 
-    public static Entity CreateManipularEntity(int currentTick, int formationNumber, Unit unit, FactionName faction) {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "marcher");
+    public static Entity CreateHastatusEntity(int currentTick, int formationNumber, Unit unit, FactionName faction) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Hastatus");
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
@@ -80,10 +80,32 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 3));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 25));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 40));
       e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
+      e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(XPValueComponent.Create(xpValue: 30));
+
+      unit.BattleReadyEntities.Add(e.EntityId);
+
+      return e;
+    }
+
+    public static Entity CreateIberianLightInfantry(int currentTick, int formationNumber, Unit unit, FactionName faction) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Iberian Light Infantry");
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      e.AddComponent(new IberianLightInfantryAIComponent(formationNumber, unit.UnitId));
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 4));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 20));
+      e.AddComponent(DisplayComponent.Create(_texFighterPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
+      e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 80));
       e.AddComponent(statusEffectTrackerComponent);
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
