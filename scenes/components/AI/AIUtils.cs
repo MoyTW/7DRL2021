@@ -10,6 +10,11 @@ using SpaceDodgeRL.scenes.entities;
 namespace SpaceDodgeRL.scenes.components.AI {
   public static class AIUtils {
 
+    public static EncounterPosition RotateAndProject(EncounterPosition origin, int x, int y, FormationFacing facing) {
+      var vec = Rotate(x, y, facing);
+      return new EncounterPosition(origin.X + vec.Item1, origin.Y + vec.Item2);
+    }
+
     public static Tuple<int, int> Rotate(int x, int y, FormationFacing facing) {
       if (facing == FormationFacing.NORTH) {
         return new Tuple<int, int>(x, y);
@@ -44,7 +49,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
     }
 
     private static EncounterPosition _PositionInManipuleClosed(int formationNumber, Unit unit) {
-      EncounterPosition center = unit.CenterPosition;
+      EncounterPosition center = unit.RallyPoint;
       
       int dx = formationNumber % 10;
       int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
@@ -54,7 +59,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     private static EncounterPosition _PositionInManipuleOpened(int formationNumber, Unit unit) {
       int numInFormation = unit.BattleReadyEntities.Count;
-      EncounterPosition center = unit.CenterPosition;
+      EncounterPosition center = unit.RallyPoint;
       int halfFormation = numInFormation / 2 + 1;
 
       if (formationNumber < halfFormation) {
@@ -71,7 +76,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
     }
 
     private static EncounterPosition _PositionInLine20(int formationNumber, Unit unit) {
-      EncounterPosition center = unit.CenterPosition;
+      EncounterPosition center = unit.RallyPoint;
       
       int dx = formationNumber % 20 - 10;
       int dy = Mathf.FloorToInt(formationNumber / 20) - 1;
@@ -91,13 +96,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
     }
 
-    public static List<EncounterAction> ActionsForUnitReform(EncounterState state, Entity parent, int formationNumber, string unitId) {
+    public static List<EncounterAction> ActionsForUnitReform(EncounterState state, Entity parent, int formationNumber, Unit unit) {
       var actions = new List<EncounterAction>();
 
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var playerPos = state.Player.GetComponent<PositionComponent>().EncounterPosition;
 
-      var targetPosition = AIUtils._DecideFormationPosition(formationNumber, playerPos, state.GetUnit(unitId));
+      var targetPosition = AIUtils._DecideFormationPosition(formationNumber, playerPos, unit);
 
       if (parentPos != targetPosition) {
         // TODO: We may want to make pathfinding stateful/cache it or something, to save on turn times

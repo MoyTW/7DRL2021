@@ -1,3 +1,4 @@
+using SpaceDodgeRL.library;
 using SpaceDodgeRL.library.encounter;
 using SpaceDodgeRL.library.encounter.rulebook;
 using SpaceDodgeRL.library.encounter.rulebook.actions;
@@ -15,14 +16,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
     public override string EntityGroup => ENTITY_GROUP;
 
     [JsonInclude] public int FormationNumber { get; private set; }
-    [JsonInclude] public string UnitId { get; private set; }
     [JsonInclude] public int PilasRemaining { get; private set; }
 
     public int TestTimer { get; set; }
 
-    public HastatusAIComponent(int formationNumber, string unitId) {
+    public HastatusAIComponent(int formationNumber) {
       this.FormationNumber = formationNumber;
-      this.UnitId = unitId;
       this.PilasRemaining = 1;
 
       this.TestTimer = 0;
@@ -32,7 +31,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return JsonSerializer.Deserialize<HastatusAIComponent>(saveData);
     }
 
-    private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent) {
+    private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent, Unit unit) {
       var actions = new List<EncounterAction>();
 
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
@@ -53,51 +52,56 @@ namespace SpaceDodgeRL.scenes.components.AI {
         }
       }
 
-      var moveVec = AIUtils.Rotate(0, -1, state.GetUnit(this.UnitId).UnitFacing);
-      var targetPos = new EncounterPosition(parentPos.X + moveVec.Item1, parentPos.Y + moveVec.Item2);
-      if (state.EntitiesAtPosition(targetPos.X, targetPos.Y).Count == 0) {
-        // Move
-        actions.Add(new MoveAction(parent.EntityId, targetPos));
-        // Attack TODO: replace this with charge
-        var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, targetPos);
-        // TODO: don't attack randomly
-        if (adjacentHostiles.Count > 0) {
-          var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
-          actions.Add(new MeleeAttackAction(parent.EntityId, target));
+      var targetEndPos = parentPos;
+      // I'm not sure I want the predictable bias in left/right directionality, but at least this solves the decoherence issue!
+      var forwardPositions = new List<EncounterPosition>() {
+        AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing)
+      };
+      //GameUtils.Shuffle(state.EncounterRand, forwardPositions);
+      foreach (var forwardPos in forwardPositions) {
+        if (state.EntitiesAtPosition(forwardPos.X, forwardPos.Y).Count == 0) {
+          targetEndPos = forwardPos;
+          break;
         }
-      } else {
-        var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, parentPos);
+      }
+      if (targetEndPos != parentPos) {
+        actions.Add(new MoveAction(parent.EntityId, targetEndPos));
+      }
+      var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, targetEndPos);
+      if (adjacentHostiles.Count > 0) {
         // TODO: don't attack randomly
-        if (adjacentHostiles.Count > 0) {
-          var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
-          actions.Add(new MeleeAttackAction(parent.EntityId, target));
-        } else {
-          actions.Add(new WaitAction(parent.EntityId));
-        }
+        var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
+        actions.Add(new MeleeAttackAction(parent.EntityId, target));
+      }
+      if (actions.Count == 0) {
+        actions.Add(new WaitAction(parent.EntityId));
       }
       
       return actions;
     }
 
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
+      var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
+
       this.TestTimer += 1;
       if (this.TestTimer == 20 && this.FormationNumber == 0) {
-        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
+        unit.StandingOrder = UnitOrder.ADVANCE;
       }
       if (this.TestTimer == 30 && this.FormationNumber == 0) {
-        state.GetUnit(this.UnitId).UnitFormation = FormationType.MANIPULE_OPENED;
-        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.REFORM;
-        state.GetUnit(this.UnitId).CenterPosition = parent.GetComponent<PositionComponent>().EncounterPosition;
+        unit.UnitFormation = FormationType.MANIPULE_OPENED;
+        unit.StandingOrder = UnitOrder.REFORM;
+        unit.RallyPoint = parent.GetComponent<PositionComponent>().EncounterPosition;
       }
-      if (this.TestTimer == 40 && this.FormationNumber == 0) {
-        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
+      if (this.TestTimer == 50 && this.FormationNumber == 0) {
+        unit.StandingOrder = UnitOrder.ADVANCE;
       }
 
-      var unit = state.GetUnit(this.UnitId);
       if (unit.StandingOrder == UnitOrder.REFORM) {
-        return AIUtils.ActionsForUnitReform(state, parent, this.FormationNumber, this.UnitId);
+        return AIUtils.ActionsForUnitReform(state, parent, this.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
-        return _ActionsForUnitAdvance(state, parent);
+        return _ActionsForUnitAdvance(state, parent, unit);
       } else {
         throw new NotImplementedException();
       }

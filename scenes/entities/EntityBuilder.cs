@@ -75,7 +75,7 @@ namespace SpaceDodgeRL.scenes.entities {
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
-      e.AddComponent(new HastatusAIComponent(formationNumber, unit.UnitId));
+      e.AddComponent(new HastatusAIComponent(formationNumber));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 3));
@@ -85,6 +85,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
       e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(UnitComponent.Create(unit.UnitId, true));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
       unit.BattleReadyEntities.Add(e.EntityId);
@@ -97,7 +98,7 @@ namespace SpaceDodgeRL.scenes.entities {
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
-      e.AddComponent(new IberianLightInfantryAIComponent(formationNumber, unit.UnitId));
+      e.AddComponent(new IberianLightInfantryAIComponent(formationNumber));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 4));
@@ -107,6 +108,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 80));
       e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(UnitComponent.Create(unit.UnitId, true));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
       unit.BattleReadyEntities.Add(e.EntityId);

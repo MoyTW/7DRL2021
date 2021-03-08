@@ -15,13 +15,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
     public override string EntityGroup => ENTITY_GROUP;
 
     [JsonInclude] public int FormationNumber { get; private set; }
-    [JsonInclude] public string UnitId { get; private set; }
 
     public int TestTimer { get; set; }
 
-    public IberianLightInfantryAIComponent(int formationNumber, string unitId) {
+    public IberianLightInfantryAIComponent(int formationNumber) {
       this.FormationNumber = formationNumber;
-      this.UnitId = unitId;
 
       this.TestTimer = 0;
     }
@@ -30,13 +28,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return JsonSerializer.Deserialize<IberianLightInfantryAIComponent>(saveData);
     }
 
-    private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent) {
+    private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent, Unit unit) {
       var actions = new List<EncounterAction>();
 
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var parentFaction = parent.GetComponent<FactionComponent>().Faction;
 
-      var moveVec = AIUtils.Rotate(0, -1, state.GetUnit(this.UnitId).UnitFacing);
+      var moveVec = AIUtils.Rotate(0, -1, unit.UnitFacing);
       var targetPos = new EncounterPosition(parentPos.X + moveVec.Item1, parentPos.Y + moveVec.Item2);
       if (state.EntitiesAtPosition(targetPos.X, targetPos.Y).Count == 0) {
         // Move
@@ -63,16 +61,17 @@ namespace SpaceDodgeRL.scenes.components.AI {
     }
 
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
+      var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
+
       this.TestTimer += 1;
-      if (this.TestTimer == 20 && this.FormationNumber == 0) {
-        state.GetUnit(this.UnitId).StandingOrder = UnitOrder.ADVANCE;
+      if (this.TestTimer == 35 && this.FormationNumber == 0) {
+        unit.StandingOrder = UnitOrder.ADVANCE;
       }
 
-      var unit = state.GetUnit(this.UnitId);
       if (unit.StandingOrder == UnitOrder.REFORM) {
-        return AIUtils.ActionsForUnitReform(state, parent, this.FormationNumber, this.UnitId);
+        return AIUtils.ActionsForUnitReform(state, parent, this.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
-        return _ActionsForUnitAdvance(state, parent);
+        return _ActionsForUnitAdvance(state, parent, unit);
       } else {
         throw new NotImplementedException();
       }

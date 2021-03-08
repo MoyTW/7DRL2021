@@ -26,15 +26,15 @@ namespace SpaceDodgeRL.library.encounter {
 
   public class Unit {
     [JsonInclude] public string UnitId { get; private set; }
-    public EncounterPosition CenterPosition { get; set; }
+    public EncounterPosition RallyPoint { get; set; }
     public UnitOrder StandingOrder { get; set; }
     public FormationType UnitFormation { get; set; }
     public FormationFacing UnitFacing { get; set; }   
     [JsonInclude] public List<string> BattleReadyEntities { get; private set; }
 
-    public Unit(string unitId, EncounterPosition centerPosition, UnitOrder standingOrder, FormationType unitFormation, FormationFacing unitFacing) {
+    public Unit(string unitId, EncounterPosition rallyPoint, UnitOrder standingOrder, FormationType unitFormation, FormationFacing unitFacing) {
       this.UnitId = unitId;
-      this.CenterPosition = centerPosition;
+      this.RallyPoint = rallyPoint;
       this.StandingOrder = standingOrder;
       this.UnitFormation = unitFormation;
       this.UnitFacing = unitFacing;
