@@ -10,12 +10,16 @@ namespace SpaceDodgeRL.scenes.components {
 
     [JsonInclude] public string SourceEntityId { get; private set; }
     [JsonInclude] public int Power { get; private set; }
+    [JsonInclude] public int MeleeAttack { get; private set; }
+    [JsonInclude] public int RangedAttack { get; private set; }
 
-    public static AttackerComponent Create(string sourceEntityId, int power) {
+    public static AttackerComponent Create(string sourceEntityId, int power, int meleeAttack, int rangedAttack) {
       var component = new AttackerComponent();
 
       component.SourceEntityId = sourceEntityId;
       component.Power = power;
+      component.MeleeAttack = meleeAttack;
+      component.RangedAttack = rangedAttack;
 
       return component;
     }

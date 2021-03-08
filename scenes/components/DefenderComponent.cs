@@ -14,10 +14,13 @@ namespace SpaceDodgeRL.scenes.components {
     public int Defense { get => this.BaseDefense; }
     [JsonInclude] public int MaxHp { get; private set; }
     [JsonInclude] public int CurrentHp { get; private set; }
+    [JsonInclude] public int MeleeDefense { get; private set; }
+    [JsonInclude] public int RangedDefense { get; private set; }
     [JsonInclude] public bool ShouldLogDamage { get; private set; }
     [JsonInclude] public bool IsInvincible { get; private set; }
 
-    public static DefenderComponent Create(int baseDefense, int maxHp, int currentHp = int.MinValue, bool logDamage = true, bool isInvincible = false) {
+    public static DefenderComponent Create(int baseDefense, int maxHp, int meleeDefense, int rangedDefense,
+        int currentHp = int.MinValue, bool logDamage = true, bool isInvincible = false) {
       var component = new DefenderComponent();
 
       component.BaseDefense = baseDefense;
@@ -27,6 +30,8 @@ namespace SpaceDodgeRL.scenes.components {
       } else {
         component.CurrentHp = currentHp;
       }
+      component.MeleeDefense = meleeDefense;
+      component.RangedDefense = rangedDefense;
       component.ShouldLogDamage = logDamage;
       component.IsInvincible = isInvincible;
 

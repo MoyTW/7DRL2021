@@ -57,10 +57,16 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       }
     }
 
-    private static void LogAttack(DefenderComponent defenderComponent, string message, EncounterState state) {
-      if (defenderComponent.ShouldLogDamage) {
+    private static void LogAttack(Entity attacker, Entity defender, DefenderComponent defenderComponent, string message, EncounterState state) {
+      if (defenderComponent.ShouldLogDamage && (attacker == state.Player || defender == state.Player)) {
         state.LogMessage(message);
       }
+    }
+
+    private static Tuple<int, int, bool> AttackHits(Random encounterRand, int attackStat, int defenseStat) {
+      var chanceToHit = (attackStat - defenseStat);
+      var rolled = encounterRand.Next(100) + 1;
+      return new Tuple<int, int, bool>(chanceToHit, rolled, chanceToHit > rolled);
     }
 
     private static bool ResolveMeleeAttack(MeleeAttackAction action, EncounterState state) {
@@ -73,14 +79,22 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       if(defenderComponent.IsInvincible) {
         var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b], but the attack has no effect!",
           attacker.EntityName, defender.EntityName);
-        LogAttack(defenderComponent, logMessage, state);
+        LogAttack(attacker, defender, defenderComponent, logMessage, state);
       } else {
+        var attackReport = AttackHits(state.EncounterRand, attackerComponent.MeleeAttack, defenderComponent.MeleeDefense);
+        if (!attackReport.Item3) {
+          var logMessage = string.Format("[b]{0}[/b] attacks [b]{1}[/b], but misses! ({2}% chance to hit)",
+            attacker.EntityName, defender.EntityName, attackReport.Item1);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
+          return true;
+        }
+
         // We don't allow underflow damage, though that could be a pretty comical mechanic...
         int damage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
         defenderComponent.RemoveHp(damage);
         if (defenderComponent.CurrentHp <= 0) {
-          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, destroying it!",
-            attacker.EntityName, defender.EntityName, damage);
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, destroying it! ({3}% chance to hit)",
+            attacker.EntityName, defender.EntityName, damage, attackReport.Item1);
 
           // Assign XP to the entity that fired the projectile
           var projectileSource = state.GetEntityById(attackerComponent.SourceEntityId);
@@ -90,12 +104,12 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
             logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", projectileSource.EntityName, xpValueComponent.XPValue);
           }
 
-          LogAttack(defenderComponent, logMessage, state);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
           ResolveAction(new DestroyAction(defender.EntityId), state);
         } else {
-          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage!",
-            attacker.EntityName, defender.EntityName, damage);
-            LogAttack(defenderComponent, logMessage, state);
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage! ({3}% chance to hit)",
+            attacker.EntityName, defender.EntityName, damage, attackReport.Item1);
+            LogAttack(attacker, defender, defenderComponent, logMessage, state);
         }
       }
       return true;
@@ -220,7 +234,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       if(defenderComponent.IsInvincible) {
         var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b], but the attack has no effect!",
           attacker.EntityName, defender.EntityName);
-        LogAttack(defenderComponent, logMessage, state);
+        LogAttack(attacker, defender, defenderComponent, logMessage, state);
       } else {
         // We don't allow underflow damage, though that could be a pretty comical mechanic...
         int damage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
@@ -237,12 +251,12 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
             logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", projectileSource.EntityName, xpValueComponent.XPValue);
           }
 
-          LogAttack(defenderComponent, logMessage, state);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
           ResolveAction(new DestroyAction(defender.EntityId), state);
         } else {
           var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage!",
             attacker.EntityName, defender.EntityName, damage);
-            LogAttack(defenderComponent, logMessage, state);
+            LogAttack(attacker, defender, defenderComponent, logMessage, state);
         }
       }
       return true;

@@ -78,9 +78,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(new HastatusAIComponent(formationNumber));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 3));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 3, meleeAttack: 50, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 40));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 40, meleeDefense: 15, rangedDefense: 25));
       e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -101,9 +101,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(new IberianLightInfantryAIComponent(formationNumber));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 4));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 4, meleeAttack: 60, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 20));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 30, meleeDefense: 25, rangedDefense: 5));
       e.AddComponent(DisplayComponent.Create(_texFighterPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 80));
@@ -186,7 +186,7 @@ namespace SpaceDodgeRL.scenes.entities {
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: false));
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 100, isInvincible: false));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 100, meleeDefense: 45, rangedDefense: 60, isInvincible: false));
       e.AddComponent(DisplayComponent.Create(_texPlayerPath, "It's you!", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(FactionName.PLAYER));
       e.AddComponent(InventoryComponent.Create(inventorySize: 26));
@@ -207,7 +207,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(ProjectileAIComponent.Create(path, target.EntityId));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick)); // Should it go instantly or should it wait for its turn...?
-      e.AddComponent(AttackerComponent.Create(source.EntityId, power));
+      e.AddComponent(AttackerComponent.Create(source.EntityId, power, meleeAttack: 9999, rangedAttack: 9999)); // TODO: ranged attack
       e.AddComponent(CollisionComponent.Create(false, false, true, true));
       e.AddComponent(DisplayComponent.Create(displayData.TexturePath, "A projectile.", false, PROJECTILE_Z_INDEX));
       e.AddComponent(SpeedComponent.Create(speed));
@@ -219,21 +219,21 @@ namespace SpaceDodgeRL.scenes.entities {
       var e = CreateEntity(Guid.NewGuid().ToString(), "boundary sign");
 
       e.AddComponent(CollisionComponent.Create(true, false));
-      e.AddComponent(DefenderComponent.Create(0, 100, logDamage: false, isInvincible: true));
+      e.AddComponent(DefenderComponent.Create(0, 100, meleeDefense: 9999, rangedDefense: 9999, logDamage: false, isInvincible: true));
       e.AddComponent(DisplayComponent.Create(_texEdgeBlockerPath, "Trying to run away, eh? Get back to your mission!", true, ENTITY_Z_INDEX));
 
       return e;
     }
 
-    public static Entity CreateSatelliteEntity() {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "satellite");
+    // public static Entity CreateSatelliteEntity() {
+    //   var e = CreateEntity(Guid.NewGuid().ToString(), "satellite");
 
-      e.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: true));
-      e.AddComponent(DefenderComponent.Create(baseDefense: int.MaxValue, maxHp: int.MaxValue, isInvincible: true, logDamage: false));
-      e.AddComponent(DisplayComponent.Create(_texSatellitePath, "Space junk. Blocks movement and projectiles. Cannot be destroyed.", true, ENTITY_Z_INDEX));
+    //   e.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: true));
+    //   e.AddComponent(DefenderComponent.Create(baseDefense: int.MaxValue, maxHp: int.MaxValue, isInvincible: true, logDamage: false));
+    //   e.AddComponent(DisplayComponent.Create(_texSatellitePath, "Space junk. Blocks movement and projectiles. Cannot be destroyed.", true, ENTITY_Z_INDEX));
 
-      return e;
-    }
+    //   return e;
+    // }
 
     public static Entity CreateStairsEntity() {
       var e = CreateEntity(Guid.NewGuid().ToString(), "jump point");
