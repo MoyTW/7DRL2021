@@ -88,7 +88,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(UnitComponent.Create(unit.UnitId, true));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
-      unit.BattleReadyEntities.Add(e.EntityId);
+      unit._BattleReadyEntities.Add(e.EntityId);
 
       return e;
     }
@@ -111,7 +111,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(UnitComponent.Create(unit.UnitId, true));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
-      unit.BattleReadyEntities.Add(e.EntityId);
+      unit._BattleReadyEntities.Add(e.EntityId);
 
       return e;
     }

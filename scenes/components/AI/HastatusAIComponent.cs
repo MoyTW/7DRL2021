@@ -53,13 +53,15 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
 
       var targetEndPos = parentPos;
-      // I'm not sure I want the predictable bias in left/right directionality, but at least this solves the decoherence issue!
-      var forwardPositions = new List<EncounterPosition>() {
-        AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing),
-        AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing),
-        AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing)
-      };
-      //GameUtils.Shuffle(state.EncounterRand, forwardPositions);
+      // We're gonna have some serious Phalanx Drift goin' on I guess?
+      var forwardPositions = new List<EncounterPosition>() { AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing) };
+      if (!(unit.RightFlank && AIUtils.IsOnFlank(this.FormationNumber, unit, Flank.RIGHT))) {
+        forwardPositions.Add(AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing));
+      }
+      if (!(unit.LeftFlank && AIUtils.IsOnFlank(this.FormationNumber, unit, Flank.LEFT))) {
+        forwardPositions.Add(AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing));
+      }
+      
       foreach (var forwardPos in forwardPositions) {
         if (state.EntitiesAtPosition(forwardPos.X, forwardPos.Y).Count == 0) {
           targetEndPos = forwardPos;

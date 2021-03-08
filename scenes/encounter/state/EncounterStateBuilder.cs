@@ -35,9 +35,10 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       }
     }
 
-    private static void CreateUnit(Random seededRand, EncounterState state, string unitId, FactionName faction, EncounterPosition center,
-        UnitOrder order, FormationType type, FormationFacing facing, int size, Func<int, Unit, Entity> entityFn) {
-      var unit = new Unit(unitId, center, order, type, facing);
+    private static void CreateUnit(Random seededRand, EncounterState state, string unitId, FactionName faction,
+        EncounterPosition center, UnitOrder order, FormationType type, FormationFacing facing, int size,
+        Func<int, Unit, Entity> entityFn, bool leftFlank, bool rightFlank) {
+      var unit = new Unit(unitId, center, order, type, facing, leftFlank, rightFlank);
       state.AddUnit(unit);
 
       var width = (int)Math.Ceiling(Math.Sqrt(size));
@@ -68,14 +69,14 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       Func<int, Unit, Entity> iberianLightInfantryFn = (formationNum, unit) => EntityBuilder.CreateIberianLightInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
 
       CreateUnit(seededRand, state, "test player center", FactionName.PLAYER, new EncounterPosition(playerPos.X, playerPos.Y - 15),
-        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 250, hastatusFn);
+        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 250, hastatusFn, leftFlank: true, rightFlank: true);
       /* CreateUnit(seededRand, state, "test player left", FactionName.PLAYER, new EncounterPosition(playerPos.X + 20, playerPos.Y - 15),
         UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 95, hastatusFn);
       CreateUnit(seededRand, state, "test player right", FactionName.PLAYER, new EncounterPosition(playerPos.X - 20, playerPos.Y - 15),
         UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 34, hastatusFn); */
 
       CreateUnit(seededRand, state, "test enemy center", FactionName.ENEMY, new EncounterPosition(playerPos.X, playerPos.Y + 40),
-        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 250, iberianLightInfantryFn);
+        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 250, iberianLightInfantryFn, leftFlank: false, rightFlank: false);
       /* CreateUnit(seededRand, state, "test enemy left", FactionName.ENEMY, new EncounterPosition(playerPos.X - 20, playerPos.Y + 40),
         UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 70, iberianLightInfantryFn);
       CreateUnit(seededRand, state, "test enemy right", FactionName.ENEMY, new EncounterPosition(playerPos.X + 20, playerPos.Y + 40),

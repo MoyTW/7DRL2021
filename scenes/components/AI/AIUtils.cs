@@ -8,7 +8,97 @@ using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
 
 namespace SpaceDodgeRL.scenes.components.AI {
+  public enum Flank {
+    LEFT,
+    RIGHT
+  }
+
+  public abstract class Formation {
+    public abstract EncounterPosition PositionInFormation(int formationNumber, Unit unit);
+    public abstract bool IsOnFlank(int formationNumber, Unit unit, Flank flank);
+  }
+
+  public class FormationManipuleClosed : Formation {
+
+    public override EncounterPosition PositionInFormation(int formationNumber, Unit unit) {
+      EncounterPosition center = unit.RallyPoint;
+      
+      int dx = formationNumber % 10;
+      int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
+      Tuple<int, int> rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+      return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
+    }
+
+    public override bool IsOnFlank(int formationNumber, Unit unit, Flank flank) {
+      if (flank == Flank.LEFT) {
+        return formationNumber % 10 == 0;
+      } else if (flank == Flank.RIGHT) {
+        return formationNumber % 10 == 9;
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+  }
+
+  public class FormationManipuleOpened : Formation {
+    
+    public override EncounterPosition PositionInFormation(int formationNumber, Unit unit) {
+      EncounterPosition center = unit.RallyPoint;
+      int halfFormation = unit.NumInFormation / 2 + 1;
+
+      if (formationNumber < halfFormation) {
+        int dx = formationNumber % 10;
+        int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
+        var rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+        return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
+      } else {
+        int dx = formationNumber % 10 - 10;
+        int dy = Mathf.FloorToInt((formationNumber - halfFormation) / 10) - 1;
+        var rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+        return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
+      }
+    }
+
+    public override bool IsOnFlank(int formationNumber, Unit unit, Flank flank) {
+      int halfFormation = unit.NumInFormation / 2 + 1;
+      if (flank == Flank.LEFT) {
+        return formationNumber > halfFormation && formationNumber % 10 == 0;
+      } else if (flank == Flank.RIGHT) {
+        return formationNumber < halfFormation && formationNumber % 10 == 9;
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+  }
+
+  public class FormationLine20 : Formation {
+    public override EncounterPosition PositionInFormation(int formationNumber, Unit unit) {
+      EncounterPosition center = unit.RallyPoint;
+      
+      int dx = formationNumber % 20 - 10;
+      int dy = Mathf.FloorToInt(formationNumber / 20) - 1;
+      Tuple<int, int> rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
+      return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
+    }
+
+    public override bool IsOnFlank(int formationNumber, Unit unit, Flank flank) {
+      if (flank == Flank.LEFT) {
+        return formationNumber % 20 == 0;
+      } else if (flank == Flank.RIGHT) {
+        return formationNumber % 20 == 9;
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+  }
+
   public static class AIUtils {
+
+    public static Dictionary<FormationType, Formation> FormationDictionary = new Dictionary<FormationType, Formation>() {
+      { FormationType.MANIPULE_CLOSED, new FormationManipuleClosed() },
+      { FormationType.MANIPULE_OPENED, new FormationManipuleOpened() },
+      { FormationType.LINE_20, new FormationLine20() }
+    };
 
     public static EncounterPosition RotateAndProject(EncounterPosition origin, int x, int y, FormationFacing facing) {
       var vec = Rotate(x, y, facing);
@@ -48,52 +138,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return adjacentHostiles;
     }
 
-    private static EncounterPosition _PositionInManipuleClosed(int formationNumber, Unit unit) {
-      EncounterPosition center = unit.RallyPoint;
-      
-      int dx = formationNumber % 10;
-      int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
-      Tuple<int, int> rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
-      return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
-    }
-
-    private static EncounterPosition _PositionInManipuleOpened(int formationNumber, Unit unit) {
-      int numInFormation = unit.BattleReadyEntities.Count;
-      EncounterPosition center = unit.RallyPoint;
-      int halfFormation = numInFormation / 2 + 1;
-
-      if (formationNumber < halfFormation) {
-        int dx = formationNumber % 10;
-        int dy = Mathf.FloorToInt(formationNumber / 10) - 1;
-        var rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
-        return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
-      } else {
-        int dx = formationNumber % 10 - 10;
-        int dy = Mathf.FloorToInt((formationNumber - halfFormation) / 10) - 1;
-        var rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
-        return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
-      }
-    }
-
-    private static EncounterPosition _PositionInLine20(int formationNumber, Unit unit) {
-      EncounterPosition center = unit.RallyPoint;
-      
-      int dx = formationNumber % 20 - 10;
-      int dy = Mathf.FloorToInt(formationNumber / 20) - 1;
-      Tuple<int, int> rotated = AIUtils.Rotate(dx, dy, unit.UnitFacing);
-      return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
-    }
-
     private static EncounterPosition _DecideFormationPosition(int formationNumber, EncounterPosition center, Unit unit) {
-      if (unit.UnitFormation == FormationType.MANIPULE_CLOSED) {
-        return AIUtils._PositionInManipuleClosed(formationNumber, unit);
-      } else if (unit.UnitFormation == FormationType.MANIPULE_OPENED) {
-        return AIUtils._PositionInManipuleOpened(formationNumber, unit);
-      } else if (unit.UnitFormation == FormationType.LINE_20) {
-        return AIUtils._PositionInLine20(formationNumber, unit);
-      } else {
-        throw new NotImplementedException();
-      }
+      return AIUtils.FormationDictionary[unit.UnitFormation].PositionInFormation(formationNumber, unit);
+    }
+
+    // TODO: A more accurate algorithm than "is your position on the flank"
+    public static bool IsOnFlank(int formationNumber, Unit unit, Flank flank) {
+      return AIUtils.FormationDictionary[unit.UnitFormation].IsOnFlank(formationNumber, unit, flank);
     }
 
     public static List<EncounterAction> ActionsForUnitReform(EncounterState state, Entity parent, int formationNumber, Unit unit) {
