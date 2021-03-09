@@ -14,7 +14,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
   public enum OrderType {
     ADVANCE,
-    OPEN_MANIPULE
+    OPEN_MANIPULE,
+    RETREAT
   }
 
   public class Order {
@@ -45,6 +46,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
         } else {
           unit.RallyPoint = firstUnitPos;
         }
+      } else if (this.OrderType == OrderType.RETREAT) {
+        unit.StandingOrder = UnitOrder.RETREAT;
       } else {
         throw new NotImplementedException();
       }
@@ -102,7 +105,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
         foreach (var unitId in this._CommandedUnitIds) {
           var unit = state.GetUnit(unitId);
           if (unit.NumInFormation < unit.OriginalUnitStrength - 15) {
-            Godot.GD.Print("UNIT ", unitId, " HAS 15 CASUALTIES!!!");
+            new Order(unitId, OrderType.RETREAT).ExecuteOrder(state);
           }
         }
       }

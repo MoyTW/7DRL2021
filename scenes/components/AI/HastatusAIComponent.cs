@@ -83,6 +83,29 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return actions;
     }
 
+    // This is actually much more like unit broken but oh well!
+    public static List<EncounterAction> ActionsForUnitRetreat(EncounterState state, Entity parent, Unit unit) {
+      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+
+      EncounterPosition targetEndPos = parentPos;
+      var backwardsPositions = new List<EncounterPosition>() {
+        AIUtils.RotateAndProject(parentPos, 0, 1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, 1, 1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, -1, 1, unit.UnitFacing),
+      };
+      GameUtils.Shuffle(state.EncounterRand, backwardsPositions);
+      foreach (var position in backwardsPositions) {
+        if (state.EntitiesAtPosition(position.X, position.Y).Count == 0) {
+          targetEndPos = position;
+          break;
+        }
+      }
+      if (targetEndPos == parentPos) {
+        targetEndPos = backwardsPositions[0];
+      }
+      return new List<EncounterAction>() { new MoveAction(parent.EntityId, targetEndPos) };
+    }
+
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
 
@@ -90,6 +113,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
         return AIUtils.ActionsForUnitReform(state, parent, this.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
         return _ActionsForUnitAdvance(state, parent, unit);
+      } else if (unit.StandingOrder == UnitOrder.RETREAT) {
+        return ActionsForUnitRetreat(state, parent, unit);
       } else {
         throw new NotImplementedException();
       }
