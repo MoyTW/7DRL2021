@@ -248,24 +248,19 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return actions;
     }
 
-    // TODO: better rotate logic
-    private static bool IsRotatingOut(Entity entity) {
-      var defenderComponent = entity.GetComponent<DefenderComponent>();
-      return defenderComponent.CurrentHp < defenderComponent.MaxHp * 2 / 3;
-    }
-
     private static List<EncounterAction> ActionsUnitAdvanceRotateOut(EncounterState state, Entity parent, Unit unit) {
       var actions = new List<EncounterAction>();
 
       var unitComponent = parent.GetComponent<UnitComponent>();
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var parentFaction = parent.GetComponent<FactionComponent>().Faction;
+      var rotationComponent = parent.GetComponent<AIRotationComponent>();
 
       var positionBack = AIUtils.RotateAndProject(parentPos, 0, 1, unit.UnitFacing);
       var friendliesBack = AIUtils.FriendliesInPosition(state, parent, parentFaction, positionBack.X, positionBack.Y);
       bool backSecure = false;
       foreach (var friendly in friendliesBack) {
-        if (!IsRotatingOut(friendly)) {
+        if (!friendly.GetComponent<AIRotationComponent>().IsRotating) {
           backSecure = true;
           break;
         }
@@ -274,7 +269,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var friendliesParent = AIUtils.FriendliesInPosition(state, parent, parentFaction, parentPos.X, parentPos.Y);
       bool parentPosSecure = false;
       foreach (var friendly in friendliesParent) {
-        if (!IsRotatingOut(friendly)) {
+        if (!friendly.GetComponent<AIRotationComponent>().IsRotating) {
           parentPosSecure = true;
           break;
         }
@@ -285,6 +280,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       if (backSecure || parentPosSecure) {
         actions.Add(new MoveAction(parent.EntityId, positionBack));
       } else {
+        rotationComponent.NotifyRotationCompleted();
         actions.Add(new WaitAction(parent.EntityId));
       }
 
@@ -292,7 +288,9 @@ namespace SpaceDodgeRL.scenes.components.AI {
     }
 
     public static List<EncounterAction> ActionsForUnitAdvanceInLine(EncounterState state, Entity parent, Unit unit) {
-      if (IsRotatingOut(parent)) {
+      var rotationComponent = parent.GetComponent<AIRotationComponent>();
+      rotationComponent.DecideIfShouldRotate(parent);
+      if (rotationComponent.IsRotating) {
         return ActionsUnitAdvanceRotateOut(state, parent, unit);
       } else {
         return ActionsUnitAdvanceFight(state, parent, unit);
