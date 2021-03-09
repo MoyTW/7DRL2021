@@ -2,6 +2,7 @@ using SpaceDodgeRL.library;
 using SpaceDodgeRL.library.encounter;
 using SpaceDodgeRL.resources.gamedata;
 using SpaceDodgeRL.scenes.components;
+using SpaceDodgeRL.scenes.components.AI;
 using SpaceDodgeRL.scenes.entities;
 using System;
 using System.Collections.Generic;
@@ -35,11 +36,12 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       }
     }
 
-    private static void CreateUnit(Random seededRand, EncounterState state, string unitId, FactionName faction,
+    private static Unit CreateAndDeployUnit(Random seededRand, EncounterState state, string unitId, FactionName faction,
         EncounterPosition center, UnitOrder order, FormationType type, FormationFacing facing, int size,
-        Func<int, Unit, Entity> entityFn, bool leftFlank, bool rightFlank) {
+        Func<int, Unit, Entity> entityFn, bool leftFlank, bool rightFlank, Entity commander) {
       var unit = new Unit(unitId, center, order, type, facing, leftFlank, rightFlank);
       state.AddUnit(unit);
+      commander.GetComponent<CommanderAIComponent>().RegisterUnit(unit);
 
       var width = (int)Math.Ceiling(Math.Sqrt(size));
       
@@ -55,6 +57,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         var entity = entityFn(i, unit);
         state.PlaceEntity(entity, new EncounterPosition(center.X + positions[i].X, center.Y + positions[i].Y));
       }
+
+      return unit;
     }
 
     public static void PopulateStateForLevel(Entity player, int dungeonLevel, EncounterState state, Random seededRand,
@@ -68,19 +72,42 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       Func<int, Unit, Entity> hastatusFn = (formationNum, unit) => EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
       Func<int, Unit, Entity> iberianLightInfantryFn = (formationNum, unit) => EntityBuilder.CreateIberianLightInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
 
-      CreateUnit(seededRand, state, "test player center", FactionName.PLAYER, new EncounterPosition(playerPos.X, playerPos.Y - 15),
-        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 123, hastatusFn, leftFlank: false, rightFlank: false);
-      CreateUnit(seededRand, state, "test player left", FactionName.PLAYER, new EncounterPosition(playerPos.X + 20, playerPos.Y - 15),
-        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 98, hastatusFn, leftFlank: true, rightFlank: false);
-      CreateUnit(seededRand, state, "test player right", FactionName.PLAYER, new EncounterPosition(playerPos.X - 20, playerPos.Y - 15),
-        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 107, hastatusFn, leftFlank: false, rightFlank: true);
+      // Friendly deployment
+      var friendlyHQ = EntityBuilder.CreateHeadquartersEntity(state.CurrentTick, FactionName.PLAYER);
+      var friendlyCommanderAI = friendlyHQ.GetComponent<CommanderAIComponent>();
+      state.PlaceEntity(friendlyHQ, new EncounterPosition(playerPos.X, playerPos.Y - 50));
+
+      var pCenter = CreateAndDeployUnit(seededRand, state, "test player center", FactionName.PLAYER,
+        new EncounterPosition(playerPos.X, playerPos.Y - 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
+        FormationFacing.SOUTH, 123, hastatusFn, leftFlank: false, rightFlank: false, friendlyHQ);
+      friendlyCommanderAI.RegisterDeploymentOrder(20, new Order(pCenter.UnitId, OrderType.ADVANCE));
+      friendlyCommanderAI.RegisterDeploymentOrder(30, new Order(pCenter.UnitId, OrderType.OPEN_MANIPULE));
+      friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pCenter.UnitId, OrderType.ADVANCE));
+
+      var pLeft = CreateAndDeployUnit(seededRand, state, "test player left", FactionName.PLAYER,
+        new EncounterPosition(playerPos.X + 20, playerPos.Y - 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
+        FormationFacing.SOUTH, 98, hastatusFn, leftFlank: true, rightFlank: false, friendlyHQ);
+      friendlyCommanderAI.RegisterDeploymentOrder(10, new Order(pLeft.UnitId, OrderType.ADVANCE));
+      friendlyCommanderAI.RegisterDeploymentOrder(20, new Order(pLeft.UnitId, OrderType.OPEN_MANIPULE));
+      friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pLeft.UnitId, OrderType.ADVANCE));
+
+      var pRight = CreateAndDeployUnit(seededRand, state, "test player right", FactionName.PLAYER,
+        new EncounterPosition(playerPos.X - 20, playerPos.Y - 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
+        FormationFacing.SOUTH, 107, hastatusFn, leftFlank: false, rightFlank: true, friendlyHQ);
+      friendlyCommanderAI.RegisterDeploymentOrder(15, new Order(pRight.UnitId, OrderType.ADVANCE));
+      friendlyCommanderAI.RegisterDeploymentOrder(25, new Order(pRight.UnitId, OrderType.OPEN_MANIPULE));
+      friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pRight.UnitId, OrderType.ADVANCE));
       
-      CreateUnit(seededRand, state, "test enemy center", FactionName.ENEMY, new EncounterPosition(playerPos.X, playerPos.Y + 40),
-        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 95, iberianLightInfantryFn, leftFlank: false, rightFlank: false);
-      CreateUnit(seededRand, state, "test enemy left", FactionName.ENEMY, new EncounterPosition(playerPos.X - 20, playerPos.Y + 40),
-        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 99, iberianLightInfantryFn, leftFlank: true, rightFlank: false);
-      CreateUnit(seededRand, state, "test enemy right", FactionName.ENEMY, new EncounterPosition(playerPos.X + 20, playerPos.Y + 40),
-        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 90, iberianLightInfantryFn, leftFlank: false, rightFlank: true);
+      // Enemy deployment
+      var enemyHQ = EntityBuilder.CreateHeadquartersEntity(state.CurrentTick, FactionName.ENEMY);
+      state.PlaceEntity(enemyHQ, new EncounterPosition(playerPos.X, playerPos.Y + 90));
+
+      CreateAndDeployUnit(seededRand, state, "test enemy center", FactionName.ENEMY, new EncounterPosition(playerPos.X, playerPos.Y + 40),
+        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 95, iberianLightInfantryFn, leftFlank: false, rightFlank: false, enemyHQ);
+      CreateAndDeployUnit(seededRand, state, "test enemy left", FactionName.ENEMY, new EncounterPosition(playerPos.X - 20, playerPos.Y + 40),
+        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 99, iberianLightInfantryFn, leftFlank: true, rightFlank: false, enemyHQ);
+      CreateAndDeployUnit(seededRand, state, "test enemy right", FactionName.ENEMY, new EncounterPosition(playerPos.X + 20, playerPos.Y + 40),
+        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 90, iberianLightInfantryFn, leftFlank: false, rightFlank: true, enemyHQ);
 
       
       /*

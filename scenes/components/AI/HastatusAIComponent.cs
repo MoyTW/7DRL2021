@@ -18,13 +18,9 @@ namespace SpaceDodgeRL.scenes.components.AI {
     [JsonInclude] public int FormationNumber { get; private set; }
     [JsonInclude] public int PilasRemaining { get; private set; }
 
-    public int TestTimer { get; set; }
-
     public HastatusAIComponent(int formationNumber) {
       this.FormationNumber = formationNumber;
       this.PilasRemaining = 1;
-
-      this.TestTimer = 0;
     }
 
     public static HastatusAIComponent Create(string saveData) {
@@ -89,27 +85,6 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
-
-      this.TestTimer += 1;
-      if (this.TestTimer == 20 && this.FormationNumber == 0) {
-        unit.StandingOrder = UnitOrder.ADVANCE;
-      }
-      if (this.TestTimer == 30 && this.FormationNumber == 0) {
-        unit.UnitFormation = FormationType.MANIPULE_OPENED;
-        unit.StandingOrder = UnitOrder.REFORM;
-        // TODO: dumb hack to make blocks line up
-        var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
-        if (unit.UnitFacing == FormationFacing.SOUTH) {
-          unit.RallyPoint = new EncounterPosition(parentPos.X + 1, parentPos.Y);
-        } else if (unit.UnitFacing == FormationFacing.WEST) {
-          unit.RallyPoint = new EncounterPosition(parentPos.X, parentPos.Y + 1);
-        } else {
-          unit.RallyPoint = parentPos;
-        }
-      }
-      if (this.TestTimer == 50 && this.FormationNumber == 0) {
-        unit.StandingOrder = UnitOrder.ADVANCE;
-      }
 
       if (unit.StandingOrder == UnitOrder.REFORM) {
         return AIUtils.ActionsForUnitReform(state, parent, this.FormationNumber, unit);

@@ -70,6 +70,24 @@ namespace SpaceDodgeRL.scenes.entities {
       return newEntity;
     }
 
+    public static Entity CreateHeadquartersEntity(int currentTick, FactionName faction) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Headquarters: " + faction.ToString());
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      e.AddComponent(new CommanderAIComponent());
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 45, meleeDefense: 20, rangedDefense: 25, isInvincible: true));
+      e.AddComponent(DisplayComponent.Create(_texCarrierPath, "Headquarters: " + faction.ToString(), false, ENTITY_Z_INDEX));
+      e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
+      e.AddComponent(XPValueComponent.Create(xpValue: 9999));
+
+      return e;
+    }
+
     public static Entity CreateHastatusEntity(int currentTick, int formationNumber, Unit unit, FactionName faction) {
       var e = CreateEntity(Guid.NewGuid().ToString(), "Hastatus");
       
@@ -80,7 +98,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 3, meleeAttack: 50, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 40, meleeDefense: 15, rangedDefense: 25));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 45, meleeDefense: 20, rangedDefense: 25));
       e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -88,7 +106,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(UnitComponent.Create(unit.UnitId, true));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
-      unit._BattleReadyEntities.Add(e.EntityId);
+      unit._BattleReadyEntityIds.Add(e.EntityId);
 
       return e;
     }
@@ -111,7 +129,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(UnitComponent.Create(unit.UnitId, true));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
-      unit._BattleReadyEntities.Add(e.EntityId);
+      unit._BattleReadyEntityIds.Add(e.EntityId);
 
       return e;
     }

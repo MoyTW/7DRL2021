@@ -32,8 +32,8 @@ namespace SpaceDodgeRL.library.encounter {
     public UnitOrder StandingOrder { get; set; }
     public FormationType UnitFormation { get; set; }
     public FormationFacing UnitFacing { get; set; }   
-    [JsonInclude] public List<string> _BattleReadyEntities { get; private set; }
-    [JsonIgnore] public int NumInFormation { get { return this._BattleReadyEntities.Count; } }
+    [JsonInclude] public List<string> _BattleReadyEntityIds { get; private set; }
+    [JsonIgnore] public int NumInFormation { get { return this._BattleReadyEntityIds.Count; } }
 
     public Unit(string unitId, EncounterPosition rallyPoint, UnitOrder standingOrder, FormationType unitFormation,
         FormationFacing unitFacing, bool leftFlank, bool rightFlank) {
@@ -44,7 +44,7 @@ namespace SpaceDodgeRL.library.encounter {
       this.StandingOrder = standingOrder;
       this.UnitFormation = unitFormation;
       this.UnitFacing = unitFacing;
-      this._BattleReadyEntities = new List<string>();
+      this._BattleReadyEntityIds = new List<string>();
     }
   }
 }
