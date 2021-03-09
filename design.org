@@ -1,5 +1,31 @@
 Commenced at Saturday March 6, 8pm Pacific time.
 
+* Schedule
+
+** Tuesday <- Formations & Combat
+1. Troops rotate in & out
+2. Units backpedal & advance (lines shift)
+3. Units break & reform
+4. Units can rout off the field
+5. Add in the armor, stamina, & footing
+
+** Wednesday <- Full Game Loop
+1. Add a scoring system for the player
+2. Add a placeholder battle generator
+3. String together battles to make a campaign
+4. Update the UI
+
+** Thursday <- Content
+1. Add a variety of troops
+2. Add a variety of different battles
+3. Playtest!
+4. Possibly add in nice-to-haves
+  a. Skirmishers
+  b. Cavalry
+
+** Friday <- Playtesting & Fixing
+** Saturday <- Playtesting & Fixing (ends 8pm)
+
 * Summary
 
 A roguelike where you're one participant of many. Think a single footsoldier in
