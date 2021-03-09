@@ -86,7 +86,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       if (flank == Flank.LEFT) {
         return formationNumber % 20 == 0;
       } else if (flank == Flank.RIGHT) {
-        return formationNumber % 20 == 9;
+        return formationNumber % 20 == 19;
       } else {
         throw new NotImplementedException();
       }
