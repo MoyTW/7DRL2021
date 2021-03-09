@@ -54,6 +54,48 @@ namespace SpaceDodgeRL.scenes.components.AI {
     }
   }
 
+  public enum OrderTriggerType {
+    UNIT_HAS_STANDING_ORDER
+  }
+
+  // This is a mess; I'm doing it like this so that the save system can work properly, because I forgot how to set up
+  // loading of inherited classes.
+  public class OrderTrigger {
+
+    [JsonInclude] public OrderTriggerType TriggerType { get; private set; }
+    [JsonInclude] public List<string> WatchedUnitIds { get; private set; }
+    [JsonInclude] public List<UnitOrder> AwaitedStandingOrders { get; private set; }
+
+    public OrderTrigger(OrderTriggerType triggerType, List<string> watchedUnitIds=null,
+        List<UnitOrder> awaitedStandingOrders=null) {
+      this.TriggerType = triggerType;
+      this.WatchedUnitIds = watchedUnitIds;
+      this.AwaitedStandingOrders = awaitedStandingOrders;
+    }
+
+    public bool IsTriggered(EncounterState state) {
+      if (this.TriggerType == OrderTriggerType.UNIT_HAS_STANDING_ORDER) {
+        foreach (var watchedUnitId in this.WatchedUnitIds) {
+          if (this.AwaitedStandingOrders.Contains(state.GetUnit(watchedUnitId).StandingOrder)) {
+            return true;
+          }
+        }
+        return false;
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+  }
+
+  public class TriggeredOrder {
+    [JsonInclude] public OrderTrigger Trigger { get; private set; }
+    [JsonInclude] public Order Order { get; private set; }
+    public TriggeredOrder(OrderTrigger trigger, Order order) {
+      this.Trigger = trigger;
+      this.Order = order;
+    }
+  }
+
   public class CommanderAIComponent : AIComponent {
     public static readonly string ENTITY_GROUP = "COMMANDER_AI_COMPONENT_GROUP";
     public string EntityGroup => ENTITY_GROUP;
@@ -61,6 +103,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
     [JsonInclude] public List<string> _CommandedUnitIds { get; private set; }
     [JsonInclude] public int _CurrentTurn { get; private set; }
     [JsonInclude] public Dictionary<int, List<Order>> _DeploymentOrders { get; private set; }
+    [JsonInclude] public Dictionary<string, List<TriggeredOrder>> _TriggerOrders { get; private set; }
     [JsonInclude] public int LastDeploymentTurn { get; private set; }
     [JsonInclude] public bool DeploymentComplete { get; private set; }
 
@@ -68,6 +111,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       this._CommandedUnitIds = new List<string>();
       this._CurrentTurn = 0;
       this._DeploymentOrders = new Dictionary<int, List<Order>>();
+      this._TriggerOrders = new Dictionary<string, List<TriggeredOrder>>();
       this.LastDeploymentTurn = 0;
       this.DeploymentComplete = true;
     }
@@ -92,6 +136,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
       this.DeploymentComplete = false;
     }
 
+    public void RegisterTriggeredOrder(OrderTrigger trigger, Order order) {
+      if (!this._TriggerOrders.ContainsKey(order.UnitId)) {
+        this._TriggerOrders[order.UnitId] = new List<TriggeredOrder>();
+      }
+      this._TriggerOrders[order.UnitId].Add(new TriggeredOrder(trigger, order));
+    }
+
     public List<EncounterAction> DecideNextAction(EncounterState state, Entity parent) {
       if (this._DeploymentOrders.ContainsKey(this._CurrentTurn)) {
         var deploymentOrders = this._DeploymentOrders[this._CurrentTurn];
@@ -102,6 +153,14 @@ namespace SpaceDodgeRL.scenes.components.AI {
           this.DeploymentComplete = true;
         }
       } else if (this.DeploymentComplete) {
+        foreach (var kvp in this._TriggerOrders) {
+          foreach (var triggeredOrder in kvp.Value) {
+            if (triggeredOrder.Trigger.IsTriggered(state)) {
+              triggeredOrder.Order.ExecuteOrder(state);
+            }
+          }
+        }
+
         foreach (var unitId in this._CommandedUnitIds) {
           var unit = state.GetUnit(unitId);
           if (unit.NumInFormation < unit.OriginalUnitStrength - 15) {

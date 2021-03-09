@@ -97,6 +97,30 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       friendlyCommanderAI.RegisterDeploymentOrder(15, new Order(pRight.UnitId, OrderType.ADVANCE));
       friendlyCommanderAI.RegisterDeploymentOrder(25, new Order(pRight.UnitId, OrderType.OPEN_MANIPULE));
       friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pRight.UnitId, OrderType.ADVANCE));
+
+      var p2ndCenter = CreateAndDeployUnit(seededRand, state, "test player 2nd center", FactionName.PLAYER,
+        new EncounterPosition(playerPos.X, playerPos.Y - 35), UnitOrder.REFORM, FormationType.MANIPULE_OPENED,
+        FormationFacing.SOUTH, 58, hastatusFn, leftFlank: false, rightFlank: false, friendlyHQ);
+      var p2ndCenterAdvTrigger = new OrderTrigger(OrderTriggerType.UNIT_HAS_STANDING_ORDER,
+        watchedUnitIds: new List<string>() { pCenter.UnitId, pLeft.UnitId, pRight.UnitId },
+        awaitedStandingOrders: new List<UnitOrder>() { UnitOrder.RETREAT });
+      friendlyCommanderAI.RegisterTriggeredOrder(p2ndCenterAdvTrigger, new Order(p2ndCenter.UnitId, OrderType.ADVANCE));
+
+      var p2ndLeft = CreateAndDeployUnit(seededRand, state, "test player 2nd left", FactionName.PLAYER,
+        new EncounterPosition(playerPos.X + 20, playerPos.Y - 35), UnitOrder.REFORM, FormationType.MANIPULE_OPENED,
+        FormationFacing.SOUTH, 70, hastatusFn, leftFlank: true, rightFlank: false, friendlyHQ);
+      var p2ndLeftAdvTrigger = new OrderTrigger(OrderTriggerType.UNIT_HAS_STANDING_ORDER,
+        watchedUnitIds: new List<string>() { pCenter.UnitId, pLeft.UnitId, pRight.UnitId },
+        awaitedStandingOrders: new List<UnitOrder>() { UnitOrder.RETREAT });
+      friendlyCommanderAI.RegisterTriggeredOrder(p2ndLeftAdvTrigger, new Order(p2ndLeft.UnitId, OrderType.ADVANCE));
+
+      var p2ndRight = CreateAndDeployUnit(seededRand, state, "test player 2nd right", FactionName.PLAYER,
+        new EncounterPosition(playerPos.X - 20, playerPos.Y - 35), UnitOrder.REFORM, FormationType.MANIPULE_OPENED,
+        FormationFacing.SOUTH, 63, hastatusFn, leftFlank: false, rightFlank: true, friendlyHQ);
+      var p2ndRightAdvTrigger = new OrderTrigger(OrderTriggerType.UNIT_HAS_STANDING_ORDER,
+        watchedUnitIds: new List<string>() { pCenter.UnitId, pLeft.UnitId, pRight.UnitId },
+        awaitedStandingOrders: new List<UnitOrder>() { UnitOrder.RETREAT });
+      friendlyCommanderAI.RegisterTriggeredOrder(p2ndRightAdvTrigger, new Order(p2ndRight.UnitId, OrderType.ADVANCE));
       
       // Enemy deployment
       var enemyHQ = EntityBuilder.CreateHeadquartersEntity(state.CurrentTick, FactionName.ENEMY);
