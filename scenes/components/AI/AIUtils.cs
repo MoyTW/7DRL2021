@@ -206,6 +206,48 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return actions;
     }
 
+    public static List<EncounterAction> ActionsForUnitAdvanceInLine(EncounterState state, Entity parent, Unit unit) {
+      var actions = new List<EncounterAction>();
+
+      var unitComponent = parent.GetComponent<UnitComponent>();
+      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+      var parentFaction = parent.GetComponent<FactionComponent>().Faction;
+
+      var targetEndPos = parentPos;
+      // We're gonna have some serious Phalanx Drift goin' on I guess?
+      var forwardPositions = new List<EncounterPosition>() { AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing) };
+      if (!(unit.RightFlank && AIUtils.IsOnFlank(unitComponent.FormationNumber, unit, Flank.RIGHT))) {
+        forwardPositions.Add(AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing));
+      }
+      if (!(unit.LeftFlank && AIUtils.IsOnFlank(unitComponent.FormationNumber, unit, Flank.LEFT))) {
+        forwardPositions.Add(AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing));
+      }
+      
+      foreach (var forwardPos in forwardPositions) {
+        if (state.EntitiesAtPosition(forwardPos.X, forwardPos.Y).Count == 0) {
+          // Never go into a square unless it's adjacent to an existing friendly
+          if (AIUtils.AdjacentFriendlies(state, parent, parentFaction, forwardPos).Count > 0) {
+            targetEndPos = forwardPos;
+            break;
+          }
+        }
+      }
+      if (targetEndPos != parentPos) {
+        actions.Add(new MoveAction(parent.EntityId, targetEndPos));
+      }
+      var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, targetEndPos);
+      if (adjacentHostiles.Count > 0) {
+        // TODO: don't attack randomly
+        var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
+        actions.Add(new MeleeAttackAction(parent.EntityId, target));
+      }
+      if (actions.Count == 0) {
+        actions.Add(new WaitAction(parent.EntityId));
+      }
+      
+      return actions;
+    }
+
     // This is actually much more like unit broken but oh well!
     public static List<EncounterAction> ActionsForUnitRetreat(EncounterState state, Entity parent, Unit unit) {
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;

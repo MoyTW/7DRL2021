@@ -14,60 +14,22 @@ namespace SpaceDodgeRL.scenes.components.AI {
     public static readonly string ENTITY_GROUP = "IBERIAN_LIGHT_INFANTRY_AI_COMPONENT_GROUP";
     public override string EntityGroup => ENTITY_GROUP;
 
-    public int TestTimer { get; set; }
-
-    public IberianLightInfantryAIComponent() {
-      this.TestTimer = 0;
-    }
+    public IberianLightInfantryAIComponent() { }
 
     public static IberianLightInfantryAIComponent Create(string saveData) {
       return JsonSerializer.Deserialize<IberianLightInfantryAIComponent>(saveData);
-    }
-
-    private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent, Unit unit) {
-      var actions = new List<EncounterAction>();
-
-      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
-      var parentFaction = parent.GetComponent<FactionComponent>().Faction;
-
-      var targetPos = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
-      if (state.EntitiesAtPosition(targetPos.X, targetPos.Y).Count == 0) {
-        // Move
-        actions.Add(new MoveAction(parent.EntityId, targetPos));
-        // Attack TODO: replace this with charge
-        var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, targetPos);
-        // TODO: don't attack randomly
-        if (adjacentHostiles.Count > 0) {
-          var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
-          actions.Add(new MeleeAttackAction(parent.EntityId, target));
-        }
-      } else {
-        var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, parentPos);
-        // TODO: don't attack randomly
-        if (adjacentHostiles.Count > 0) {
-          var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
-          actions.Add(new MeleeAttackAction(parent.EntityId, target));
-        } else {
-          actions.Add(new WaitAction(parent.EntityId));
-        }
-      }
-      
-      return actions;
     }
 
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
       var unitComponent = parent.GetComponent<UnitComponent>();
 
-      this.TestTimer += 1;
-      if (this.TestTimer == 35 && unitComponent.FormationNumber == 0) {
-        unit.StandingOrder = UnitOrder.ADVANCE;
-      }
+      
 
       if (unit.StandingOrder == UnitOrder.REFORM) {
         return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
-        return _ActionsForUnitAdvance(state, parent, unit);
+        return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
       } else if (unit.StandingOrder == UnitOrder.RETREAT) {
         return AIUtils.ActionsForUnitRetreat(state, parent, unit);
       } else {
