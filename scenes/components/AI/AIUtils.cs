@@ -16,7 +16,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
   public abstract class Formation {
     public abstract EncounterPosition PositionInFormation(int formationNumber, Unit unit);
-    public abstract bool IsOnFlank(int formationNumber, Unit unit, Flank flank);
+    public abstract bool IsOnFlank(int x, int y, Unit unit, Flank flank);
   }
 
   public class FormationManipuleClosed : Formation {
@@ -30,11 +30,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
     }
 
-    public override bool IsOnFlank(int formationNumber, Unit unit, Flank flank) {
+    public override bool IsOnFlank(int x, int y, Unit unit, Flank flank) {
+      var northFacing = AIUtils.VectorFromCenterRotated(unit.RallyPoint, x, y, unit.UnitFacing);
       if (flank == Flank.LEFT) {
-        return formationNumber % 10 == 0;
+        return northFacing.Item1 <= -10;
       } else if (flank == Flank.RIGHT) {
-        return formationNumber % 10 == 9;
+        return northFacing.Item1 >= 9;
       } else {
         throw new NotImplementedException();
       }
@@ -60,12 +61,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
     }
 
-    public override bool IsOnFlank(int formationNumber, Unit unit, Flank flank) {
-      int halfFormation = unit.NumInFormation / 2 + 1;
+    public override bool IsOnFlank(int x, int y, Unit unit, Flank flank) {
+      var northFacing = AIUtils.VectorFromCenterRotated(unit.RallyPoint, x, y, unit.UnitFacing);
       if (flank == Flank.LEFT) {
-        return formationNumber > halfFormation && formationNumber % 10 == 0;
+        return northFacing.Item1 <= -10;
       } else if (flank == Flank.RIGHT) {
-        return formationNumber < halfFormation && formationNumber % 10 == 9;
+        return northFacing.Item1 >= 9;
       } else {
         throw new NotImplementedException();
       }
@@ -82,11 +83,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return new EncounterPosition(center.X + rotated.Item1, center.Y + rotated.Item2);
     }
 
-    public override bool IsOnFlank(int formationNumber, Unit unit, Flank flank) {
+    public override bool IsOnFlank(int x, int y, Unit unit, Flank flank) {
+      var northFacing = AIUtils.VectorFromCenterRotated(unit.RallyPoint, x, y, unit.UnitFacing);
       if (flank == Flank.LEFT) {
-        return formationNumber % 20 == 0;
+        return northFacing.Item1 <= -10;
       } else if (flank == Flank.RIGHT) {
-        return formationNumber % 20 == 19;
+        return northFacing.Item1 >= 9;
       } else {
         throw new NotImplementedException();
       }
@@ -118,6 +120,26 @@ namespace SpaceDodgeRL.scenes.components.AI {
       } else {
         throw new NotImplementedException();
       }
+    }
+
+    private static Tuple<int, int> ToNorthCoordinates(int dx, int dy, FormationFacing facing) {
+      if (facing == FormationFacing.NORTH) {
+        return new Tuple<int, int>(dx, dy);
+      } else if (facing == FormationFacing.EAST) {
+        return new Tuple<int, int>(dy, -dx);
+      } else if (facing == FormationFacing.SOUTH) {
+        return new Tuple<int, int>(-dx - 1, -dy);
+      } else if (facing == FormationFacing.WEST) { // TODO: uh, is that...right. test out east/west alignment.
+        return new Tuple<int, int>(-dy, dx - 1);
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+
+    public static Tuple<int, int> VectorFromCenterRotated(EncounterPosition center, int tx, int ty, FormationFacing facing) {
+      int dx = tx - center.X;
+      int dy = ty - center.Y;
+      return ToNorthCoordinates(dx, dy, facing);
     }
 
     private static Tuple<int, int> Rotate(int x, int y, FormationFacing facing) {
@@ -179,8 +201,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
     }
 
     // TODO: A more accurate algorithm than "is your position on the flank"
-    public static bool IsOnFlank(int formationNumber, Unit unit, Flank flank) {
-      return AIUtils.FormationDictionary[unit.UnitFormation].IsOnFlank(formationNumber, unit, flank);
+    public static bool IsOnFlank(int x, int y, Unit unit, Flank flank) {
+      return AIUtils.FormationDictionary[unit.UnitFormation].IsOnFlank(x, y, unit, flank);
     }
 
     public static List<EncounterAction> ActionsForUnitReform(EncounterState state, Entity parent, int formationNumber, Unit unit) {
@@ -216,17 +238,34 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var targetEndPos = parentPos;
       // We're gonna have some serious Phalanx Drift goin' on I guess?
       var forwardPositions = new List<EncounterPosition>() { AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing) };
-      if (!(unit.RightFlank && AIUtils.IsOnFlank(unitComponent.FormationNumber, unit, Flank.RIGHT))) {
+      if (!(unit.RightFlank && AIUtils.IsOnFlank(parentPos.X, parentPos.Y, unit, Flank.RIGHT))) {
         forwardPositions.Add(AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing));
       }
-      if (!(unit.LeftFlank && AIUtils.IsOnFlank(unitComponent.FormationNumber, unit, Flank.LEFT))) {
+      if (!(unit.LeftFlank && AIUtils.IsOnFlank(parentPos.X, parentPos.Y, unit, Flank.LEFT))) {
         forwardPositions.Add(AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing));
       }
       
       foreach (var forwardPos in forwardPositions) {
         if (state.EntitiesAtPosition(forwardPos.X, forwardPos.Y).Count == 0) {
-          // Never go into a square unless it's adjacent to an existing friendly
-          if (AIUtils.AdjacentFriendlies(state, parent, parentFaction, forwardPos).Count > 0) {
+          // Never go into a square unless it's flanked by an existing friendly
+          // if (AIUtils.AdjacentFriendlies(state, parent, parentFaction, forwardPos).Count > 0) {
+          //   targetEndPos = forwardPos;
+          //   break;
+          // }
+          bool supported = false;
+          for (int y = -1; y < 2; y++) {
+            var leftPos = AIUtils.RotateAndProject(forwardPos, -1, y, unit.UnitFacing);
+            if(AIUtils.FriendliesInPosition(state, parent, parentFaction, leftPos.X, leftPos.Y).Count > 0) {
+              supported = true;
+              break;
+            }
+            var rightPos = AIUtils.RotateAndProject(forwardPos, 1, y, unit.UnitFacing);
+            if(AIUtils.FriendliesInPosition(state, parent, parentFaction, rightPos.X, rightPos.Y).Count > 0) {
+              supported = true;
+              break;
+            }
+          }
+          if (supported) {
             targetEndPos = forwardPos;
             break;
           }
