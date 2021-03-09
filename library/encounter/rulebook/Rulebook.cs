@@ -63,8 +63,9 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       }
     }
 
-    private static Tuple<int, int, bool> AttackHits(Random encounterRand, int attackStat, int defenseStat) {
-      var chanceToHit = (attackStat - defenseStat);
+    private static Tuple<int, int, bool> AttackHits(Random encounterRand, int attackStat, int attackerFootingPenalty,
+        int defenseStat, int defenderFootingPenalty) {
+      var chanceToHit = ((attackStat - attackerFootingPenalty) - (defenseStat - defenderFootingPenalty));
       var rolled = encounterRand.Next(100) + 1;
       return new Tuple<int, int, bool>(chanceToHit, rolled, chanceToHit > rolled);
     }
@@ -74,6 +75,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       Entity defender = action.TargetEntity;
 
       var attackerComponent = attacker.GetComponent<AttackerComponent>();
+      var attackerDefenderComponent = attacker.GetComponent<DefenderComponent>();
       var defenderComponent = defender.GetComponent<DefenderComponent>();
 
       if(defenderComponent.IsInvincible) {
@@ -81,7 +83,9 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           attacker.EntityName, defender.EntityName);
         LogAttack(attacker, defender, defenderComponent, logMessage, state);
       } else {
-        var attackReport = AttackHits(state.EncounterRand, attackerComponent.MeleeAttack, defenderComponent.MeleeDefense);
+        var attackReport = AttackHits(state.EncounterRand, attackerComponent.MeleeAttack, attackerDefenderComponent.FootingPenalty,
+          defenderComponent.MeleeDefense, defenderComponent.FootingPenalty);
+        attackerDefenderComponent.NotifyParentHasAttacked();
         if (!attackReport.Item3) {
           var logMessage = string.Format("[b]{0}[/b] attacks [b]{1}[/b], but misses! ({2}% chance to hit)",
             attacker.EntityName, defender.EntityName, attackReport.Item1);
@@ -90,11 +94,17 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         }
 
         // We don't allow underflow damage, though that could be a pretty comical mechanic...
-        int damage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
+        int weaponDamage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
+        int shieldedByFooting = (int)Math.Floor(weaponDamage * defenderComponent.PercentageFooting);
+        int damage = weaponDamage - shieldedByFooting;
+        int footingDamage = shieldedByFooting * 3;
+
         defenderComponent.RemoveHp(damage);
+        defenderComponent.RemoveFooting(footingDamage);
+
         if (defenderComponent.CurrentHp <= 0) {
           var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, destroying it! ({3}% chance to hit)",
-            attacker.EntityName, defender.EntityName, damage, attackReport.Item1);
+            attacker.EntityName, defender.EntityName, weaponDamage, attackReport.Item1);
 
           // Assign XP to the entity that fired the projectile
           var projectileSource = state.GetEntityById(attackerComponent.SourceEntityId);
@@ -108,7 +118,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           ResolveAction(new DestroyAction(defender.EntityId), state);
         } else {
           var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage! ({3}% chance to hit)",
-            attacker.EntityName, defender.EntityName, damage, attackReport.Item1);
+            attacker.EntityName, defender.EntityName, weaponDamage, attackReport.Item1);
             LogAttack(attacker, defender, defenderComponent, logMessage, state);
         }
       }
@@ -387,6 +397,10 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
     }
 
     private static bool ResolveWait(WaitAction action, EncounterState state) {
+      var defenderComponent = state.GetEntityById(action.ActorId).GetComponent<DefenderComponent>();
+      if (defenderComponent != null) {
+        defenderComponent.RestoreFooting();
+      }
       return true;
     }
   }

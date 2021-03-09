@@ -260,7 +260,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var friendliesBack = AIUtils.FriendliesInPosition(state, parent, parentFaction, positionBack.X, positionBack.Y);
       bool backSecure = false;
       foreach (var friendly in friendliesBack) {
-        if (!friendly.GetComponent<AIRotationComponent>().IsRotating) {
+        if (!friendly.IsRotating()) {
           backSecure = true;
           break;
         }
@@ -269,7 +269,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var friendliesParent = AIUtils.FriendliesInPosition(state, parent, parentFaction, parentPos.X, parentPos.Y);
       bool parentPosSecure = false;
       foreach (var friendly in friendliesParent) {
-        if (!friendly.GetComponent<AIRotationComponent>().IsRotating) {
+        if (!friendly.IsRotating()) {
           parentPosSecure = true;
           break;
         }

@@ -97,7 +97,7 @@ namespace SpaceDodgeRL.scenes.encounter {
             descBuilder.AppendLine("[b]Invincible[/b]");
           } else {
             descBuilder.AppendLine(string.Format("[b]HP:[/b] {0}/{1}", defenderComponent.CurrentHp, defenderComponent.MaxHp));
-            descBuilder.AppendLine(string.Format("[b]Armor:[/b] {0}", defenderComponent.BaseDefense));
+            descBuilder.AppendLine(string.Format("[b]Armor:[/b] {0}", defenderComponent.BaseDR));
           }
         }
 

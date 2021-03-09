@@ -35,6 +35,16 @@ namespace SpaceDodgeRL.scenes.entities {
       return this;
     }
 
+    // #################### JANK 7DRL HACK CONVENIENCE FNS ####################
+    public bool IsRotating() {
+      var rotationComponent = this.GetComponent<AIRotationComponent>();
+      if (rotationComponent != null) {
+        return rotationComponent.IsRotating;
+      } else {
+        return false;
+      }
+    }
+
     public static Entity Create(string entityId, string entityName) {
       return new Entity().Init(entityId, entityName);
     }
@@ -50,7 +60,7 @@ namespace SpaceDodgeRL.scenes.entities {
       // TODO: Formalize this into a "template" concept
       if (entity.EntityName == "boundary sign") {
         entity.AddComponent(CollisionComponent.Create(true, false));
-        entity.AddComponent(DefenderComponent.Create(0, 100, meleeDefense: 9999, rangedDefense: 9999, logDamage: false, isInvincible: true));
+        entity.AddComponent(DefenderComponent.Create(9999, 9999, 9999, 9999, 9999, logDamage: false, isInvincible: true));
         entity.AddComponent(DisplayComponent.Create("res://resources/sprites/edge_blocker.png", "Trying to run away, eh? Get back to your mission!", true, 2));
       }/* else if (entity.EntityName == "satellite") {
         entity.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: true));

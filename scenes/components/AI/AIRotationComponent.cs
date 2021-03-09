@@ -14,13 +14,15 @@ namespace SpaceDodgeRL.scenes.components {
     [JsonInclude] public bool IsRotating { get; private set; }
     [JsonInclude] public int TimesRotated { get; private set; }
     [JsonInclude] public int RotateAtHpThreshold { get; private set; }
+    [JsonInclude] public double RotateAtFootingPercentThreshold { get; private set; }
     
-    public static AIRotationComponent Create() {
+    public static AIRotationComponent Create(double rotateAtFootingPercentThreshold) {
       var component = new AIRotationComponent();
 
       component.IsRotating = false;
       component.TimesRotated = 0;
       component.RotateAtHpThreshold = -1;
+      component.RotateAtFootingPercentThreshold = rotateAtFootingPercentThreshold;
       
       return component;
     }
@@ -29,19 +31,22 @@ namespace SpaceDodgeRL.scenes.components {
       return JsonSerializer.Deserialize<AIRotationComponent>(saveData);
     }
 
-    public bool DecideIfShouldRotate(Entity parent) {
+    public void DecideIfShouldRotate(Entity parent) {
       var defender = parent.GetComponent<DefenderComponent>();
       if (this.RotateAtHpThreshold == -1) {
         this.RotateAtHpThreshold = defender.MaxHp * 2 / 3;
       }
 
-      bool shouldRotate = defender.CurrentHp < this.RotateAtHpThreshold;
-      if (shouldRotate) {
+      bool underHPThreshold = defender.CurrentHp < this.RotateAtHpThreshold;
+      if (underHPThreshold) {
         this.RotateAtHpThreshold = this.RotateAtHpThreshold * 2 / 3;
-        this.IsRotating = shouldRotate;
       }
 
-      return shouldRotate;
+      bool underFootingThreshold = defender.PercentageFooting < this.RotateAtFootingPercentThreshold;
+
+      if (underHPThreshold || underFootingThreshold) {
+        this.IsRotating = true;
+      }
     }
 
     public void NotifyRotationCompleted() {

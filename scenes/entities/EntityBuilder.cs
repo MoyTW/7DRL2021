@@ -79,7 +79,7 @@ namespace SpaceDodgeRL.scenes.entities {
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 45, meleeDefense: 20, rangedDefense: 25, isInvincible: true));
+      e.AddComponent(DefenderComponent.Create(9999, 9999, 9999, 9999, 9999, isInvincible: true));
       e.AddComponent(DisplayComponent.Create(_texCarrierPath, "Headquarters: " + faction.ToString(), false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -94,12 +94,12 @@ namespace SpaceDodgeRL.scenes.entities {
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
       e.AddComponent(new HastatusAIComponent(numPilas));
-      e.AddComponent(AIRotationComponent.Create());
+      e.AddComponent(AIRotationComponent.Create(.60));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 3, meleeAttack: 50, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 45, meleeDefense: 20, rangedDefense: 25));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 45, maxFooting: 80, meleeDefense: 20, rangedDefense: 25));
       e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -119,12 +119,12 @@ namespace SpaceDodgeRL.scenes.entities {
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
       e.AddComponent(new IberianLightInfantryAIComponent());
-      e.AddComponent(AIRotationComponent.Create());
+      e.AddComponent(AIRotationComponent.Create(.7));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 4, meleeAttack: 60, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 30, meleeDefense: 25, rangedDefense: 5));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 30, maxFooting: 60, meleeDefense: 25, rangedDefense: 5));
       e.AddComponent(DisplayComponent.Create(_texFighterPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -208,7 +208,7 @@ namespace SpaceDodgeRL.scenes.entities {
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: false));
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 100, meleeDefense: 45, rangedDefense: 60, isInvincible: false));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 100, maxFooting: 100, meleeDefense: 45, rangedDefense: 60, isInvincible: false));
       e.AddComponent(DisplayComponent.Create(_texPlayerPath, "It's you!", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(FactionName.PLAYER));
       e.AddComponent(InventoryComponent.Create(inventorySize: 26));
@@ -241,7 +241,7 @@ namespace SpaceDodgeRL.scenes.entities {
       var e = CreateEntity(Guid.NewGuid().ToString(), "boundary sign");
 
       e.AddComponent(CollisionComponent.Create(true, false));
-      e.AddComponent(DefenderComponent.Create(0, 100, meleeDefense: 9999, rangedDefense: 9999, logDamage: false, isInvincible: true));
+      e.AddComponent(DefenderComponent.Create(9999, 9999, 9999, 9999, 9999, logDamage: false, isInvincible: true));
       e.AddComponent(DisplayComponent.Create(_texEdgeBlockerPath, "Trying to run away, eh? Get back to your mission!", true, ENTITY_Z_INDEX));
 
       return e;
