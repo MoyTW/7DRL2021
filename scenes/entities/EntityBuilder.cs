@@ -88,12 +88,12 @@ namespace SpaceDodgeRL.scenes.entities {
       return e;
     }
 
-    public static Entity CreateHastatusEntity(int currentTick, int formationNumber, Unit unit, FactionName faction) {
+    public static Entity CreateHastatusEntity(int currentTick, int formationNumber, Unit unit, FactionName faction, int numPilas=1) {
       var e = CreateEntity(Guid.NewGuid().ToString(), "Hastatus");
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
-      e.AddComponent(new HastatusAIComponent(formationNumber));
+      e.AddComponent(new HastatusAIComponent(numPilas));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 3, meleeAttack: 50, rangedAttack: 30));
@@ -104,7 +104,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
       e.AddComponent(statusEffectTrackerComponent);
-      e.AddComponent(UnitComponent.Create(unit.UnitId, true));
+      e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
       unit.RegisterBattleReadyEntity(e);
@@ -117,7 +117,7 @@ namespace SpaceDodgeRL.scenes.entities {
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
-      e.AddComponent(new IberianLightInfantryAIComponent(formationNumber));
+      e.AddComponent(new IberianLightInfantryAIComponent());
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 4, meleeAttack: 60, rangedAttack: 10));
@@ -128,7 +128,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 80));
       e.AddComponent(statusEffectTrackerComponent);
-      e.AddComponent(UnitComponent.Create(unit.UnitId, true));
+      e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
       unit.RegisterBattleReadyEntity(e);

@@ -14,13 +14,9 @@ namespace SpaceDodgeRL.scenes.components.AI {
     public static readonly string ENTITY_GROUP = "IBERIAN_LIGHT_INFANTRY_AI_COMPONENT_GROUP";
     public override string EntityGroup => ENTITY_GROUP;
 
-    [JsonInclude] public int FormationNumber { get; private set; }
-
     public int TestTimer { get; set; }
 
-    public IberianLightInfantryAIComponent(int formationNumber) {
-      this.FormationNumber = formationNumber;
-
+    public IberianLightInfantryAIComponent() {
       this.TestTimer = 0;
     }
 
@@ -61,16 +57,19 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
+      var unitComponent = parent.GetComponent<UnitComponent>();
 
       this.TestTimer += 1;
-      if (this.TestTimer == 35 && this.FormationNumber == 0) {
+      if (this.TestTimer == 35 && unitComponent.FormationNumber == 0) {
         unit.StandingOrder = UnitOrder.ADVANCE;
       }
 
       if (unit.StandingOrder == UnitOrder.REFORM) {
-        return AIUtils.ActionsForUnitReform(state, parent, this.FormationNumber, unit);
+        return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
         return _ActionsForUnitAdvance(state, parent, unit);
+      } else if (unit.StandingOrder == UnitOrder.RETREAT) {
+        return AIUtils.ActionsForUnitRetreat(state, parent, unit);
       } else {
         throw new NotImplementedException();
       }

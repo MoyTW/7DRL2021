@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using SpaceDodgeRL.scenes.components;
 using SpaceDodgeRL.scenes.components.AI;
 using SpaceDodgeRL.scenes.entities;
 
@@ -64,7 +65,7 @@ namespace SpaceDodgeRL.library.encounter {
     public void RegisterBattleReadyEntity(Entity entity) {
       this.OriginalUnitStrength += 1;
       this._BattleReadyEntityIds.Add(entity.EntityId);
-      if (entity.GetComponent<HastatusAIComponent>() != null && entity.GetComponent<HastatusAIComponent>().FormationNumber == 0) {
+      if (entity.GetComponent<UnitComponent>().FormationNumber == 0) {
         this.EntityIdInForPositionZero = entity.EntityId;
       }
     }

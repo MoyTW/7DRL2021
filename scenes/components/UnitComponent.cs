@@ -11,11 +11,13 @@ namespace SpaceDodgeRL.scenes.components {
     public string EntityGroup => ENTITY_GROUP;
 
     [JsonInclude] public string UnitId { get; private set; }
+    [JsonInclude] public int FormationNumber { get; private set; }
     
-    public static UnitComponent Create(string unitId, bool hackBoolean) {
+    public static UnitComponent Create(string unitId, int formationNumber) {
       var component = new UnitComponent();
 
       component.UnitId = unitId;
+      component.FormationNumber = formationNumber;
       
       return component;
     }

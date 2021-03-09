@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using SpaceDodgeRL.library;
 using SpaceDodgeRL.library.encounter;
 using SpaceDodgeRL.library.encounter.rulebook;
 using SpaceDodgeRL.library.encounter.rulebook.actions;
@@ -203,6 +204,29 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
 
       return actions;
+    }
+
+    // This is actually much more like unit broken but oh well!
+    public static List<EncounterAction> ActionsForUnitRetreat(EncounterState state, Entity parent, Unit unit) {
+      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+
+      EncounterPosition targetEndPos = parentPos;
+      var backwardsPositions = new List<EncounterPosition>() {
+        AIUtils.RotateAndProject(parentPos, 0, 1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, 1, 1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, -1, 1, unit.UnitFacing),
+      };
+      GameUtils.Shuffle(state.EncounterRand, backwardsPositions);
+      foreach (var position in backwardsPositions) {
+        if (state.EntitiesAtPosition(position.X, position.Y).Count == 0) {
+          targetEndPos = position;
+          break;
+        }
+      }
+      if (targetEndPos == parentPos) {
+        targetEndPos = backwardsPositions[0];
+      }
+      return new List<EncounterAction>() { new MoveAction(parent.EntityId, targetEndPos) };
     }
   }
 }

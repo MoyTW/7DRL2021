@@ -15,12 +15,10 @@ namespace SpaceDodgeRL.scenes.components.AI {
     public static readonly string ENTITY_GROUP = "HASTATUS_AI_COMPONENT_GROUP";
     public override string EntityGroup => ENTITY_GROUP;
 
-    [JsonInclude] public int FormationNumber { get; private set; }
     [JsonInclude] public int PilasRemaining { get; private set; }
 
-    public HastatusAIComponent(int formationNumber) {
-      this.FormationNumber = formationNumber;
-      this.PilasRemaining = 1;
+    public HastatusAIComponent(int pilasRemaining) {
+      this.PilasRemaining = pilasRemaining;
     }
 
     public static HastatusAIComponent Create(string saveData) {
@@ -30,6 +28,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
     private List<EncounterAction> _ActionsForUnitAdvance(EncounterState state, Entity parent, Unit unit) {
       var actions = new List<EncounterAction>();
 
+      var unitComponent = parent.GetComponent<UnitComponent>();
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var parentFaction = parent.GetComponent<FactionComponent>().Faction;
 
@@ -51,10 +50,10 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var targetEndPos = parentPos;
       // We're gonna have some serious Phalanx Drift goin' on I guess?
       var forwardPositions = new List<EncounterPosition>() { AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing) };
-      if (!(unit.RightFlank && AIUtils.IsOnFlank(this.FormationNumber, unit, Flank.RIGHT))) {
+      if (!(unit.RightFlank && AIUtils.IsOnFlank(unitComponent.FormationNumber, unit, Flank.RIGHT))) {
         forwardPositions.Add(AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing));
       }
-      if (!(unit.LeftFlank && AIUtils.IsOnFlank(this.FormationNumber, unit, Flank.LEFT))) {
+      if (!(unit.LeftFlank && AIUtils.IsOnFlank(unitComponent.FormationNumber, unit, Flank.LEFT))) {
         forwardPositions.Add(AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing));
       }
       
@@ -83,38 +82,18 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return actions;
     }
 
-    // This is actually much more like unit broken but oh well!
-    public static List<EncounterAction> ActionsForUnitRetreat(EncounterState state, Entity parent, Unit unit) {
-      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
 
-      EncounterPosition targetEndPos = parentPos;
-      var backwardsPositions = new List<EncounterPosition>() {
-        AIUtils.RotateAndProject(parentPos, 0, 1, unit.UnitFacing),
-        AIUtils.RotateAndProject(parentPos, 1, 1, unit.UnitFacing),
-        AIUtils.RotateAndProject(parentPos, -1, 1, unit.UnitFacing),
-      };
-      GameUtils.Shuffle(state.EncounterRand, backwardsPositions);
-      foreach (var position in backwardsPositions) {
-        if (state.EntitiesAtPosition(position.X, position.Y).Count == 0) {
-          targetEndPos = position;
-          break;
-        }
-      }
-      if (targetEndPos == parentPos) {
-        targetEndPos = backwardsPositions[0];
-      }
-      return new List<EncounterAction>() { new MoveAction(parent.EntityId, targetEndPos) };
-    }
 
     public override List<EncounterAction> _DecideNextAction(EncounterState state, Entity parent) {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
+      var unitComponent = parent.GetComponent<UnitComponent>();
 
       if (unit.StandingOrder == UnitOrder.REFORM) {
-        return AIUtils.ActionsForUnitReform(state, parent, this.FormationNumber, unit);
+        return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
         return _ActionsForUnitAdvance(state, parent, unit);
       } else if (unit.StandingOrder == UnitOrder.RETREAT) {
-        return ActionsForUnitRetreat(state, parent, unit);
+        return AIUtils.ActionsForUnitRetreat(state, parent, unit);
       } else {
         throw new NotImplementedException();
       }
