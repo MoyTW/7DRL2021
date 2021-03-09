@@ -189,12 +189,16 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       }
     }
 
-    private static bool ResolveOnDeathEffect(string effectType, EncounterState state) {
+    private static bool ResolveOnDeathEffect(DestroyAction action, string effectType, EncounterState state) {
       if (effectType == OnDeathEffectType.PLAYER_VICTORY) {
         state.NotifyPlayerVictory();
-        return false;
+        return true;
       } else if (effectType == OnDeathEffectType.PLAYER_DEFEAT) {
         state.NotifyPlayerDefeat();
+        return true;
+      } else if (effectType == OnDeathEffectType.REMOVE_FROM_UNIT) {
+        var unit = state.GetUnit(state.GetEntityById(action.ActorId).GetComponent<UnitComponent>().UnitId);
+        unit.NotifyEntityDestroyed(action.ActorId);
         return false;
       } else {
         throw new NotImplementedException(String.Format("Don't know how to resolve on death effect type {0}", effectType));
@@ -209,7 +213,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       bool shouldRemoveEntity = true;
       if (onDeathComponent != null) {
         foreach (var effectType in onDeathComponent.ActiveEffectTypes) {
-          var effectStopsRemoval = !ResolveOnDeathEffect(effectType, state);
+          var effectStopsRemoval = ResolveOnDeathEffect(action, effectType, state);
           if (effectStopsRemoval) {
             shouldRemoveEntity = false;
           }

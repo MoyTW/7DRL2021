@@ -101,12 +101,13 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 45, meleeDefense: 20, rangedDefense: 25));
       e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
       e.AddComponent(statusEffectTrackerComponent);
       e.AddComponent(UnitComponent.Create(unit.UnitId, true));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
-      unit._BattleReadyEntityIds.Add(e.EntityId);
+      unit.RegisterBattleReadyEntity(e);
 
       return e;
     }
@@ -124,12 +125,13 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 30, meleeDefense: 25, rangedDefense: 5));
       e.AddComponent(DisplayComponent.Create(_texFighterPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 80));
       e.AddComponent(statusEffectTrackerComponent);
       e.AddComponent(UnitComponent.Create(unit.UnitId, true));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
-      unit._BattleReadyEntityIds.Add(e.EntityId);
+      unit.RegisterBattleReadyEntity(e);
 
       return e;
     }

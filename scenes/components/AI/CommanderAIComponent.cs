@@ -32,9 +32,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       if (this.OrderType == OrderType.ADVANCE) {
         unit.StandingOrder = UnitOrder.ADVANCE;
       } else if (this.OrderType == OrderType.OPEN_MANIPULE) {
-        var firstUnitId = unit._BattleReadyEntityIds.First( // TODO: not just hastatus
-          (u) => state.GetEntityById(u).GetComponent<HastatusAIComponent>().FormationNumber == 0);
-        var firstUnit = state.GetEntityById(firstUnitId);
+        var firstUnit = state.GetEntityById(unit.EntityIdInForPositionZero);
 
         unit.UnitFormation = FormationType.MANIPULE_OPENED;
         unit.StandingOrder = UnitOrder.REFORM;
@@ -60,11 +58,15 @@ namespace SpaceDodgeRL.scenes.components.AI {
     [JsonInclude] public List<string> _CommandedUnitIds { get; private set; }
     [JsonInclude] public int _CurrentTurn { get; private set; }
     [JsonInclude] public Dictionary<int, List<Order>> _DeploymentOrders { get; private set; }
+    [JsonInclude] public int LastDeploymentTurn { get; private set; }
+    [JsonInclude] public bool DeploymentComplete { get; private set; }
 
     public CommanderAIComponent() {
       this._CommandedUnitIds = new List<string>();
       this._CurrentTurn = 0;
       this._DeploymentOrders = new Dictionary<int, List<Order>>();
+      this.LastDeploymentTurn = 0;
+      this.DeploymentComplete = true;
     }
 
     public static CommanderAIComponent Create(string saveData) {
@@ -80,6 +82,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
         this._DeploymentOrders[turn] = new List<Order>();
       }
       this._DeploymentOrders[turn].Add(order);
+
+      if (turn > this.LastDeploymentTurn) {
+        this.LastDeploymentTurn = turn;
+      }
+      this.DeploymentComplete = false;
     }
 
     public List<EncounterAction> DecideNextAction(EncounterState state, Entity parent) {
@@ -87,6 +94,16 @@ namespace SpaceDodgeRL.scenes.components.AI {
         var deploymentOrders = this._DeploymentOrders[this._CurrentTurn];
         foreach (var order in deploymentOrders) {
           order.ExecuteOrder(state);
+        }
+        if (this.LastDeploymentTurn == this._CurrentTurn) {
+          this.DeploymentComplete = true;
+        }
+      } else if (this.DeploymentComplete) {
+        foreach (var unitId in this._CommandedUnitIds) {
+          var unit = state.GetUnit(unitId);
+          if (unit.NumInFormation < unit.OriginalUnitStrength - 15) {
+            Godot.GD.Print("UNIT ", unitId, " HAS 15 CASUALTIES!!!");
+          }
         }
       }
 

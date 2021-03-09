@@ -10,6 +10,7 @@ namespace SpaceDodgeRL.scenes.components {
   public static class OnDeathEffectType {
     public static string PLAYER_VICTORY = "ON_DEATH_EFFECT_TYPE_PLAYER_VICTORY";
     public static string PLAYER_DEFEAT = "ON_DEATH_EFFECT_TYPE_PLAYER_DEFEAT";
+    public static string REMOVE_FROM_UNIT = "ON_DEATH_EFFECT_REMOVE_FROM_UNIT";
   }
 
   public class OnDeathComponent : Component {
