@@ -206,7 +206,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return actions;
     }
 
-    public static List<EncounterAction> ActionsForUnitAdvanceInLine(EncounterState state, Entity parent, Unit unit) {
+    private static List<EncounterAction> ActionsUnitAdvanceFight(EncounterState state, Entity parent, Unit unit) {
       var actions = new List<EncounterAction>();
 
       var unitComponent = parent.GetComponent<UnitComponent>();
@@ -246,6 +246,57 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
       
       return actions;
+    }
+
+    // TODO: better rotate logic
+    private static bool IsRotatingOut(Entity entity) {
+      var defenderComponent = entity.GetComponent<DefenderComponent>();
+      return defenderComponent.CurrentHp < defenderComponent.MaxHp * 2 / 3;
+    }
+
+    private static List<EncounterAction> ActionsUnitAdvanceRotateOut(EncounterState state, Entity parent, Unit unit) {
+      var actions = new List<EncounterAction>();
+
+      var unitComponent = parent.GetComponent<UnitComponent>();
+      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+      var parentFaction = parent.GetComponent<FactionComponent>().Faction;
+
+      var positionBack = AIUtils.RotateAndProject(parentPos, 0, 1, unit.UnitFacing);
+      var friendliesBack = AIUtils.FriendliesInPosition(state, parent, parentFaction, positionBack.X, positionBack.Y);
+      bool backSecure = false;
+      foreach (var friendly in friendliesBack) {
+        if (!IsRotatingOut(friendly)) {
+          backSecure = true;
+          break;
+        }
+      }
+
+      var friendliesParent = AIUtils.FriendliesInPosition(state, parent, parentFaction, parentPos.X, parentPos.Y);
+      bool parentPosSecure = false;
+      foreach (var friendly in friendliesParent) {
+        if (!IsRotatingOut(friendly)) {
+          parentPosSecure = true;
+          break;
+        }
+      }
+
+      // If nobody is in your square or behind you, hold position
+      // Issue: if you have 2 units that are retreating, they'll form a self-reinforcing rout, which...I mean. lol.
+      if (backSecure || parentPosSecure) {
+        actions.Add(new MoveAction(parent.EntityId, positionBack));
+      } else {
+        actions.Add(new WaitAction(parent.EntityId));
+      }
+
+      return actions;
+    }
+
+    public static List<EncounterAction> ActionsForUnitAdvanceInLine(EncounterState state, Entity parent, Unit unit) {
+      if (IsRotatingOut(parent)) {
+        return ActionsUnitAdvanceRotateOut(state, parent, unit);
+      } else {
+        return ActionsUnitAdvanceFight(state, parent, unit);
+      }
     }
 
     // This is actually much more like unit broken but oh well!
