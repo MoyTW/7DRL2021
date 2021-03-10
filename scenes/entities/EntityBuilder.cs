@@ -95,6 +95,7 @@ namespace SpaceDodgeRL.scenes.entities {
 
       e.AddComponent(new HastatusAIComponent(numPilas));
       e.AddComponent(AIRotationComponent.Create(.60));
+      e.AddComponent(AIMoraleComponent.Create(100, 45));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 3, meleeAttack: 50, rangedAttack: 30));
@@ -118,6 +119,7 @@ namespace SpaceDodgeRL.scenes.entities {
 
       e.AddComponent(new IberianLightInfantryAIComponent());
       e.AddComponent(AIRotationComponent.Create(.7));
+      e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 4, meleeAttack: 60, rangedAttack: 10));

@@ -265,12 +265,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
       if (tryAdvance) {
         var twoStepsAhead = AIUtils.RotateAndProject(parentPos, 0, -2, unit.UnitFacing);
         if (AIUtils.HostilesInPosition(state, parentFaction, twoStepsAhead.X, twoStepsAhead.Y).Count > 0) {
-          if (parent.GetComponent<HastatusAIComponent>() != null) { // TODO: Actually make this a morale check lol
+          var moraleState = parent.GetComponent<AIMoraleComponent>().CurrentMoraleState;
+          if (moraleState <= MoraleState.WAVERING) {
             tryAdvance = false;
           }
         }
       }
-
 
       if (tryAdvance) {
         // We're gonna have some serious Phalanx Drift goin' on I guess?
