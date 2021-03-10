@@ -23,8 +23,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
     }
 
     public string ToCardinalDirection(EncounterPosition parentPos, EncounterPosition adjacentPos) {
-      int dx = parentPos.X - adjacentPos.X;
-      int dy = parentPos.Y - adjacentPos.Y;
+      int dx = adjacentPos.X - parentPos.X;
+      int dy = adjacentPos.Y - parentPos.Y;
       if (dx == 0 && dy == -1) {
         return InputHandler.ActionMapping.MOVE_N;
       } else if (dx == 1 && dy == -1) {
@@ -46,26 +46,28 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
     }
 
-    public List<string> AllowedMovesForAdvance(EncounterState state, Entity parent) {
+    public List<string> AllowedActions(EncounterState state, Entity parent, UnitOrder standingOrder) {
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
-      var positions = new List<string>();
+      var actions = new List<string>() { InputHandler.ActionMapping.LEAVE_FORMATION, InputHandler.ActionMapping.WAIT };
       
-      // Directly ahead pos
-      var validEndPositions = new List<EncounterPosition>() {
-        AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),
-        AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing),
-        AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing),
-        AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing),
-        AIUtils.RotateAndProject(parentPos, 1, 0, unit.UnitFacing),
-      };
-      foreach (var possible in validEndPositions) {
-        if (state.EntitiesAtPosition(possible.X, possible.Y).Count > 0) {
-          positions.Add(ToCardinalDirection(parentPos, possible));
+      if (standingOrder == UnitOrder.ADVANCE) {
+        // Directly ahead pos
+        var validEndPositions = new List<EncounterPosition>() {
+          AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),
+          AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing),
+          AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing),
+          AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing),
+          AIUtils.RotateAndProject(parentPos, 1, 0, unit.UnitFacing),
+        };
+        foreach (var possible in validEndPositions) {
+          if (state.EntitiesAtPosition(possible.X, possible.Y).Count == 0) {
+            actions.Add(ToCardinalDirection(parentPos, possible));
+          }
         }
       }
 
-      return positions;
+      return actions;
     }
 
     public List<EncounterAction> DecideNextActionForInput(EncounterState state, Entity parent, string actionMapping) {
@@ -84,10 +86,6 @@ namespace SpaceDodgeRL.scenes.components.AI {
           return null;
         }
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
-        // You're allowed to move into these
-
-        Godot.GD.Print(AllowedMovesForAdvance(state, parent));
-
         return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
       } else if (unit.StandingOrder == UnitOrder.RETREAT) {
         if (actionMapping == InputHandler.ActionMapping.WAIT) {

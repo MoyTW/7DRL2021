@@ -17,6 +17,7 @@ namespace SpaceDodgeRL.scenes.encounter {
     // We use this to determine whether the UI should refresh; this will cause a comical number of UI updates since we'll be
     // sending it every end turn, but I don't want to have to go in and effectively instrument all my state changes to set up
     // "change on data update" changes.
+    [Signal] public delegate void PlayerTurnStarted();
     [Signal] public delegate void TurnEnded();
     [Signal] public delegate void PositionScanned(int x, int y, Entity scannedEntity);
 
@@ -144,11 +145,13 @@ namespace SpaceDodgeRL.scenes.encounter {
           this._sceneManager.ShowCharacterMenu(state);
         }
 
+        // Update the player options text
+        EmitSignal(nameof(EncounterRunner.PlayerTurnStarted));
+
         var playerComponent = entity.GetComponent<PlayerComponent>();
         var action = inputHandler.PopQueue();
 
         // Super not a fan of the awkwardness of checking this twice! Switch string -> enum, maybe?
-        // TODO: this is a jank if & the conditions are hard to read
         if (action != null && AlwaysAvaiableActionMappingToActionDict.ContainsKey(action.Mapping)) {
           AlwaysAvaiableActionMappingToActionDict[action.Mapping].Invoke(state, this, action);
         } else if (action != null && !playerComponent.IsInFormation && FreeMovementActionMappingToActionDict.ContainsKey(action.Mapping) ) {

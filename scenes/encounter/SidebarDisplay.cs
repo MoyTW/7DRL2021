@@ -33,23 +33,26 @@ namespace SpaceDodgeRL.scenes.encounter {
       var newHPText = string.Format("HP: {0}/{1}", playerDefenderComponent.CurrentHp, playerDefenderComponent.MaxHp);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/HPLabel").Text = newHPText;
 
-      var playerComponent = player.GetComponent<PlayerComponent>();
-      var newAttackPowerText = string.Format("Laser Power: {0}", "nosuch");
+      var newFootingText = string.Format("Footing: {0}/{1}", playerDefenderComponent.CurrentFooting,
+        playerDefenderComponent.MaxFooting, playerDefenderComponent.FootingPenalty);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/FootingLabel").Text = newFootingText;
+
+      var playerAttackerComponent = player.GetComponent<AttackerComponent>();
+      var newMAtkText = string.Format("Melee Attack: {0}", playerAttackerComponent.MeleeAttack);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/MeleeAttackLabel").Text = newMAtkText;
+
+      var newAttackPowerText = string.Format("Attack Power: {0}", playerAttackerComponent.Power);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/AttackPowerLabel").Text = newAttackPowerText;
+
+      var newMDefText = string.Format("Melee Defense: {0}", playerDefenderComponent.MeleeDefense);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/MeleeDefenseLabel").Text = newMDefText;
+
+      var newRDefText = string.Format("Ranged Defense: {0}", playerDefenderComponent.RangedDefense);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/RangedDefenseLabel").Text = newRDefText;
 
       var speedComponent = player.GetComponent<SpeedComponent>();
       var newSpeedText = string.Format("Speed: {0}", speedComponent.Speed);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/SpeedLabel").Text = newSpeedText;
-
-      var invComponent = player.GetComponent<InventoryComponent>();
-      var newInvText = string.Format("Cargo Space: {0}/{1}", invComponent.InventoryUsed, invComponent.InventorySize);
-      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/InventoryLabel").Text = newInvText;
-
-      var xpComponent = player.GetComponent<XPTrackerComponent>();
-      var newLevelText = string.Format("Level: {0}", xpComponent.Level);
-      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/LevelLabel").Text = newLevelText;
-      var newXPText = string.Format("Experience: {0}/{1}", xpComponent.XP, xpComponent.NextLevelAtXP);
-      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/ExperienceLabel").Text = newXPText;
 
       // Right column
       var playerPos = player.GetComponent<PositionComponent>().EncounterPosition;
@@ -57,15 +60,18 @@ namespace SpaceDodgeRL.scenes.encounter {
       var newTurnReadoutText = string.Format("Turn: {0:0.00}", state.CurrentTick / 100);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/TurnReadoutLabel").Text = newTurnReadoutText;
 
-      var newSectorZoneText = string.Format("Current Sector: {0}", state.DungeonLevel);
-      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/SectorLabel").Text = newSectorZoneText;
+      var xpComponent = player.GetComponent<XPTrackerComponent>();
+      var newLevelText = string.Format("Level: {0}", xpComponent.Level);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/LevelLabel").Text = newLevelText;
+      var newXPText = string.Format("Experience: {0}/{1}", xpComponent.XP, xpComponent.NextLevelAtXP);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ExperienceLabel").Text = newXPText;
 
-      string newPositionZoneText = string.Format("Point: ({0}, {1})", playerPos.X, playerPos.Y);
-      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/PositionLabel").Text = newPositionZoneText;
+      var unit = state.GetUnit(player.GetComponent<UnitComponent>().UnitId);
+      var unitOrderText = string.Format("Order: {0}", unit.StandingOrder.ToString());
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/UnitOrderLabel").Text = unitOrderText;
 
-      
-      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneHeaderLabel").Text = "Not In Zone";
-      GetNode<VBoxContainer>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ZoneBlock").Hide();
+      var unitSizeText = string.Format("Strength: {0}/{1}", unit.NumInFormation, unit.OriginalUnitStrength);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/UnitNumLabel").Text = unitSizeText;
     }
 
     public void DisplayScannedEntity(int x, int y, Entity entity) {

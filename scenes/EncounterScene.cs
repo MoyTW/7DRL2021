@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using SpaceDodgeRL.scenes.components;
+using SpaceDodgeRL.scenes.components.AI;
 using SpaceDodgeRL.scenes.encounter;
 using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
@@ -31,6 +32,7 @@ namespace SpaceDodgeRL.scenes {
       // Hook up the UI
       this.EncounterState.Connect(nameof(EncounterState.EncounterLogMessageAdded), this, nameof(OnEncounterLogMessageAdded));
       this.encounterRunner.Connect(nameof(EncounterRunner.TurnEnded), this, nameof(OnTurnEnded));
+      this.encounterRunner.Connect(nameof(EncounterRunner.PlayerTurnStarted), this, nameof(OnPlayerTurnStarted));
       // TODO: Add keyboard look via "s"
       this.encounterRunner.Connect(nameof(EncounterRunner.PositionScanned), this, nameof(OnPositionScanned));
       var viewportContainer = GetNode<ViewportContainer>("SceneFrame/SceneVBox/EncounterViewportContainer");
@@ -60,8 +62,22 @@ namespace SpaceDodgeRL.scenes {
       this.GetNode<SidebarDisplay>("SceneFrame/SidebarDisplay").AddEncounterLogMessage(bbCodeMessage, encounterLogSize);
     }
 
+    private void OnPlayerTurnStarted() {
+      var player = this.EncounterState.Player;
+      var playerComponent = player.GetComponent<PlayerComponent>();
+
+      if (playerComponent.IsInFormation) {
+        var formationText = this.GetNode<Label>("CanvasLayer/FormationText");
+        formationText.Show();
+        var order = this.EncounterState.GetUnit(player.GetComponent<UnitComponent>().UnitId).StandingOrder;
+        var actions = player.GetComponent<PlayerAIComponent>().AllowedActions(this.EncounterState, player, order);
+        formationText.Text = "In formation. Approved actions: " + String.Join(",", actions);
+      }
+    }
+
     private void OnTurnEnded() {
       this.GetNode<SidebarDisplay>("SceneFrame/SidebarDisplay").RefreshStats(this.EncounterState);
+      this.GetNode<Label>("CanvasLayer/FormationText").Hide();
     }
 
     private void OnPositionScanned(int x, int y, Entity entity) {
