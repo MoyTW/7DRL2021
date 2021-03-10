@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -79,6 +80,22 @@ namespace SpaceDodgeRL.scenes.encounter {
       return state.NextEntity.IsInGroup(PlayerComponent.ENTITY_GROUP);
     }
 
+    private static void blah(EncounterState state, EncounterRunner runner) {
+
+    }
+
+    private static Dictionary<string, Action<EncounterState, EncounterRunner>> AlwaysAvaiableActionMappingToActionDict =
+      new Dictionary<string, Action<EncounterState, EncounterRunner>>()
+    {
+      { InputHandler.ActionMapping.CHARACTER, (s, r) => r._sceneManager.ShowCharacterMenu(s) },
+      { InputHandler.ActionMapping.ESCAPE_MENU, (s, r) => r._sceneManager.ShowEscapeMenu(s) },
+      { InputHandler.ActionMapping.HELP_MENU, (s, r) => r._sceneManager.ShowHelpMenu() },
+      { InputHandler.ActionMapping.INVENTORY, (s, r) => r._sceneManager.ShowInventoryMenu(s) },
+      { InputHandler.ActionMapping.ZOOM_IN, (s, r) => s.ZoomIn() },
+      { InputHandler.ActionMapping.ZOOM_OUT, (s, r) => s.ZoomOut() },
+      { InputHandler.ActionMapping.ZOOM_RESET, (s, r) => s.ZoomReset() },
+    };
+
     private void RunTurn(EncounterState state, InputHandler inputHandler) {
       if (state.RunStatus == EncounterState.RUN_STATUS_PLAYER_DEFEAT) {
         this._sceneManager.ShowDefeatMenu(state);
@@ -87,6 +104,8 @@ namespace SpaceDodgeRL.scenes.encounter {
         this._sceneManager.ShowVictoryMenu(state);
         return;
       }
+
+      Action<EncounterState, EncounterRunner> lol = (s, runner) => runner._sceneManager.ShowCharacterMenu(s);
 
       var entity = state.NextEntity;
       var actionTimeComponent = entity.GetComponent<ActionTimeComponent>();
@@ -101,7 +120,9 @@ namespace SpaceDodgeRL.scenes.encounter {
 
         // Super not a fan of the awkwardness of checking this twice! Switch string -> enum, maybe?
         // TODO: this is a jank if & the conditions are hard to read
-        if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_N) {
+        if (action != null && AlwaysAvaiableActionMappingToActionDict.ContainsKey(action.Mapping)) {
+          AlwaysAvaiableActionMappingToActionDict[action.Mapping].Invoke(state, this);
+        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_N) {
           PlayerMove(state, 0, -1);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_NE) {
           PlayerMove(state, 1, -1);
@@ -119,26 +140,13 @@ namespace SpaceDodgeRL.scenes.encounter {
           PlayerMove(state, -1, -1);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.WAIT) {
           PlayerWait(state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.CHARACTER) {
-          this._sceneManager.ShowCharacterMenu(state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.ESCAPE_MENU) {
-          this._sceneManager.ShowEscapeMenu(state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.HELP_MENU) {
-          this._sceneManager.ShowHelpMenu();
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.INVENTORY) {
-          this._sceneManager.ShowInventoryMenu(state);
+          // TODO: rip out use stairs
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_STAIRS) {
           PlayerExecuteTurnEndingAction(new UseStairsAction(entity.EntityId), state);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.GET_ITEM) {
           PlayerExecuteTurnEndingAction(new GetItemAction(entity.EntityId), state);
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_ITEM) {
           GD.Print("Select an item via the inventory menu instead!");
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.ZOOM_IN) {
-          state.ZoomIn();
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.ZOOM_OUT) {
-          state.ZoomOut();
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.ZOOM_RESET) {
-          state.ZoomReset();
         } else if (action != null && action.Mapping == InputHandler.ActionMapping.SCAN_POSITION) {
           var scanAction = action as InputHandler.ScanInputAction;
           if (!state.IsInBounds(scanAction.X, scanAction.Y)) {
