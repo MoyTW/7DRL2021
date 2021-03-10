@@ -266,7 +266,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
         var twoStepsAhead = AIUtils.RotateAndProject(parentPos, 0, -2, unit.UnitFacing);
         if (AIUtils.HostilesInPosition(state, parentFaction, twoStepsAhead.X, twoStepsAhead.Y).Count > 0) {
           var moraleState = parent.GetComponent<AIMoraleComponent>().CurrentMoraleState;
-          if (moraleState <= MoraleState.WAVERING) {
+          if (moraleState == MoraleState.WAVERING) {
+            if (state.EncounterRand.Next(2) == 0) {
+              tryAdvance = false;
+            }
+          } else if (moraleState < MoraleState.WAVERING) {
             tryAdvance = false;
           }
         }
