@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Godot;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.resources.gamedata;
 using SpaceDodgeRL.scenes.entities;
 
 namespace SpaceDodgeRL.scenes.components {
@@ -15,14 +10,16 @@ namespace SpaceDodgeRL.scenes.components {
 
     private Entity _parent;
     
-    // Right now the player is a special case in that they're the only entity with variable-power weaponry!
+    [JsonInclude] public bool IsInFormation { get; private set; }
     [JsonInclude] public int PilaRange { get; private set; }
 
     public static PlayerComponent Create(
+      bool isInFormation,
       int pilaRange = 3
     ) {
       var component = new PlayerComponent();
-
+      
+      component.IsInFormation = isInFormation;
       component.PilaRange = pilaRange;
 
       return component;

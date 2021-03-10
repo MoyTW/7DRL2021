@@ -137,82 +137,25 @@ namespace SpaceDodgeRL.scenes.entities {
       return e;
     }
 
-    private static Entity CreateExtraBatteryEntity() {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "extra battery");
-
-      e.AddComponent(DisplayComponent.Create(_texBatteryPath, "An extra battery for your weapons. Gives 20 power for 450 ticks.", true, ITEM_Z_INDEX));
-      e.AddComponent(StorableComponent.Create());
-      e.AddComponent(UsableComponent.Create(useOnGet: false));
-      e.AddComponent(UseEffectBoostPowerComponent.Create(boostPower: 20, duration: 450));
-
-      return e;
-    }
-
-    private static Entity CreateDuctTapeEntity() {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "duct tape");
-
-      e.AddComponent(DisplayComponent.Create(_texDuctTapePath, "Some duct tape. Heals 10 HP.", true, ITEM_Z_INDEX));
-      e.AddComponent(StorableComponent.Create());
-      e.AddComponent(UsableComponent.Create(useOnGet: false));
-      e.AddComponent(UseEffectHealComponent.Create(healpower: 10));
-
-      return e;
-    }
-
-    private static Entity CreateRedPaintEntity() {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "red paint");
-
-      e.AddComponent(DisplayComponent.Create(_texRedPaintPath, "Reduces turn time by 75 for 300 ticks (minimum time is 1).", true, ITEM_Z_INDEX));
-      e.AddComponent(StorableComponent.Create());
-      e.AddComponent(UsableComponent.Create(useOnGet: false));
-      e.AddComponent(UseEffectBoostSpeedComponent.Create(boostPower: 75, duration: 300));
-
-      return e;
-    }
-
-    private static Entity CreateEMPEntity() {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "EMP");
-
-      e.AddComponent(DisplayComponent.Create(_texEMPPath, "An EMP burst. Disables enemies for 10 turns in radius 20.", true, ITEM_Z_INDEX));
-      e.AddComponent(StorableComponent.Create());
-      e.AddComponent(UsableComponent.Create(useOnGet: false));
-      // I seriously put 20 radius 10 turns? That's enough time to mop up an entire encounter!
-      e.AddComponent(UseEffectEMPComponent.Create(radius: 20, disableTurns: 10));
-
-      return e;
-    }
-
-    public static Entity CreateEnemyByEntityDefId(string enemyDefId, string activationGroupId, int currentTick) {
-      throw new NotImplementedException("No mapping defined for " + enemyDefId);
-    }
-
-    public static Entity CreateItemByEntityDefId(string itemDefId) {
-      if (itemDefId == EntityDefId.ITEM_DUCT_TAPE) {
-        return EntityBuilder.CreateDuctTapeEntity();
-      } else if (itemDefId == EntityDefId.ITEM_EXTRA_BATTERY) {
-        return EntityBuilder.CreateExtraBatteryEntity();
-      } else if (itemDefId == EntityDefId.ITEM_RED_PAINT) {
-        return EntityBuilder.CreateRedPaintEntity();
-      } else if (itemDefId == EntityDefId.ITEM_EMP) {
-        return EntityBuilder.CreateEMPEntity();
-      } else {
-        throw new NotImplementedException("No mapping defined for " + itemDefId);
-      }
-    }
-
     public static Entity CreatePlayerEntity(int currentTick) {
       var e = CreateEntity(Guid.NewGuid().ToString(), "player");
+
+      // TODO: modify PlayerAIComponent to it doesn't, you know...need these.
+      e.AddComponent(new PlayerAIComponent());
+      e.AddComponent(AIRotationComponent.Create(.60));
+      e.AddComponent(AIMoraleComponent.Create(100, 100));
 
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, power: 500, meleeAttack: 9999, rangedAttack: 10)); // TODO: make player not Ares
       e.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: false));
       e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 100, maxFooting: 100, meleeDefense: 45, rangedDefense: 60, isInvincible: false));
       e.AddComponent(DisplayComponent.Create(_texPlayerPath, "It's you!", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(FactionName.PLAYER));
       e.AddComponent(InventoryComponent.Create(inventorySize: 26));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.PLAYER_DEFEAT }));
-      e.AddComponent(PlayerComponent.Create());
+      e.AddComponent(PlayerComponent.Create(isInFormation: true));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
       e.AddComponent(statusEffectTrackerComponent);
       e.AddComponent(XPTrackerComponent.Create(levelUpBase: 200, levelUpFactor: 150));

@@ -80,20 +80,48 @@ namespace SpaceDodgeRL.scenes.encounter {
       return state.NextEntity.IsInGroup(PlayerComponent.ENTITY_GROUP);
     }
 
-    private static void blah(EncounterState state, EncounterRunner runner) {
+    private static void HandleScanAction(EncounterState state, EncounterRunner runner, InputHandler.InputAction action) {
+      var scanAction = action as InputHandler.ScanInputAction;
+      if (!state.IsInBounds(scanAction.X, scanAction.Y)) {
+        return;
+      }
 
+      var blockingEntity = state.BlockingEntityAtPosition(scanAction.X, scanAction.Y);
+      var allEntities = state.EntitiesAtPosition(scanAction.X, scanAction.Y);
+      if (blockingEntity != null) {
+        runner.EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, blockingEntity);
+      } else if (allEntities.Count > 0) {
+        runner.EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, allEntities[0]);
+      } else {
+        runner.EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, null);
+      }
     }
 
-    private static Dictionary<string, Action<EncounterState, EncounterRunner>> AlwaysAvaiableActionMappingToActionDict =
-      new Dictionary<string, Action<EncounterState, EncounterRunner>>()
+    private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> AlwaysAvaiableActionMappingToActionDict =
+      new Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>>()
     {
-      { InputHandler.ActionMapping.CHARACTER, (s, r) => r._sceneManager.ShowCharacterMenu(s) },
-      { InputHandler.ActionMapping.ESCAPE_MENU, (s, r) => r._sceneManager.ShowEscapeMenu(s) },
-      { InputHandler.ActionMapping.HELP_MENU, (s, r) => r._sceneManager.ShowHelpMenu() },
-      { InputHandler.ActionMapping.INVENTORY, (s, r) => r._sceneManager.ShowInventoryMenu(s) },
-      { InputHandler.ActionMapping.ZOOM_IN, (s, r) => s.ZoomIn() },
-      { InputHandler.ActionMapping.ZOOM_OUT, (s, r) => s.ZoomOut() },
-      { InputHandler.ActionMapping.ZOOM_RESET, (s, r) => s.ZoomReset() },
+      { InputHandler.ActionMapping.CHARACTER, (s, r, a) => r._sceneManager.ShowCharacterMenu(s) },
+      { InputHandler.ActionMapping.ESCAPE_MENU, (s, r, a) => r._sceneManager.ShowEscapeMenu(s) },
+      { InputHandler.ActionMapping.HELP_MENU, (s, r, a) => r._sceneManager.ShowHelpMenu() },
+      { InputHandler.ActionMapping.INVENTORY, (s, r, a) => r._sceneManager.ShowInventoryMenu(s) },
+      { InputHandler.ActionMapping.ZOOM_IN, (s, r, a) => s.ZoomIn() },
+      { InputHandler.ActionMapping.ZOOM_OUT, (s, r, a) => s.ZoomOut() },
+      { InputHandler.ActionMapping.ZOOM_RESET, (s, r, a) => s.ZoomReset() },
+      { InputHandler.ActionMapping.SCAN_POSITION, HandleScanAction },
+    };
+
+    private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> FreeMovementActionMappingToActionDict =
+      new Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>>()
+    {
+      { InputHandler.ActionMapping.MOVE_N, (s, r, a) => r.PlayerMove(s, 0, -1) },
+      { InputHandler.ActionMapping.MOVE_NE, (s, r, a) => r.PlayerMove(s, 1, -1) },
+      { InputHandler.ActionMapping.MOVE_E, (s, r, a) => r.PlayerMove(s, 1, 0) },
+      { InputHandler.ActionMapping.MOVE_SE, (s, r, a) => r.PlayerMove(s, 1, 1) },
+      { InputHandler.ActionMapping.MOVE_S, (s, r, a) => r.PlayerMove(s, 0, 1) },
+      { InputHandler.ActionMapping.MOVE_SW, (s, r, a) => r.PlayerMove(s, -1, 1) },
+      { InputHandler.ActionMapping.MOVE_W, (s, r, a) => r.PlayerMove(s, -1, 0) },
+      { InputHandler.ActionMapping.MOVE_NW, (s, r, a) => r.PlayerMove(s, -1, -1) },
+      { InputHandler.ActionMapping.WAIT, (s, r, a) => r.PlayerWait(s) },
     };
 
     private void RunTurn(EncounterState state, InputHandler inputHandler) {
@@ -116,52 +144,28 @@ namespace SpaceDodgeRL.scenes.encounter {
           this._sceneManager.ShowCharacterMenu(state);
         }
 
+        var playerComponent = entity.GetComponent<PlayerComponent>();
         var action = inputHandler.PopQueue();
 
         // Super not a fan of the awkwardness of checking this twice! Switch string -> enum, maybe?
         // TODO: this is a jank if & the conditions are hard to read
         if (action != null && AlwaysAvaiableActionMappingToActionDict.ContainsKey(action.Mapping)) {
-          AlwaysAvaiableActionMappingToActionDict[action.Mapping].Invoke(state, this);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_N) {
-          PlayerMove(state, 0, -1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_NE) {
-          PlayerMove(state, 1, -1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_E) {
-          PlayerMove(state, 1, 0);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_SE) {
-          PlayerMove(state, 1, 1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_S) {
-          PlayerMove(state, 0, 1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_SW) {
-          PlayerMove(state, -1, 1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_W) {
-          PlayerMove(state, -1, 0);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_NW) {
-          PlayerMove(state, -1, -1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.WAIT) {
-          PlayerWait(state);
-          // TODO: rip out use stairs
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_STAIRS) {
-          PlayerExecuteTurnEndingAction(new UseStairsAction(entity.EntityId), state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.GET_ITEM) {
-          PlayerExecuteTurnEndingAction(new GetItemAction(entity.EntityId), state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_ITEM) {
-          GD.Print("Select an item via the inventory menu instead!");
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.SCAN_POSITION) {
-          var scanAction = action as InputHandler.ScanInputAction;
-          if (!state.IsInBounds(scanAction.X, scanAction.Y)) {
-            return;
-          }
-
-          var blockingEntity = state.BlockingEntityAtPosition(scanAction.X, scanAction.Y);
-          var allEntities = state.EntitiesAtPosition(scanAction.X, scanAction.Y);
-          if (blockingEntity != null) {
-            EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, blockingEntity);
-          } else if (allEntities.Count > 0) {
-            EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, allEntities[0]);
-          } else {
-            EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, null);
-          }
+          AlwaysAvaiableActionMappingToActionDict[action.Mapping].Invoke(state, this, action);
+        } else if (action != null && !playerComponent.IsInFormation && FreeMovementActionMappingToActionDict.ContainsKey(action.Mapping) ) {
+          FreeMovementActionMappingToActionDict[action.Mapping].Invoke(state, this, action);
+        } else if (action != null && playerComponent.IsInFormation) {
+          var playerAI = entity.GetComponent<PlayerAIComponent>();
+          var commands = playerAI.DecideNextActionForInput(state, entity, action.Mapping);
+          Rulebook.ResolveActionsAndEndTurn(commands, state);
+          EmitSignal(nameof(EncounterRunner.TurnEnded));
+          state.UpdatePlayerOverlays();
+        // TODO: rip out use stairs
+        // } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_STAIRS) {
+        //   PlayerExecuteTurnEndingAction(new UseStairsAction(entity.EntityId), state);
+        // } else if (action != null && action.Mapping == InputHandler.ActionMapping.GET_ITEM) {
+        //   PlayerExecuteTurnEndingAction(new GetItemAction(entity.EntityId), state);
+        // } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_ITEM) {
+        //   GD.Print("Select an item via the inventory menu instead!");
         } else if (action != null) {
           GD.Print("No handler yet for ", action);
         }

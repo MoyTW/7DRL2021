@@ -68,6 +68,14 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       commanderAIComponent.RegisterTriggeredOrder(trigger, new Order(unit.UnitId, OrderType.RETREAT));
     }
 
+    private static void AddPlayerToUnit(Entity player, Unit unit, int formationNumber) {
+      var oldUnitComponent = player.GetComponent<UnitComponent>();
+      if (oldUnitComponent != null) {
+        player.RemoveComponent(oldUnitComponent);
+      }
+      player.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
+    }
+
     public static void PopulateStateForLevel(Entity player, int dungeonLevel, EncounterState state, Random seededRand,
         int width = 300, int height = 300, int maxZoneGenAttempts = 100) {
       InitializeMapAndAddBorderWalls(state, width, height);
@@ -88,6 +96,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       var pCenter = CreateAndDeployUnit(seededRand, state, "test player center", FactionName.PLAYER,
         new EncounterPosition(playerPos.X, playerPos.Y - 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
         FormationFacing.SOUTH, 123, hastatusFn, leftFlank: false, rightFlank: false, friendlyHQ);
+      AddPlayerToUnit(player, pCenter, 123);
       friendlyCommanderAI.RegisterDeploymentOrder(20, new Order(pCenter.UnitId, OrderType.ADVANCE));
       friendlyCommanderAI.RegisterDeploymentOrder(30, new Order(pCenter.UnitId, OrderType.OPEN_MANIPULE));
       friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pCenter.UnitId, OrderType.ADVANCE));
