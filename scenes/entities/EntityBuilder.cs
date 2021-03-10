@@ -88,17 +88,18 @@ namespace SpaceDodgeRL.scenes.entities {
       return e;
     }
 
-    public static Entity CreateHastatusEntity(int currentTick, int formationNumber, Unit unit, FactionName faction, int numPilas=1) {
+    public static Entity CreateHastatusEntity(int currentTick, int formationNumber, Unit unit, FactionName faction,
+        int numPilas=1, int startingMorale=45) {
       var e = CreateEntity(Guid.NewGuid().ToString(), "Hastatus");
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
       e.AddComponent(new HastatusAIComponent(numPilas));
       e.AddComponent(AIRotationComponent.Create(.60));
-      e.AddComponent(AIMoraleComponent.Create(100, 45));
+      e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 3, meleeAttack: 50, rangedAttack: 30));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 4, meleeAttack: 50, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 45, maxFooting: 80, meleeDefense: 20, rangedDefense: 25));
       e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
@@ -122,7 +123,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 4, meleeAttack: 60, rangedAttack: 10));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 60, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 30, maxFooting: 60, meleeDefense: 25, rangedDefense: 5));
       e.AddComponent(DisplayComponent.Create(_texFighterPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
