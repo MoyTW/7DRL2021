@@ -22,20 +22,79 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return JsonSerializer.Deserialize<PlayerAIComponent>(saveData);
     }
 
-    public List<EncounterAction> DecideNextActionForInput(EncounterState state, Entity parent, string actionMapping) {
-      if (actionMapping == InputHandler.ActionMapping.MOVE_N) {
-        Godot.GD.Print("player AI recognizes player wants to move north!!!");
+    public string ToCardinalDirection(EncounterPosition parentPos, EncounterPosition adjacentPos) {
+      int dx = parentPos.X - adjacentPos.X;
+      int dy = parentPos.Y - adjacentPos.Y;
+      if (dx == 0 && dy == -1) {
+        return InputHandler.ActionMapping.MOVE_N;
+      } else if (dx == 1 && dy == -1) {
+        return InputHandler.ActionMapping.MOVE_NE;
+      } else if (dx == 1 && dy == 0) {
+        return InputHandler.ActionMapping.MOVE_E;
+      } else if (dx == 1 && dy == 1) {
+        return InputHandler.ActionMapping.MOVE_SE;
+      } else if (dx == 0 && dy == 1) {
+        return InputHandler.ActionMapping.MOVE_S;
+      } else if (dx == -1 && dy == 1) {
+        return InputHandler.ActionMapping.MOVE_SW;
+      } else if (dx == -1 && dy == 0) {
+        return InputHandler.ActionMapping.MOVE_W;
+      } else if (dx == -1 && dy == -1) {
+        return InputHandler.ActionMapping.MOVE_NW;
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+
+    public List<string> AllowedMovesForAdvance(EncounterState state, Entity parent) {
+      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+      var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
+      var positions = new List<string>();
+      
+      // Directly ahead pos
+      var validEndPositions = new List<EncounterPosition>() {
+        AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing),
+        AIUtils.RotateAndProject(parentPos, 1, 0, unit.UnitFacing),
+      };
+      foreach (var possible in validEndPositions) {
+        if (state.EntitiesAtPosition(possible.X, possible.Y).Count > 0) {
+          positions.Add(ToCardinalDirection(parentPos, possible));
+        }
       }
 
+      return positions;
+    }
+
+    public List<EncounterAction> DecideNextActionForInput(EncounterState state, Entity parent, string actionMapping) {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
       var unitComponent = parent.GetComponent<UnitComponent>();
 
+      if (actionMapping == InputHandler.ActionMapping.LEAVE_FORMATION) {
+        parent.GetComponent<PlayerComponent>().LeaveFormation(state, parent);
+        return null;
+      }
+
       if (unit.StandingOrder == UnitOrder.REFORM) {
-        return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
+        if (actionMapping == InputHandler.ActionMapping.WAIT) {
+          return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
+        } else {
+          return null;
+        }
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
+        // You're allowed to move into these
+
+        Godot.GD.Print(AllowedMovesForAdvance(state, parent));
+
         return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
       } else if (unit.StandingOrder == UnitOrder.RETREAT) {
-        return AIUtils.ActionsForUnitRetreat(state, parent, unit);
+        if (actionMapping == InputHandler.ActionMapping.WAIT) {
+          return AIUtils.ActionsForUnitRetreat(state, parent, unit);
+        } else {
+          return null;
+        }
       } else {
         throw new NotImplementedException();
       }

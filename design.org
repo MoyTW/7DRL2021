@@ -20,14 +20,14 @@ Commenced at Saturday March 6, 8pm Pacific time.
 **** Controls
 
 + When you're "in formation" you basically are on autopilot. You can:
-  - Choose whether to advance forwards, to the left, or the right
-  - Choose when to rotate out
-  - Choose what enemies to attack when engaged
-  - Choose to break formation, which counts as routing and loses you points
+  - TODO: Choose whether to advance forwards, to the left, or the right
+  - TODO: Choose when to rotate out
+  - TODO: Choose what enemies to attack when engaged
+  - TODO: Choose to break formation, which counts as routing and loses you points
 
 + When you're "out of formation" you can move freely.
-  - You can still fight
-  - You can re-enter formation by reaching your unit
+  - TODO: You can still fight
+  - TODO: You can re-enter formation by reaching your unit (press R to rally)
 
 **** Scoring
 

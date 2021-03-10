@@ -156,9 +156,14 @@ namespace SpaceDodgeRL.scenes.encounter {
         } else if (action != null && playerComponent.IsInFormation) {
           var playerAI = entity.GetComponent<PlayerAIComponent>();
           var commands = playerAI.DecideNextActionForInput(state, entity, action.Mapping);
-          Rulebook.ResolveActionsAndEndTurn(commands, state);
-          EmitSignal(nameof(EncounterRunner.TurnEnded));
-          state.UpdatePlayerOverlays();
+
+          if (commands != null) { 
+            Rulebook.ResolveActionsAndEndTurn(commands, state);
+            EmitSignal(nameof(EncounterRunner.TurnEnded));
+            state.UpdatePlayerOverlays();
+          } else {
+            return;
+          }
         // TODO: rip out use stairs
         // } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_STAIRS) {
         //   PlayerExecuteTurnEndingAction(new UseStairsAction(entity.EntityId), state);

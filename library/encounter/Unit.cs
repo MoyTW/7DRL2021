@@ -118,6 +118,14 @@ namespace SpaceDodgeRL.library.encounter {
       this.AverageTrackerY.ReplaceInAverage(newPosition.Y, oldPosition.Y);
     }
 
+    public void NotifyEntityRouted(Entity entity) {
+      this._BattleReadyEntityIds.Remove(entity.EntityId);
+      this._RoutedEntityIds.Add(entity.EntityId);
+      var pos = entity.GetComponent<PositionComponent>().EncounterPosition;
+      this.AverageTrackerX.SubtractFromAverage(pos.X);
+      this.AverageTrackerY.SubtractFromAverage(pos.Y);
+    }
+
     public void NotifyEntityDestroyed(Entity entity) {
       this._BattleReadyEntityIds.Remove(entity.EntityId);
       this._DeadEntityIds.Add(entity.EntityId);

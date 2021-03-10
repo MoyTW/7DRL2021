@@ -14,6 +14,7 @@ namespace SpaceDodgeRL.scenes.entities {
 
     [JsonInclude] public string EntityId { get; private set; }
     [JsonInclude] public string EntityName { get; private set; }
+    [JsonInclude] public bool IsPlayer { get; private set; }
 
     // Currently we make the assumption that an Entity can have 1 and only 1 of each node of any particular inheritance tree. So,
     // a node can only have 1 AIComponent, for example. This might change if we model, I don't know, a status effect as a node -
@@ -28,6 +29,7 @@ namespace SpaceDodgeRL.scenes.entities {
     private Entity Init(string entityId, string entityName) {
       this.EntityId = entityId;
       this.EntityName = entityName;
+      this.IsPlayer = false;
       this._Components = new List<Component>();
       this._childTypeToComponent = new Dictionary<Type, Component>();
       this._childComponentToTypes = new Dictionary<Component, List<Type>>();
@@ -37,6 +39,10 @@ namespace SpaceDodgeRL.scenes.entities {
 
     // #################### JANK 7DRL HACK CONVENIENCE FNS ####################
     public bool IsRotating() {
+      // hack: player's always rotating if they're in free move mode
+      if (IsPlayer && !this.GetComponent<PlayerComponent>().IsInFormation) {
+        return true;
+      }
       var rotationComponent = this.GetComponent<AIRotationComponent>();
       if (rotationComponent != null) {
         return rotationComponent.IsRotating;
@@ -86,6 +92,8 @@ namespace SpaceDodgeRL.scenes.entities {
     }
 
     public void AddComponent(Component component, bool legibleUniqueName = false) {
+      if (component is PlayerComponent) { this.IsPlayer = true; }
+
       if (!(component is Component)) {
         throw new NotImplementedException();
       }

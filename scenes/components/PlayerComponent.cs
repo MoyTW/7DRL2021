@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
 
 namespace SpaceDodgeRL.scenes.components {
@@ -23,6 +24,11 @@ namespace SpaceDodgeRL.scenes.components {
       component.PilaRange = pilaRange;
 
       return component;
+    }
+
+    public void LeaveFormation(EncounterState state, Entity parent) {
+      this.IsInFormation = false;
+      state.GetUnit(parent.GetComponent<UnitComponent>().UnitId).NotifyEntityRouted(parent);
     }
 
     public static PlayerComponent Create(string saveData) {
