@@ -161,6 +161,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       return IsPositionBlocked(position.X, position.Y);
     }
 
+    // TODO: entities can run off the map lol
     public ReadOnlyCollection<Entity> EntitiesAtPosition(int x, int y) {
       if (!IsInBounds(x, y)) {
         throw new NotImplementedException("out of bounds");

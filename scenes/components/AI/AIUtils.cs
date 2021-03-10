@@ -252,45 +252,61 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var parentFaction = parent.GetComponent<FactionComponent>().Faction;
 
       var targetEndPos = parentPos;
-      // We're gonna have some serious Phalanx Drift goin' on I guess?
-      var forwardPositions = new List<EncounterPosition>() { AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing) };
-      if (!(unit.RightFlank && AIUtils.IsOnFlank(parentPos.X, parentPos.Y, unit, Flank.RIGHT))) {
-        forwardPositions.Add(AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing));
+      bool tryAdvance = true;
+
+      // Don't advance if you're going to be going too far ahead
+      var directlyInFrontPosition = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
+      var forwardVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, directlyInFrontPosition.X, directlyInFrontPosition.Y, unit.UnitFacing);
+      if (forwardVec.Item2 < - Mathf.CeilToInt(unit.Depth / 2) - 1) {
+        tryAdvance = false;
       }
-      if (!(unit.LeftFlank && AIUtils.IsOnFlank(parentPos.X, parentPos.Y, unit, Flank.LEFT))) {
-        forwardPositions.Add(AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing));
+
+      // Morale check for advancing directly into an enemy
+      if (tryAdvance) {
+        var twoStepsAhead = AIUtils.RotateAndProject(parentPos, 0, -2, unit.UnitFacing);
+        if (AIUtils.HostilesInPosition(state, parentFaction, twoStepsAhead.X, twoStepsAhead.Y).Count > 0) {
+          if (parent.GetComponent<HastatusAIComponent>() != null) { // TODO: Actually make this a morale check lol
+            tryAdvance = false;
+          }
+        }
       }
-      
-      foreach (var forwardPos in forwardPositions) {
-        // If the position is too far out ahead of the center, don't advance
-        var forwardVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, forwardPos.X, forwardPos.Y, unit.UnitFacing);
-        if (forwardVec.Item2 < - Mathf.CeilToInt(unit.Depth / 2) - 1) {
-          continue;
+
+
+      if (tryAdvance) {
+        // We're gonna have some serious Phalanx Drift goin' on I guess?
+        var forwardPositions = new List<EncounterPosition>() { directlyInFrontPosition };
+        if (!(unit.RightFlank && AIUtils.IsOnFlank(parentPos.X, parentPos.Y, unit, Flank.RIGHT))) {
+          forwardPositions.Add(AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing));
+        }
+        if (!(unit.LeftFlank && AIUtils.IsOnFlank(parentPos.X, parentPos.Y, unit, Flank.LEFT))) {
+          forwardPositions.Add(AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing));
         }
 
-        if (state.EntitiesAtPosition(forwardPos.X, forwardPos.Y).Count == 0) {
-          // Never go into a square unless it's flanked by an existing friendly
-          bool supported = false;
-          for (int y = -1; y < 2; y++) {
-            var leftPos = AIUtils.RotateAndProject(forwardPos, -1, y, unit.UnitFacing);
-            if(AIUtils.FriendliesInPosition(state, parent, parentFaction, leftPos.X, leftPos.Y).Count > 0) {
-              supported = true;
+        foreach (var forwardPos in forwardPositions) {
+          if (state.EntitiesAtPosition(forwardPos.X, forwardPos.Y).Count == 0) {
+            // Never go into a square unless it's flanked by an existing friendly
+            bool supported = false;
+            for (int y = -1; y < 2; y++) {
+              var leftPos = AIUtils.RotateAndProject(forwardPos, -1, y, unit.UnitFacing);
+              if(AIUtils.FriendliesInPosition(state, parent, parentFaction, leftPos.X, leftPos.Y).Count > 0) {
+                supported = true;
+                break;
+              }
+              var rightPos = AIUtils.RotateAndProject(forwardPos, 1, y, unit.UnitFacing);
+              if(AIUtils.FriendliesInPosition(state, parent, parentFaction, rightPos.X, rightPos.Y).Count > 0) {
+                supported = true;
+                break;
+              }
+            }
+            if (supported) {
+              targetEndPos = forwardPos;
               break;
             }
-            var rightPos = AIUtils.RotateAndProject(forwardPos, 1, y, unit.UnitFacing);
-            if(AIUtils.FriendliesInPosition(state, parent, parentFaction, rightPos.X, rightPos.Y).Count > 0) {
-              supported = true;
-              break;
-            }
-          }
-          if (supported) {
-            targetEndPos = forwardPos;
-            break;
           }
         }
-      }
-      if (targetEndPos != parentPos) {
-        actions.Add(new MoveAction(parent.EntityId, targetEndPos));
+        if (targetEndPos != parentPos) {
+          actions.Add(new MoveAction(parent.EntityId, targetEndPos));
+        }
       }
       var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, targetEndPos);
       if (adjacentHostiles.Count > 0) {
