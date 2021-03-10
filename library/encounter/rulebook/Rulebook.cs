@@ -128,27 +128,17 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
     private static bool ResolveMove(MoveAction action, EncounterState state) {
       Entity actor = state.GetEntityById(action.ActorId);
       var positionComponent = state.GetEntityById(action.ActorId).GetComponent<PositionComponent>();
+      var oldPosition = positionComponent.EncounterPosition;
 
       if (positionComponent.EncounterPosition == action.TargetPosition) {
         GD.PrintErr(string.Format("Entity {0}:{1} tried to move to its current position {2}", actor.EntityName, actor.EntityId, action.TargetPosition));
         return false;
-      }
-      // else if (state.IsPositionBlocked(action.TargetPosition)) {
-      //   var blocker = state.BlockingEntityAtPosition(action.TargetPosition.X, action.TargetPosition.Y);
-      //   var actorCollision = actor.GetComponent<CollisionComponent>();
-
-      //   if (actorCollision.OnCollisionAttack) {
-      //     Attack(actor, blocker, state);
-      //   }
-      //   if (actorCollision.OnCollisionSelfDestruct) {
-      //     state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: true);
-      //     positionComponent.PlayExplosion();
-      //     ResolveAction(new DestroyAction(action.ActorId), state);
-      //   }
-      //   return true;
-      // } 
-      else {
+      } else {
         state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: false);
+        var unitComponent = actor.GetComponent<UnitComponent>();
+        if (unitComponent != null) {
+          state.GetUnit(unitComponent.UnitId).NotifyEntityMoved(oldPosition, action.TargetPosition);
+        }
         return true;
       }
     }
@@ -208,7 +198,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         return true;
       } else if (effectType == OnDeathEffectType.REMOVE_FROM_UNIT) {
         var unit = state.GetUnit(state.GetEntityById(action.ActorId).GetComponent<UnitComponent>().UnitId);
-        unit.NotifyEntityDestroyed(action.ActorId);
+        unit.NotifyEntityDestroyed(state.GetEntityById(action.ActorId));
         return false;
       } else {
         throw new NotImplementedException(String.Format("Don't know how to resolve on death effect type {0}", effectType));

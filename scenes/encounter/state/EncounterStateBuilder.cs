@@ -56,6 +56,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       for (int i = 0; i < size; i++) {
         var entity = entityFn(i, unit);
         state.PlaceEntity(entity, new EncounterPosition(center.X + positions[i].X, center.Y + positions[i].Y));
+        unit.RegisterBattleReadyEntity(entity);
       }
 
       return unit;
@@ -144,7 +145,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         new EncounterPosition(playerPos.X + 20, playerPos.Y + 40), UnitOrder.REFORM, FormationType.LINE_20,
         FormationFacing.NORTH, 90, iberianLightInfantryFn, leftFlank: false, rightFlank: true, enemyHQ);
       friendlyCommanderAI.RegisterDeploymentOrder(35, new Order(eRight.UnitId, OrderType.ADVANCE));
-
       
       /*
       var nextToPlayer = new EncounterPosition(zones[playerZoneIdx].Center.X + 2, zones[playerZoneIdx].Center.Y + 1);

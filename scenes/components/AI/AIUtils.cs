@@ -15,11 +15,16 @@ namespace SpaceDodgeRL.scenes.components.AI {
   }
 
   public abstract class Formation {
+    public abstract int Depth(int numInFormation);
     public abstract EncounterPosition PositionInFormation(int formationNumber, Unit unit);
     public abstract bool IsOnFlank(int x, int y, Unit unit, Flank flank);
   }
 
   public class FormationManipuleClosed : Formation {
+
+    public override int Depth(int numInFormation) {
+      return Mathf.CeilToInt(numInFormation / 10);
+    }
 
     public override EncounterPosition PositionInFormation(int formationNumber, Unit unit) {
       EncounterPosition center = unit.RallyPoint;
@@ -43,7 +48,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
   }
 
   public class FormationManipuleOpened : Formation {
-    
+
+    public override int Depth(int numInFormation) {
+      return Mathf.CeilToInt(numInFormation / 20);
+    }
+
     public override EncounterPosition PositionInFormation(int formationNumber, Unit unit) {
       EncounterPosition center = unit.RallyPoint;
       int halfFormation = unit.NumInFormation / 2 + 1;
@@ -71,9 +80,16 @@ namespace SpaceDodgeRL.scenes.components.AI {
         throw new NotImplementedException();
       }
     }
+
+    
   }
 
   public class FormationLine20 : Formation {
+
+    public override int Depth(int numInFormation) {
+      return Mathf.CeilToInt(numInFormation / 20);
+    }
+
     public override EncounterPosition PositionInFormation(int formationNumber, Unit unit) {
       EncounterPosition center = unit.RallyPoint;
       
@@ -246,12 +262,14 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
       
       foreach (var forwardPos in forwardPositions) {
+        // If the position is too far out ahead of the center, don't advance
+        var forwardVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, forwardPos.X, forwardPos.Y, unit.UnitFacing);
+        if (forwardVec.Item2 < - Mathf.CeilToInt(unit.Depth / 2) - 1) {
+          continue;
+        }
+
         if (state.EntitiesAtPosition(forwardPos.X, forwardPos.Y).Count == 0) {
           // Never go into a square unless it's flanked by an existing friendly
-          // if (AIUtils.AdjacentFriendlies(state, parent, parentFaction, forwardPos).Count > 0) {
-          //   targetEndPos = forwardPos;
-          //   break;
-          // }
           bool supported = false;
           for (int y = -1; y < 2; y++) {
             var leftPos = AIUtils.RotateAndProject(forwardPos, -1, y, unit.UnitFacing);

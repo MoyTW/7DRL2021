@@ -108,8 +108,6 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
 
-      unit.RegisterBattleReadyEntity(e);
-
       return e;
     }
 
@@ -132,8 +130,6 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(statusEffectTrackerComponent);
       e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
-
-      unit.RegisterBattleReadyEntity(e);
 
       return e;
     }
