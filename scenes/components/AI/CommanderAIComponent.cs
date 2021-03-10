@@ -55,7 +55,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
   }
 
   public enum OrderTriggerType {
-    UNIT_HAS_STANDING_ORDER
+    UNIT_HAS_STANDING_ORDER,
+    UNIT_BELOW_STRENGTH_PERCENT
   }
 
   // This is a mess; I'm doing it like this so that the save system can work properly, because I forgot how to set up
@@ -63,20 +64,32 @@ namespace SpaceDodgeRL.scenes.components.AI {
   public class OrderTrigger {
 
     [JsonInclude] public OrderTriggerType TriggerType { get; private set; }
+    [JsonInclude] public bool Repeating { get; private set; }
     [JsonInclude] public List<string> WatchedUnitIds { get; private set; }
     [JsonInclude] public List<UnitOrder> AwaitedStandingOrders { get; private set; }
+    [JsonInclude] public float BelowStrengthPercent { get; private set; }
 
-    public OrderTrigger(OrderTriggerType triggerType, List<string> watchedUnitIds=null,
-        List<UnitOrder> awaitedStandingOrders=null) {
+    public OrderTrigger(OrderTriggerType triggerType, bool repeating, List<string> watchedUnitIds=null,
+        List<UnitOrder> awaitedStandingOrders=null, float belowStrengthPercent=9999) {
       this.TriggerType = triggerType;
+      this.Repeating = repeating;
       this.WatchedUnitIds = watchedUnitIds;
       this.AwaitedStandingOrders = awaitedStandingOrders;
+      this.BelowStrengthPercent = belowStrengthPercent;
     }
 
     public bool IsTriggered(EncounterState state) {
       if (this.TriggerType == OrderTriggerType.UNIT_HAS_STANDING_ORDER) {
         foreach (var watchedUnitId in this.WatchedUnitIds) {
           if (this.AwaitedStandingOrders.Contains(state.GetUnit(watchedUnitId).StandingOrder)) {
+            return true;
+          }
+        }
+        return false;
+      } else if (this.TriggerType == OrderTriggerType.UNIT_BELOW_STRENGTH_PERCENT) {
+        foreach (var watchedUnitId in this.WatchedUnitIds) {
+          var unit = state.GetUnit(watchedUnitId);
+          if ((float)unit.NumInFormation / (float)unit.OriginalUnitStrength < this.BelowStrengthPercent) {
             return true;
           }
         }
@@ -154,17 +167,19 @@ namespace SpaceDodgeRL.scenes.components.AI {
         }
       } else if (this.DeploymentComplete) {
         foreach (var kvp in this._TriggerOrders) {
+          var removeThese = new List<TriggeredOrder>();
+
           foreach (var triggeredOrder in kvp.Value) {
             if (triggeredOrder.Trigger.IsTriggered(state)) {
               triggeredOrder.Order.ExecuteOrder(state);
+              if (!triggeredOrder.Trigger.Repeating) {
+                removeThese.Add(triggeredOrder);
+              }
             }
           }
-        }
 
-        foreach (var unitId in this._CommandedUnitIds) {
-          var unit = state.GetUnit(unitId);
-          if (unit.NumInFormation < unit.OriginalUnitStrength - 15) {
-            new Order(unitId, OrderType.RETREAT).ExecuteOrder(state);
+          foreach (var removeThis in removeThese) {
+            kvp.Value.Remove(removeThis);
           }
         }
       }
