@@ -15,6 +15,39 @@ Commenced at Saturday March 6, 8pm Pacific time.
 3. String together battles to make a campaign
 4. Update the UI
 
+*** How does the game *play*?
+
+**** Controls
+
++ When you're "in formation" you basically are on autopilot. You can:
+  - Choose whether to advance forwards, to the left, or the right
+  - Choose when to rotate out
+  - Choose what enemies to attack when engaged
+  - Choose to break formation, which counts as routing and loses you points
+
++ When you're "out of formation" you can move freely.
+  - You can still fight
+  - You can re-enter formation by reaching your unit
+
+**** Scoring
+
+Game ends when you die, obviously.
+
++ Actions +Points
+  - Injuring an enemy
+  - Killing an enemy
+  - Saving an injured soldier <- complex
+
++ Actions -Points
+  - Breaking formation
+  - Rotating too often <- complex
+  - Failing to advance <- complex
+
+Most of the gameplay will be trying to not get stabbed to death. You're gonna
+need to have to keep an eye on the morale of your troops, because if you're in
+the front line when the unit breaks you're gonna be at high risk of getting
+caught out and stabbed to death by angry enemies.
+
 ** Thursday <- Content
 1. Add a variety of troops
 2. Add a variety of different battles
