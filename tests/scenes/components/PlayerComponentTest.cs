@@ -22,39 +22,5 @@ namespace SpaceDodgeRL.tests.scenes.components {
       JsonElement deserialized = JsonSerializer.Deserialize<JsonElement>(component.Save());
       Assert.Equal(PlayerComponent.ENTITY_GROUP, deserialized.GetProperty("EntityGroup").GetString());
     }
-
-    [Fact]
-    public void SerializesAndDeserializesCorrectly() {
-      var path = new EncounterPath(new List<EncounterPosition>() { new EncounterPosition(15, 53) });
-
-      var component = PlayerComponent.Create();
-      component.RegisterIntel(3);
-      string saved = component.Save();
-
-      var newComponent = PlayerComponent.Create(saved);
-
-      Assert.Equal(component.KnowsIntel(0), newComponent.KnowsIntel(0));
-      Assert.Equal(component.KnowsIntel(1), newComponent.KnowsIntel(1));
-      Assert.Equal(component.KnowsIntel(2), newComponent.KnowsIntel(2));
-      Assert.Equal(component.KnowsIntel(3), newComponent.KnowsIntel(3));
-      Assert.Equal(component.CuttingLaserRange, newComponent.CuttingLaserRange);
-      Assert.Equal(component.BaseCuttingLaserPower, newComponent.BaseCuttingLaserPower);
-    }
-
-    [Fact]
-    public void PullsStatusEffectTrackerFromEntity() {
-      var entity = Entity.Create("", "");
-      
-      var playerComponent = PlayerComponent.Create(baseCuttingLaserPower: 5);
-      entity.AddComponent(playerComponent);
-      
-      var trackerComponent = new StatusEffectTrackerComponent();
-      entity.AddComponent(trackerComponent);
-
-      Assert.Equal(5, playerComponent.CuttingLaserPower);
-
-      trackerComponent.AddEffect(new StatusEffectTimedPowerBoost(10, 5, 5));
-      Assert.Equal(15, playerComponent.CuttingLaserPower);
-    }
   }
 }

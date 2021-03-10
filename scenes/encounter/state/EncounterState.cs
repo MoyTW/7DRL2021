@@ -279,7 +279,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       overlaysMap.Clear();
 
       // Update the range indicator
-      var laserRange = this.Player.GetComponent<PlayerComponent>().CuttingLaserRange;
+      var laserRange = this.Player.GetComponent<PlayerComponent>().PilaRange;
       var playerPos = this.Player.GetComponent<PositionComponent>().EncounterPosition;
       for (int x = playerPos.X - laserRange; x <= playerPos.X + laserRange; x++) {
         for (int y = playerPos.Y - laserRange; y <= playerPos.Y + laserRange; y++) {

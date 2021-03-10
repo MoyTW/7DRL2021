@@ -280,13 +280,6 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         state.LogMessage(string.Format("{0} restored {1} HP to {2}!", usable.EntityName, restored, user.EntityName));
       }
 
-      var useEffectAddIntel = usable.GetComponent<UseEffectAddIntelComponent>();
-      if (useEffectAddIntel != null) {
-        // Kinda funny because player's the only one for which this effect is meaningful so we just grab player it's fiiiiiine
-        state.Player.GetComponent<PlayerComponent>().RegisterIntel(useEffectAddIntel.TargetDungeonLevel);
-        state.LogMessage(string.Format("Discovered intel for [b]sector {0}[/b]!", useEffectAddIntel.TargetDungeonLevel));
-      }
-
       var useEffectBoostPower = usable.GetComponent<UseEffectBoostPowerComponent>();
       if (useEffectBoostPower != null) {
         state.LogMessage(String.Format("Attack power boosted by {0} for duration {1}!",

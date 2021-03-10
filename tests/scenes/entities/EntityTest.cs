@@ -28,14 +28,14 @@ namespace SpaceDodgeRL.tests.scenes.entities {
     [Fact]
     public void EntityWithComponent() {
       Entity entity = Entity.Create("some id", "some name");
-      entity.AddComponent(PlayerComponent.Create(baseCuttingLaserPower: 99));
+      entity.AddComponent(PlayerComponent.Create(99));
 
       var saved = JsonSerializer.Serialize(entity);
       var loaded = JsonSerializer.Deserialize<Entity>(saved);
 
       Assert.Equal(entity._Components.Count, loaded._Components.Count);
       Assert.NotNull(loaded.GetComponent<PlayerComponent>());
-      Assert.Equal(99, loaded.GetComponent<PlayerComponent>().BaseCuttingLaserPower);
+      Assert.Equal(99, loaded.GetComponent<PlayerComponent>().PilaRange);
     }
   }
 }

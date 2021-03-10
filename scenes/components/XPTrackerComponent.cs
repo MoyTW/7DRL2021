@@ -81,7 +81,7 @@ namespace SpaceDodgeRL.scenes.components {
         // TODO: We can model persistent level-ups as status effects, can't we?
         entity.GetComponent<DefenderComponent>().AddBaseMaxHp(LevelUpBonus.MAX_HP_BONUS);
       } else if (chosenLevelUp == LevelUpBonus.ATTACK_POWER) {
-        entity.GetComponent<PlayerComponent>().AddBaseCuttingLaserPower(LevelUpBonus.ATTACK_POWER_BONUS);
+        throw new NotImplementedException("lol level ups");
       } else if (chosenLevelUp == LevelUpBonus.REPAIR) {
         var defenderComponent = entity.GetComponent<DefenderComponent>();
         int repairValue = (int)((double)defenderComponent.MaxHp * LevelUpBonus.REPAIR_PERCENTAGE);

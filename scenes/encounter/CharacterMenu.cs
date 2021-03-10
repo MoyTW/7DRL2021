@@ -31,7 +31,6 @@ namespace SpaceDodgeRL.scenes.encounter {
     public void PrepMenu(EncounterState state) {
       PrepLevelColumn(state);
       PrepStatsColumn(state);
-      PrepIntelColumn(state);
       PrepLevelUpMenu(state);
     }
 
@@ -71,36 +70,8 @@ namespace SpaceDodgeRL.scenes.encounter {
       var defenderComponent = state.Player.GetComponent<DefenderComponent>();
       GetNode<Label>("Columns/StatsColumn/StatsHPLabel").Text = string.Format("HP: {0}/{1}", defenderComponent.CurrentHp, defenderComponent.MaxHp);
 
-      var playerComponent = state.Player.GetComponent<PlayerComponent>();
-      GetNode<Label>("Columns/StatsColumn/StatsAttackPowerLabel").Text = string.Format("Laser Power: {0}", playerComponent.CuttingLaserPower);
-      GetNode<Label>("Columns/StatsColumn/StatsAttackRangeLabel").Text = string.Format("Laser Range: {0}", playerComponent.CuttingLaserRange);
-
       var speed = state.Player.GetComponent<SpeedComponent>().Speed;
       GetNode<Label>("Columns/StatsColumn/StatsSpeedLabel").Text = string.Format("Speed: {0}", speed);
-    }
-
-    private void PrepIntelColumn(EncounterState state) {
-      var playerComponent = state.Player.GetComponent<PlayerComponent>();
-      var intelColumn = GetNode<VBoxContainer>("Columns/IntelColumn");
-
-      if (_intelLabels == null) {
-        _intelLabels = new List<Label>();
-        for (int i = 1; i < state.LevelsInDungeon; i++) {
-          var font = new DynamicFont();
-          font.FontData = (DynamicFontData)GD.Load(_fontPath);
-
-          var newLabel = new Label();
-          newLabel.AddFontOverride("font", font);
-          intelColumn.AddChild(newLabel);
-          _intelLabels.Add(newLabel);
-
-          newLabel.Text = string.Format("Sector {0}: {1}", i, playerComponent.KnowsIntel(i) ? "KNOWN" : "UNKNOWN");
-        }
-      } else {
-        for (int i = 1; i < state.LevelsInDungeon; i++) {
-          _intelLabels[i - 1].Text = string.Format("Sector {0}: {1}", i, playerComponent.KnowsIntel(i) ? "KNOWN" : "UNKNOWN");
-        }
-      }
     }
 
     public override void _UnhandledKeyInput(InputEventKey @event) {

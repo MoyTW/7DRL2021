@@ -34,7 +34,7 @@ namespace SpaceDodgeRL.scenes.encounter {
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/HPLabel").Text = newHPText;
 
       var playerComponent = player.GetComponent<PlayerComponent>();
-      var newAttackPowerText = string.Format("Laser Power: {0}", playerComponent.CuttingLaserPower);
+      var newAttackPowerText = string.Format("Laser Power: {0}", "nosuch");
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/AttackPowerLabel").Text = newAttackPowerText;
 
       var speedComponent = player.GetComponent<SpeedComponent>();
