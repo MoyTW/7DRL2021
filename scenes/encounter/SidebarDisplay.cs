@@ -30,7 +30,7 @@ namespace SpaceDodgeRL.scenes.encounter {
 
       // Left column
       var playerDefenderComponent = player.GetComponent<DefenderComponent>();
-      var newHPText = string.Format("HP: {0}/{1}", playerDefenderComponent.CurrentHp, playerDefenderComponent.MaxHp);
+      var newHPText = string.Format("Hit Points: {0}/{1}", playerDefenderComponent.CurrentHp, playerDefenderComponent.MaxHp);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/HPLabel").Text = newHPText;
 
       var newFootingText = string.Format("Footing: {0}/{1}", playerDefenderComponent.CurrentFooting,
@@ -74,10 +74,10 @@ namespace SpaceDodgeRL.scenes.encounter {
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ArmyStatusLabel").Text = armyStatusText;
 
       var unit = state.GetUnit(player.GetComponent<UnitComponent>().UnitId);
-      var unitOrderText = string.Format("Order: {0}", unit.StandingOrder.ToString());
+      var unitOrderText = string.Format("Unit Order: {0}", unit.StandingOrder.ToString());
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/UnitOrderLabel").Text = unitOrderText;
 
-      var unitSizeText = string.Format("Strength: {0}/{1}", unit.NumInFormation, unit.OriginalUnitStrength);
+      var unitSizeText = string.Format("Unit Size: {0}/{1}", unit.NumInFormation, unit.OriginalUnitStrength);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/UnitNumLabel").Text = unitSizeText;
     }
 

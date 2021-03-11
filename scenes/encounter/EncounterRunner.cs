@@ -167,13 +167,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           } else {
             return;
           }
-        // TODO: rip out use stairs
-        // } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_STAIRS) {
-        //   PlayerExecuteTurnEndingAction(new UseStairsAction(entity.EntityId), state);
-        // } else if (action != null && action.Mapping == InputHandler.ActionMapping.GET_ITEM) {
-        //   PlayerExecuteTurnEndingAction(new GetItemAction(entity.EntityId), state);
-        // } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_ITEM) {
-        //   GD.Print("Select an item via the inventory menu instead!");
         } else if (action != null) {
           GD.Print("No handler yet for ", action);
         }
