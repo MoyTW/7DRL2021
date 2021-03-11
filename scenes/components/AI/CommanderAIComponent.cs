@@ -15,7 +15,9 @@ namespace SpaceDodgeRL.scenes.components.AI {
   public enum OrderType {
     ADVANCE,
     OPEN_MANIPULE,
-    RETREAT
+    RETREAT,
+    DECLARE_VICTORY,
+    DECLARE_DEFEAT
   }
 
   public class Order {

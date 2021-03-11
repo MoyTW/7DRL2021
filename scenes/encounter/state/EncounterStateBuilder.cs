@@ -25,15 +25,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
           state._encounterTiles[x, y] = new EncounterTile();
         }
       }
-
-      // Create border walls to prevent objects running off the map
-      for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-          if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-            state.PlaceEntity(EntityBuilder.CreateEdgeBlockerEntity(), new EncounterPosition(x, y));
-          }
-        }
-      }
     }
 
     private static Unit CreateAndDeployUnit(Random seededRand, EncounterState state, string unitId, FactionName faction,

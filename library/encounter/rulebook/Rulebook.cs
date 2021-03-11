@@ -125,6 +125,11 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       return true;
     }
 
+    // Last 5 items are "retreat zone" - TODO: color them yellow, or something
+    private static bool IsInRetreatZone(EncounterState state, EncounterPosition position) {
+      return !(5 <= position.X && state.MapWidth - 5 >= position.X && 5 <= position.Y && state.MapHeight - 5 >= position.Y);
+    }
+
     private static bool ResolveMove(MoveAction action, EncounterState state) {
       Entity actor = state.GetEntityById(action.ActorId);
       var positionComponent = state.GetEntityById(action.ActorId).GetComponent<PositionComponent>();
@@ -138,6 +143,10 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         var unitComponent = actor.GetComponent<UnitComponent>();
         if (unitComponent != null) {
           state.GetUnit(unitComponent.UnitId).NotifyEntityMoved(oldPosition, action.TargetPosition);
+        }
+        // If you go into the retreat zone you insta-die
+        if (IsInRetreatZone(state, action.TargetPosition)) {
+          ResolveAction(new DestroyAction(action.ActorId), state);
         }
         return true;
       }
