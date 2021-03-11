@@ -316,6 +316,13 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     }
 
     public void ZoomOut() {
+      GD.Print(Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").GetChildCount());
+      if (this.IsInsideTree() && GetTree().GetNodesInGroup("ENCOUNTER_CAMERA_GROUP").Count == 0) {
+        var camera = new Camera2D();
+        camera.AddToGroup("ENCOUNTER_CAMERA_GROUP");
+        camera.Current = true;
+        Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(camera);
+      }
       Camera2D cam = (Camera2D)GetTree().GetNodesInGroup("ENCOUNTER_CAMERA_GROUP")[0];
       var oldZoom = cam.Zoom;
       cam.Zoom = new Vector2(oldZoom.x + .2f, oldZoom.y + .2f);
@@ -406,11 +413,39 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       // Populate all our initial caches
       this.LogMessage(string.Format("Level {0} started!", dungeonLevel));
+      // This is a deeply dumb, possibly redundant hack to get the camera to work properly, not gonna think on it
+      // since it's 7DRL and I'm running outta time
+      if (dungeonLevel > 1) {
+        if (GetTree().GetNodesInGroup(ENCOUNTER_CAMERA_GROUP).Count > 0) {
+          Camera2D cam = (Camera2D)GetTree().GetNodesInGroup("ENCOUNTER_CAMERA_GROUP")[0];
+          cam.Current = true;
+          cam.GetParent().RemoveChild(cam);
+          Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(cam);
+        }
+      }
       this.UpdatePlayerOverlays();
     }
 
+    // Refers to "manage to not die for 12 battles"
     public void NotifyPlayerVictory() {
       this.RunStatus = EncounterState.RUN_STATUS_PLAYER_VICTORY;
+    }
+
+    // Refers to "army declares victory"
+    public void NotifyArmyVictory() {
+      var playerComponent = this.Player.GetComponent<PlayerComponent>();
+      playerComponent.AddPrestige(25);      
+    }
+
+    public void NotifyPlayerRetreat() {
+      var playerComponent = this.Player.GetComponent<PlayerComponent>();
+      var unit = this.GetUnit(this.Player.GetComponent<UnitComponent>().UnitId);
+      if (unit.StandingOrder != UnitOrder.WITHDRAW) {
+        playerComponent.AddPrestige(-50);
+      }
+      playerComponent.JoinFormation(this, this.Player);
+      this.ResetStateForNewLevel(this.Player, this.DungeonLevel + 1);
+      this.WriteToFile();
     }
 
     public void NotifyPlayerDefeat() {

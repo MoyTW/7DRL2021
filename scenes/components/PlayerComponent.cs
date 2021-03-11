@@ -12,6 +12,7 @@ namespace SpaceDodgeRL.scenes.components {
     private Entity _parent;
     
     [JsonInclude] public bool IsInFormation { get; private set; }
+    [JsonInclude] public int Prestige { get; private set; }
     [JsonInclude] public int PilaRange { get; private set; }
 
     public static PlayerComponent Create(
@@ -21,9 +22,15 @@ namespace SpaceDodgeRL.scenes.components {
       var component = new PlayerComponent();
       
       component.IsInFormation = isInFormation;
+      component.Prestige = 0;
       component.PilaRange = pilaRange;
 
       return component;
+    }
+
+    public void JoinFormation(EncounterState state, Entity parent) {
+      this.IsInFormation = true;
+      state.GetUnit(parent.GetComponent<UnitComponent>().UnitId).NotifyEntityRallied(parent);
     }
 
     public void LeaveFormation(EncounterState state, Entity parent) {
@@ -33,6 +40,10 @@ namespace SpaceDodgeRL.scenes.components {
 
     public static PlayerComponent Create(string saveData) {
       return JsonSerializer.Deserialize<PlayerComponent>(saveData);
+    }
+
+    public void AddPrestige(int dPrestige) {
+      this.Prestige += dPrestige;
     }
 
     public string Save() {

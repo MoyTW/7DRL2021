@@ -146,7 +146,12 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         }
         // If you go into the retreat zone you insta-die
         if (IsInRetreatZone(state, action.TargetPosition)) {
-          ResolveAction(new DestroyAction(action.ActorId), state);
+          if (actor.GetComponent<PlayerComponent>() != null) {
+            state.NotifyPlayerRetreat();
+            return false;
+          } else {
+            ResolveAction(new DestroyAction(action.ActorId), state);
+          }
         }
         return true;
       }

@@ -168,10 +168,20 @@ custom_fonts/font = ExtResource( 3 )
 text = "Character Info"
 align = 1
 
-[node name="LevelLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
+[node name="PrestigeLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
 margin_top = 66.0
 margin_right = 198.0
 margin_bottom = 86.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme = ExtResource( 6 )
+text = "PrestigeLabel"
+align = 1
+
+[node name="LevelLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
+margin_top = 90.0
+margin_right = 198.0
+margin_bottom = 110.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )
@@ -179,9 +189,9 @@ text = "LevelLabel"
 align = 1
 
 [node name="ExperienceLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
-margin_top = 90.0
+margin_top = 114.0
 margin_right = 198.0
-margin_bottom = 110.0
+margin_bottom = 134.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )
@@ -189,9 +199,9 @@ text = "ExperienceLabel"
 align = 1
 
 [node name="PositionHeader" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
-margin_top = 114.0
+margin_top = 138.0
 margin_right = 198.0
-margin_bottom = 134.0
+margin_bottom = 158.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )
@@ -200,9 +210,9 @@ text = "Unit Info"
 align = 1
 
 [node name="UnitOrderLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
-margin_top = 138.0
+margin_top = 162.0
 margin_right = 198.0
-margin_bottom = 158.0
+margin_bottom = 182.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )
@@ -210,9 +220,9 @@ text = "UnitOrderLabel"
 align = 1
 
 [node name="UnitNumLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
-margin_top = 162.0
+margin_top = 186.0
 margin_right = 198.0
-margin_bottom = 182.0
+margin_bottom = 206.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )

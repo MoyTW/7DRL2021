@@ -60,6 +60,10 @@ namespace SpaceDodgeRL.scenes.encounter {
       var newTurnReadoutText = string.Format("Turn: {0:0.00}", state.CurrentTick / 100);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/TurnReadoutLabel").Text = newTurnReadoutText;
 
+      var playerComponent = player.GetComponent<PlayerComponent>();
+      var newPretigeText = string.Format("Prestige: {0}", playerComponent.Prestige);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/PrestigeLabel").Text = newPretigeText;
+
       var xpComponent = player.GetComponent<XPTrackerComponent>();
       var newLevelText = string.Format("Level: {0}", xpComponent.Level);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/LevelLabel").Text = newLevelText;
