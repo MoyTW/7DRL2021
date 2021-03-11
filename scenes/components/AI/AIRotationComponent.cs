@@ -15,14 +15,16 @@ namespace SpaceDodgeRL.scenes.components {
     [JsonInclude] public int TimesRotated { get; private set; }
     [JsonInclude] public int RotateAtHpThreshold { get; private set; }
     [JsonInclude] public double RotateAtFootingPercentThreshold { get; private set; }
+    [JsonInclude] public bool IsPlayer { get; private set; }
     
-    public static AIRotationComponent Create(double rotateAtFootingPercentThreshold) {
+    public static AIRotationComponent Create(double rotateAtFootingPercentThreshold, bool isPlayer) {
       var component = new AIRotationComponent();
 
       component.IsRotating = false;
       component.TimesRotated = 0;
       component.RotateAtHpThreshold = -1;
       component.RotateAtFootingPercentThreshold = rotateAtFootingPercentThreshold;
+      component.IsPlayer = isPlayer;
       
       return component;
     }
@@ -32,6 +34,8 @@ namespace SpaceDodgeRL.scenes.components {
     }
 
     public void DecideIfShouldRotate(Entity parent) {
+      if (this.IsPlayer) { return; }
+
       var defender = parent.GetComponent<DefenderComponent>();
       if (this.RotateAtHpThreshold == -1) {
         this.RotateAtHpThreshold = defender.MaxHp * 2 / 3;
@@ -47,6 +51,10 @@ namespace SpaceDodgeRL.scenes.components {
       if (underHPThreshold || underFootingThreshold) {
         this.IsRotating = true;
       }
+    }
+
+    public void PlayerSetRotation(bool isRotating) {
+      this.IsRotating = isRotating;
     }
 
     public void NotifyRotationCompleted() {

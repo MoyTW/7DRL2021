@@ -53,6 +53,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var actions = new List<string>() { InputHandler.ActionMapping.LEAVE_FORMATION, InputHandler.ActionMapping.WAIT };
       
       if (standingOrder == UnitOrder.ADVANCE && !parent.GetComponent<AIRotationComponent>().IsRotating) {
+        actions.Add(InputHandler.ActionMapping.ROTATE);
         // Directly ahead pos
         var validEndPositions = new List<EncounterPosition>() {
           AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),
@@ -122,7 +123,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
         }
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
         if (this.AllowedActions(state, parent, unit.StandingOrder).Contains(actionMapping) && actionMapping != InputHandler.ActionMapping.WAIT) {
-          return HandleMoveCommand(state, actionMapping);
+          if (actionMapping == InputHandler.ActionMapping.ROTATE) {
+            parent.GetComponent<AIRotationComponent>().PlayerSetRotation(true);
+            return null;
+          } else {
+            return HandleMoveCommand(state, actionMapping);
+          }
         } else {
           return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
         }

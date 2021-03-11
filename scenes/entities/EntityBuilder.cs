@@ -95,7 +95,7 @@ namespace SpaceDodgeRL.scenes.entities {
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
       e.AddComponent(new HastatusAIComponent(numPilas));
-      e.AddComponent(AIRotationComponent.Create(.60));
+      e.AddComponent(AIRotationComponent.Create(.60, false));
       e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
@@ -119,7 +119,7 @@ namespace SpaceDodgeRL.scenes.entities {
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
       e.AddComponent(new IberianLightInfantryAIComponent());
-      e.AddComponent(AIRotationComponent.Create(.7));
+      e.AddComponent(AIRotationComponent.Create(.7, false));
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
@@ -142,7 +142,7 @@ namespace SpaceDodgeRL.scenes.entities {
 
       // TODO: modify PlayerAIComponent to it doesn't, you know...need these.
       e.AddComponent(new PlayerAIComponent());
-      e.AddComponent(AIRotationComponent.Create(.60));
+      e.AddComponent(AIRotationComponent.Create(.60, true));
       e.AddComponent(AIMoraleComponent.Create(100, 100));
 
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
