@@ -93,6 +93,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
         } else {
           return null;
         }
+      } else if (unit.StandingOrder == UnitOrder.ROUT) {
+        return null;
       } else {
         throw new NotImplementedException();
       }

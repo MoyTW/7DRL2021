@@ -25,7 +25,7 @@ namespace SpaceDodgeRL.library.encounter {
     RETREAT,  // Retreat behind the next line
     REFORM,   // Reform and rest
     WITHDRAW, // Move off the battlefield
-    BROKEN    // Flee
+    ROUT    // Flee
   }
 
   public class AverageTracker {

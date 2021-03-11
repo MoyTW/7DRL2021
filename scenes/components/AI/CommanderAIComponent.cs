@@ -16,6 +16,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
     ADVANCE,
     OPEN_MANIPULE,
     RETREAT,
+    ROUT, // This isn't really an "order" but it can be modelled as such
     DECLARE_VICTORY,
     DECLARE_DEFEAT
   }
@@ -50,6 +51,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
         }
       } else if (this.OrderType == OrderType.RETREAT) {
         unit.StandingOrder = UnitOrder.RETREAT;
+      } else if (this.OrderType == OrderType.ROUT) {
+        unit.StandingOrder = UnitOrder.ROUT;
       } else {
         throw new NotImplementedException();
       }

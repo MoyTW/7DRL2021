@@ -53,10 +53,10 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       return unit;
     }
 
-    private static void RegisterRetreatAtPercentage(CommanderAIComponent commanderAIComponent, Unit unit, float percentage) {
+    private static void RegisterRoutAtPercentage(CommanderAIComponent commanderAIComponent, Unit unit, float percentage) {
       var trigger = new OrderTrigger(OrderTriggerType.UNIT_BELOW_STRENGTH_PERCENT, false,
         watchedUnitIds: new List<string>() { unit.UnitId }, belowStrengthPercent: percentage);
-      commanderAIComponent.RegisterTriggeredOrder(trigger, new Order(unit.UnitId, OrderType.RETREAT));
+      commanderAIComponent.RegisterTriggeredOrder(trigger, new Order(unit.UnitId, OrderType.ROUT));
     }
 
     private static void AddPlayerToUnit(Entity player, Unit unit, int formationNumber) {
@@ -100,7 +100,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pCenter.UnitId, OrderType.ADVANCE));
       var pCenterBreakTrigger = new OrderTrigger(OrderTriggerType.UNIT_BELOW_STRENGTH_PERCENT, false,
         watchedUnitIds: new List<string>() { pCenter.UnitId }, belowStrengthPercent: 80);
-      RegisterRetreatAtPercentage(friendlyCommanderAI, pCenter, .80f);
+      RegisterRoutAtPercentage(friendlyCommanderAI, pCenter, .80f);
 
       /* var pLeft = CreateAndDeployUnit(seededRand, state, "test player left", FactionName.PLAYER,
         new EncounterPosition(centerPos.X + 20, centerPos.Y - 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
@@ -108,7 +108,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       friendlyCommanderAI.RegisterDeploymentOrder(10, new Order(pLeft.UnitId, OrderType.ADVANCE));
       friendlyCommanderAI.RegisterDeploymentOrder(20, new Order(pLeft.UnitId, OrderType.OPEN_MANIPULE));
       friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pLeft.UnitId, OrderType.ADVANCE));
-      RegisterRetreatAtPercentage(friendlyCommanderAI, pLeft, .80f);
+      RegisterRoutAtPercentage(friendlyCommanderAI, pLeft, .80f);
 
       var pRight = CreateAndDeployUnit(seededRand, state, "test player right", FactionName.PLAYER,
         new EncounterPosition(centerPos.X - 20, centerPos.Y - 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
@@ -118,7 +118,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pRight.UnitId, OrderType.ADVANCE));
       var pRightBreakTrigger = new OrderTrigger(OrderTriggerType.UNIT_BELOW_STRENGTH_PERCENT, false,
         watchedUnitIds: new List<string>() { pRight.UnitId }, belowStrengthPercent: 80);
-      RegisterRetreatAtPercentage(friendlyCommanderAI, pRight, .80f);
+      RegisterRoutAtPercentage(friendlyCommanderAI, pRight, .80f);
 
       var p2ndCenter = CreateAndDeployUnit(seededRand, state, "test player 2nd center", FactionName.PLAYER,
         new EncounterPosition(centerPos.X, centerPos.Y - 35), UnitOrder.REFORM, FormationType.MANIPULE_OPENED,
@@ -127,7 +127,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         watchedUnitIds: new List<string>() { pCenter.UnitId, pLeft.UnitId, pRight.UnitId },
         awaitedStandingOrders: new List<UnitOrder>() { UnitOrder.RETREAT });
       friendlyCommanderAI.RegisterTriggeredOrder(p2ndCenterAdvTrigger, new Order(p2ndCenter.UnitId, OrderType.ADVANCE));
-      RegisterRetreatAtPercentage(friendlyCommanderAI, p2ndCenter, .50f);
+      RegisterRoutAtPercentage(friendlyCommanderAI, p2ndCenter, .50f);
 
       var p2ndLeft = CreateAndDeployUnit(seededRand, state, "test player 2nd left", FactionName.PLAYER,
         new EncounterPosition(centerPos.X + 20, centerPos.Y - 35), UnitOrder.REFORM, FormationType.MANIPULE_OPENED,
@@ -136,7 +136,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         watchedUnitIds: new List<string>() { pCenter.UnitId, pLeft.UnitId, pRight.UnitId },
         awaitedStandingOrders: new List<UnitOrder>() { UnitOrder.RETREAT });
       friendlyCommanderAI.RegisterTriggeredOrder(p2ndLeftAdvTrigger, new Order(p2ndLeft.UnitId, OrderType.ADVANCE));
-      RegisterRetreatAtPercentage(friendlyCommanderAI, p2ndLeft, .50f);
+      RegisterRoutAtPercentage(friendlyCommanderAI, p2ndLeft, .50f);
 
       var p2ndRight = CreateAndDeployUnit(seededRand, state, "test player 2nd right", FactionName.PLAYER,
         new EncounterPosition(centerPos.X - 20, centerPos.Y - 35), UnitOrder.REFORM, FormationType.MANIPULE_OPENED,
@@ -145,7 +145,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         watchedUnitIds: new List<string>() { pCenter.UnitId, pLeft.UnitId, pRight.UnitId },
         awaitedStandingOrders: new List<UnitOrder>() { UnitOrder.RETREAT });
       friendlyCommanderAI.RegisterTriggeredOrder(p2ndRightAdvTrigger, new Order(p2ndRight.UnitId, OrderType.ADVANCE));
-      RegisterRetreatAtPercentage(friendlyCommanderAI, p2ndRight, .50f); */
+      RegisterRoutAtPercentage(friendlyCommanderAI, p2ndRight, .50f); */
       
       // Enemy deployment
       var enemyHQ = EntityBuilder.CreateHeadquartersEntity(state.CurrentTick, FactionName.ENEMY);
@@ -155,19 +155,19 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         new EncounterPosition(centerPos.X, centerPos.Y + 40), UnitOrder.REFORM, FormationType.LINE_20,
         FormationFacing.NORTH, 95, iberianLightInfantryFn, leftFlank: false, rightFlank: false, enemyHQ);
       friendlyCommanderAI.RegisterDeploymentOrder(35, new Order(eCenter.UnitId, OrderType.ADVANCE));
-      RegisterRetreatAtPercentage(friendlyCommanderAI, eCenter, .80f);
+      RegisterRoutAtPercentage(friendlyCommanderAI, eCenter, .80f);
 
       /* var eLeft = CreateAndDeployUnit(seededRand, state, "test enemy left", FactionName.ENEMY,
         new EncounterPosition(centerPos.X - 20, centerPos.Y + 40), UnitOrder.REFORM, FormationType.LINE_20,
         FormationFacing.NORTH, 99, iberianLightInfantryFn, leftFlank: true, rightFlank: false, enemyHQ);
       friendlyCommanderAI.RegisterDeploymentOrder(35, new Order(eLeft.UnitId, OrderType.ADVANCE));
-      RegisterRetreatAtPercentage(friendlyCommanderAI, eLeft, .80f);
+      RegisterRoutAtPercentage(friendlyCommanderAI, eLeft, .80f);
       
       var eRight = CreateAndDeployUnit(seededRand, state, "test enemy right", FactionName.ENEMY,
         new EncounterPosition(centerPos.X + 20, centerPos.Y + 40), UnitOrder.REFORM, FormationType.LINE_20,
         FormationFacing.NORTH, 90, iberianLightInfantryFn, leftFlank: false, rightFlank: true, enemyHQ);
       friendlyCommanderAI.RegisterDeploymentOrder(35, new Order(eRight.UnitId, OrderType.ADVANCE));
-      RegisterRetreatAtPercentage(friendlyCommanderAI, eRight, .80f); */
+      RegisterRoutAtPercentage(friendlyCommanderAI, eRight, .80f); */
       
       /*
       var nextToPlayer = new EncounterPosition(zones[playerZoneIdx].Center.X + 2, zones[playerZoneIdx].Center.Y + 1);

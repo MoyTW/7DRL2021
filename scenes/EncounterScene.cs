@@ -67,11 +67,16 @@ namespace SpaceDodgeRL.scenes {
       var playerComponent = player.GetComponent<PlayerComponent>();
 
       if (playerComponent.IsInFormation) {
-        var formationText = this.GetNode<Label>("CanvasLayer/FormationText");
-        formationText.Show();
-        var order = this.EncounterState.GetUnit(player.GetComponent<UnitComponent>().UnitId).StandingOrder;
-        var actions = player.GetComponent<PlayerAIComponent>().AllowedActions(this.EncounterState, player, order);
-        formationText.Text = "In formation. Approved actions: " + String.Join(",", actions);
+        var unit = this.EncounterState.GetUnit(player.GetComponent<UnitComponent>().UnitId);
+        if (unit.StandingOrder == library.encounter.UnitOrder.ROUT) {
+          playerComponent.LeaveFormation(this.EncounterState, player);
+        } else {
+          var formationText = this.GetNode<Label>("CanvasLayer/FormationText");
+          formationText.Show();
+          var order = this.EncounterState.GetUnit(player.GetComponent<UnitComponent>().UnitId).StandingOrder;
+          var actions = player.GetComponent<PlayerAIComponent>().AllowedActions(this.EncounterState, player, order);
+          formationText.Text = "In formation. Approved actions: " + String.Join(",", actions);
+        }
       }
     }
 

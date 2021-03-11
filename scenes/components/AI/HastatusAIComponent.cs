@@ -64,6 +64,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
         }
       } else if (unit.StandingOrder == UnitOrder.RETREAT) {
         return AIUtils.ActionsForUnitRetreat(state, parent, unit);
+      } else if (unit.StandingOrder == UnitOrder.ROUT) {
+        return AIUtils.ActionsForUnitRetreat(state, parent, unit);
       } else {
         throw new NotImplementedException();
       }

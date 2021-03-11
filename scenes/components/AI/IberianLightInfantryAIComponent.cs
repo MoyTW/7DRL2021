@@ -24,13 +24,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
       var unitComponent = parent.GetComponent<UnitComponent>();
 
-      
-
       if (unit.StandingOrder == UnitOrder.REFORM) {
         return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
         return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
       } else if (unit.StandingOrder == UnitOrder.RETREAT) {
+        return AIUtils.ActionsForUnitRetreat(state, parent, unit);
+      } else if (unit.StandingOrder == UnitOrder.ROUT) {
         return AIUtils.ActionsForUnitRetreat(state, parent, unit);
       } else {
         throw new NotImplementedException();
