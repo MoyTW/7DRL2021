@@ -22,7 +22,9 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     // tiles maybe I will add it back.
     public static int PLAYER_VISION_RADIUS = 12;
     public static int EncounterLogSize = 50;
-    public static string RUN_STATUS_RUNNING = "ENCOUNTER_RUN_STATUS_RUNNING";
+    public static string RUN_STATUS_RUNNING = "Fighting!";
+    public static string RUN_STATUS_ARMY_VICTORY = "Victorious!";
+    public static string RUN_STATUS_ARMY_DEFEAT = "Defeated!";
     public static string RUN_STATUS_PLAYER_VICTORY = "ENCOUNTER_RUN_STATUS_PLAYER_VICTORY";
     public static string RUN_STATUS_PLAYER_DEFEAT = "ENCOUNTER_RUN_STATUS_PLAYER_DEFEAT";
 
@@ -44,6 +46,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     // Entity tracking
     private Dictionary<string, Unit> _unitTracker;
+    private Dictionary<FactionName, List<Unit>> _unitsByFaction = null;
     private Dictionary<string, Entity> _entitiesById;
 
     // Time & runner state
@@ -270,6 +273,19 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       return this._unitTracker[unitId];
     }
 
+    public List<Unit> GetUnitsOfFaction(FactionName faction) {
+      if (this._unitsByFaction == null) {
+        this._unitsByFaction = new Dictionary<FactionName, List<Unit>>();
+        foreach (var kvp in this._unitTracker) {
+          if (!this._unitsByFaction.ContainsKey(kvp.Value.UnitFaction)) {
+            this._unitsByFaction[kvp.Value.UnitFaction] = new List<Unit>();
+          }
+          this._unitsByFaction[kvp.Value.UnitFaction].Add(kvp.Value);
+        }
+      }
+      return this._unitsByFaction[faction];
+    }
+
     #endregion
     // ##########################################################################################################################
     #region Display caches
@@ -390,6 +406,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       this._encounterLog = new List<string>();
       this._entitiesById = new Dictionary<string, Entity>();
       this._unitTracker = new Dictionary<string, Unit>();
+      this._unitsByFaction = null;
       this.RunStatus = EncounterState.RUN_STATUS_RUNNING;
       this._actionTimeline = new ActionTimeline(0);
       // We also need to reset the player's action time
@@ -434,13 +451,20 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     // Refers to "army declares victory"
     public void NotifyArmyVictory() {
       var playerComponent = this.Player.GetComponent<PlayerComponent>();
-      playerComponent.AddPrestige(25);      
+      playerComponent.AddPrestige(25);
+      this.RunStatus = EncounterState.RUN_STATUS_ARMY_VICTORY;
+    }
+
+    public void NotifyArmyDefeat() {
+      this.RunStatus = EncounterState.RUN_STATUS_ARMY_DEFEAT;
     }
 
     public void NotifyPlayerRetreat() {
       var playerComponent = this.Player.GetComponent<PlayerComponent>();
       var unit = this.GetUnit(this.Player.GetComponent<UnitComponent>().UnitId);
-      if (unit.StandingOrder != UnitOrder.WITHDRAW) {
+      if (unit.StandingOrder != UnitOrder.WITHDRAW && 
+          this.RunStatus != EncounterState.RUN_STATUS_ARMY_DEFEAT && 
+          this.RunStatus != EncounterState.RUN_STATUS_ARMY_VICTORY) {
         playerComponent.AddPrestige(-50);
       }
       playerComponent.JoinFormation(this, this.Player);

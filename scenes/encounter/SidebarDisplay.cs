@@ -70,6 +70,9 @@ namespace SpaceDodgeRL.scenes.encounter {
       var newXPText = string.Format("Experience: {0}/{1}", xpComponent.XP, xpComponent.NextLevelAtXP);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ExperienceLabel").Text = newXPText;
 
+      var armyStatusText = string.Format("Army: {0}", state.RunStatus);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/ArmyStatusLabel").Text = armyStatusText;
+
       var unit = state.GetUnit(player.GetComponent<UnitComponent>().UnitId);
       var unitOrderText = string.Format("Order: {0}", unit.StandingOrder.ToString());
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/PositionBlock/UnitOrderLabel").Text = unitOrderText;

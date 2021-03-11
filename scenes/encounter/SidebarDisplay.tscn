@@ -198,7 +198,7 @@ theme = ExtResource( 6 )
 text = "ExperienceLabel"
 align = 1
 
-[node name="PositionHeader" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
+[node name="ArmyHeader" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
 margin_top = 138.0
 margin_right = 198.0
 margin_bottom = 158.0
@@ -206,13 +206,26 @@ size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )
 custom_fonts/font = ExtResource( 3 )
-text = "Unit Info"
+text = "Battle Info"
 align = 1
 
-[node name="UnitOrderLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
+[node name="ArmyStatusLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
 margin_top = 162.0
 margin_right = 198.0
 margin_bottom = 182.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme = ExtResource( 6 )
+text = "ArmyStatusLabel"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="UnitOrderLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
+margin_top = 186.0
+margin_right = 198.0
+margin_bottom = 206.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )
@@ -220,9 +233,9 @@ text = "UnitOrderLabel"
 align = 1
 
 [node name="UnitNumLabel" type="Label" parent="SidebarVBox/StatsAndPositionHBox/PositionBlock"]
-margin_top = 186.0
+margin_top = 210.0
 margin_right = 198.0
-margin_bottom = 206.0
+margin_bottom = 230.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )

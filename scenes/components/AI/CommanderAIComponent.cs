@@ -53,6 +53,10 @@ namespace SpaceDodgeRL.scenes.components.AI {
         unit.StandingOrder = UnitOrder.RETREAT;
       } else if (this.OrderType == OrderType.ROUT) {
         unit.StandingOrder = UnitOrder.ROUT;
+      } else if (this.OrderType == OrderType.DECLARE_VICTORY) {
+        state.NotifyArmyVictory();
+      } else if (this.OrderType == OrderType.DECLARE_DEFEAT) {
+        state.NotifyArmyDefeat();
       } else {
         throw new NotImplementedException();
       }
@@ -61,7 +65,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
   public enum OrderTriggerType {
     UNIT_HAS_STANDING_ORDER,
-    UNIT_BELOW_STRENGTH_PERCENT
+    UNIT_BELOW_STRENGTH_PERCENT,
+    ALL_UNITS_OF_FACTION_ROUTED
   }
 
   // This is a mess; I'm doing it like this so that the save system can work properly, because I forgot how to set up
@@ -73,14 +78,17 @@ namespace SpaceDodgeRL.scenes.components.AI {
     [JsonInclude] public List<string> WatchedUnitIds { get; private set; }
     [JsonInclude] public List<UnitOrder> AwaitedStandingOrders { get; private set; }
     [JsonInclude] public float BelowStrengthPercent { get; private set; }
+    [JsonInclude] public FactionName TriggerFaction { get; private set; }
 
     public OrderTrigger(OrderTriggerType triggerType, bool repeating, List<string> watchedUnitIds=null,
-        List<UnitOrder> awaitedStandingOrders=null, float belowStrengthPercent=9999) {
+        List<UnitOrder> awaitedStandingOrders=null, float belowStrengthPercent=9999,
+        FactionName triggerFaction=FactionName.ENEMY) {
       this.TriggerType = triggerType;
       this.Repeating = repeating;
       this.WatchedUnitIds = watchedUnitIds;
       this.AwaitedStandingOrders = awaitedStandingOrders;
       this.BelowStrengthPercent = belowStrengthPercent;
+      this.TriggerFaction = triggerFaction;
     }
 
     public bool IsTriggered(EncounterState state) {
@@ -99,6 +107,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
           }
         }
         return false;
+      } else if (this.TriggerType == OrderTriggerType.ALL_UNITS_OF_FACTION_ROUTED) {
+        foreach (var unit in state.GetUnitsOfFaction(this.TriggerFaction)) {
+          if (unit.StandingOrder != UnitOrder.ROUT) {
+            return false;
+          }
+        }
+        return true;
       } else {
         throw new NotImplementedException();
       }

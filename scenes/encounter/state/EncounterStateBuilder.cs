@@ -30,7 +30,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     private static Unit CreateAndDeployUnit(Random seededRand, EncounterState state, string unitId, FactionName faction,
         EncounterPosition center, UnitOrder order, FormationType type, FormationFacing facing, int size,
         Func<int, Unit, Entity> entityFn, bool leftFlank, bool rightFlank, Entity commander) {
-      var unit = new Unit(unitId, center, order, type, facing, leftFlank, rightFlank);
+      var unit = new Unit(unitId, faction, center, order, type, facing, leftFlank, rightFlank);
       state.AddUnit(unit);
       commander.GetComponent<CommanderAIComponent>().RegisterUnit(unit);
 
@@ -91,6 +91,17 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       var friendlyHQ = EntityBuilder.CreateHeadquartersEntity(state.CurrentTick, FactionName.PLAYER);
       var friendlyCommanderAI = friendlyHQ.GetComponent<CommanderAIComponent>();
       state.PlaceEntity(friendlyHQ, new EncounterPosition(centerPos.X, centerPos.Y - 50));
+      // Commander unit is a placeholder
+      var commanderUnit = new Unit("friendly commander", FactionName.PLAYER, friendlyHQ.GetComponent<PositionComponent>().EncounterPosition,
+        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.SOUTH, true, true);
+      state.AddUnit(commanderUnit);
+      friendlyCommanderAI.RegisterUnit(commanderUnit);
+      // Boilerplate conditions
+      var playerRouted = new OrderTrigger(OrderTriggerType.ALL_UNITS_OF_FACTION_ROUTED, false, triggerFaction: FactionName.PLAYER);
+      friendlyCommanderAI.RegisterTriggeredOrder(playerRouted, new Order("friendly commander", OrderType.DECLARE_DEFEAT));
+      var enemyRouted = new OrderTrigger(OrderTriggerType.ALL_UNITS_OF_FACTION_ROUTED, false, triggerFaction: FactionName.ENEMY);
+      friendlyCommanderAI.RegisterTriggeredOrder(enemyRouted, new Order("friendly commander", OrderType.DECLARE_VICTORY));
+
 
       var pCenter = CreateAndDeployUnit(seededRand, state, "test player center", FactionName.PLAYER,
         new EncounterPosition(centerPos.X, centerPos.Y - 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
@@ -98,8 +109,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       friendlyCommanderAI.RegisterDeploymentOrder(20, new Order(pCenter.UnitId, OrderType.ADVANCE));
       friendlyCommanderAI.RegisterDeploymentOrder(30, new Order(pCenter.UnitId, OrderType.OPEN_MANIPULE));
       friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pCenter.UnitId, OrderType.ADVANCE));
-      var pCenterBreakTrigger = new OrderTrigger(OrderTriggerType.UNIT_BELOW_STRENGTH_PERCENT, false,
-        watchedUnitIds: new List<string>() { pCenter.UnitId }, belowStrengthPercent: 80);
       RegisterRoutAtPercentage(friendlyCommanderAI, pCenter, .80f);
 
       /* var pLeft = CreateAndDeployUnit(seededRand, state, "test player left", FactionName.PLAYER,

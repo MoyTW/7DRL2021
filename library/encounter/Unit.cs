@@ -56,6 +56,7 @@ namespace SpaceDodgeRL.library.encounter {
 
   public class Unit {
     [JsonInclude] public string UnitId { get; private set; }
+    [JsonInclude] public FactionName UnitFaction { get; private set; }
     [JsonInclude] public bool LeftFlank { get; private set; }
     [JsonInclude] public bool RightFlank { get; private set; }
     [JsonInclude] public EncounterPosition RallyPoint { get; set; }
@@ -82,9 +83,10 @@ namespace SpaceDodgeRL.library.encounter {
     [JsonInclude] public List<string> _DeadEntityIds { get; private set; }
     [JsonIgnore] public int NumInFormation { get { return this._BattleReadyEntityIds.Count; } }
 
-    public Unit(string unitId, EncounterPosition rallyPoint, UnitOrder standingOrder, FormationType unitFormation,
-        FormationFacing unitFacing, bool leftFlank, bool rightFlank) {
+    public Unit(string unitId, FactionName unitFaction, EncounterPosition rallyPoint, UnitOrder standingOrder,
+        FormationType unitFormation, FormationFacing unitFacing, bool leftFlank, bool rightFlank) {
       this.UnitId = unitId;
+      this.UnitFaction = unitFaction;
       this.LeftFlank = leftFlank;
       this.RightFlank = rightFlank;
       this.RallyPoint = rallyPoint;
