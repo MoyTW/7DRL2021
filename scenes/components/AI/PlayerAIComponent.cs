@@ -52,7 +52,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
       var actions = new List<string>() { InputHandler.ActionMapping.LEAVE_FORMATION, InputHandler.ActionMapping.WAIT };
       
-      if (standingOrder == UnitOrder.ADVANCE) {
+      if (standingOrder == UnitOrder.ADVANCE && !parent.GetComponent<AIRotationComponent>().IsRotating) {
         // Directly ahead pos
         var validEndPositions = new List<EncounterPosition>() {
           AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),
@@ -62,7 +62,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
           AIUtils.RotateAndProject(parentPos, 1, 0, unit.UnitFacing),
         };
         foreach (var possible in validEndPositions) {
-          if (state.EntitiesAtPosition(possible.X, possible.Y).Count == 0) {
+          var entitiesAtPos = state.EntitiesAtPosition(possible.X, possible.Y);
+          if (!AIUtils.IsNextRowTooFarAhead(parentPos, unit) && entitiesAtPos.Count == 0) {
+            actions.Add(ToCardinalDirection(parentPos, possible));
+          }
+
+          var hostilesAtPos = AIUtils.HostilesInPosition(state, FactionName.PLAYER, possible.X, possible.Y);
+          if (hostilesAtPos.Count > 0) {
             actions.Add(ToCardinalDirection(parentPos, possible));
           }
         }
@@ -74,8 +80,17 @@ namespace SpaceDodgeRL.scenes.components.AI {
     private List<EncounterAction> MoveAndAttack(EncounterState state, int dx, int dy) {
       var positionComponent = state.Player.GetComponent<PositionComponent>();
       var oldPos = positionComponent.EncounterPosition;
-      var moveAction = new MoveAction(state.Player.EntityId, new EncounterPosition(oldPos.X + dx, oldPos.Y + dy));
-      return new List<EncounterAction>() { moveAction };
+      var newPos = new EncounterPosition(oldPos.X + dx, oldPos.Y + dy);
+
+      // TODO: maybe not hostile?
+      var hostiles = AIUtils.HostilesInPosition(state, FactionName.PLAYER, newPos.X, newPos.Y);
+      if (hostiles.Count > 0) {
+        var attackAction = new MeleeAttackAction(state.Player.EntityId, hostiles[state.EncounterRand.Next(hostiles.Count)]);
+        return new List<EncounterAction>() { attackAction };
+      } else {
+        var moveAction = new MoveAction(state.Player.EntityId, newPos);
+        return new List<EncounterAction>() { moveAction };
+      }
     }
 
     private List<EncounterAction> HandleMoveCommand(EncounterState state, string actionMapping) {

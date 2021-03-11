@@ -244,6 +244,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return actions;
     }
 
+    public static bool IsNextRowTooFarAhead(EncounterPosition parentPos, Unit unit) {
+      var directlyInFrontPosition = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
+      var forwardVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, directlyInFrontPosition.X, directlyInFrontPosition.Y, unit.UnitFacing);
+      return forwardVec.Item2 < - Mathf.CeilToInt(unit.Depth / 2) - 1;
+    }
+
     private static List<EncounterAction> ActionsUnitAdvanceFight(EncounterState state, Entity parent, Unit unit) {
       var actions = new List<EncounterAction>();
 
@@ -254,11 +260,10 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var targetEndPos = parentPos;
       bool tryAdvance = true;
 
-      // Don't advance if you're going to be going too far ahead
-      var directlyInFrontPosition = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
-      var forwardVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, directlyInFrontPosition.X, directlyInFrontPosition.Y, unit.UnitFacing);
-      if (forwardVec.Item2 < - Mathf.CeilToInt(unit.Depth / 2) - 1) {
-        tryAdvance = false;
+      if (tryAdvance) {
+        if (IsNextRowTooFarAhead(parentPos, unit)) {
+          tryAdvance = false;
+        }
       }
 
       // Morale check for advancing directly into an enemy
@@ -278,7 +283,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
       if (tryAdvance) {
         // We're gonna have some serious Phalanx Drift goin' on I guess?
-        var forwardPositions = new List<EncounterPosition>() { directlyInFrontPosition };
+        var forwardPositions = new List<EncounterPosition>() { AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing) };
         if (!(unit.RightFlank && AIUtils.IsOnFlank(parentPos.X, parentPos.Y, unit, Flank.RIGHT))) {
           forwardPositions.Add(AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing));
         }

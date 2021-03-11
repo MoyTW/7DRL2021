@@ -76,8 +76,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       // state.PlaceEntity(player, playerPos);
 
       Func<int, Unit, Entity> hastatusWithPlayerFn = delegate(int formationNum, Unit unit) {
-        if (formationNum == 28) {
-          AddPlayerToUnit(player, unit, 28);
+        if (formationNum == 6) {
+          AddPlayerToUnit(player, unit, 6);
           return player;
         } else {
           return EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
@@ -105,7 +105,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       var pCenter = CreateAndDeployUnit(seededRand, state, "test player center", FactionName.PLAYER,
         new EncounterPosition(centerPos.X, centerPos.Y - 15), UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
-        FormationFacing.SOUTH, 123, hastatusWithPlayerFn, leftFlank: false, rightFlank: false, friendlyHQ);
+        FormationFacing.SOUTH, 123, hastatusWithPlayerFn, leftFlank: true, rightFlank: true, friendlyHQ);
       friendlyCommanderAI.RegisterDeploymentOrder(20, new Order(pCenter.UnitId, OrderType.ADVANCE));
       friendlyCommanderAI.RegisterDeploymentOrder(30, new Order(pCenter.UnitId, OrderType.OPEN_MANIPULE));
       friendlyCommanderAI.RegisterDeploymentOrder(50, new Order(pCenter.UnitId, OrderType.ADVANCE));
@@ -162,7 +162,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       var eCenter = CreateAndDeployUnit(seededRand, state, "test enemy center", FactionName.ENEMY,
         new EncounterPosition(centerPos.X, centerPos.Y + 40), UnitOrder.REFORM, FormationType.LINE_20,
-        FormationFacing.NORTH, 95, iberianLightInfantryFn, leftFlank: false, rightFlank: false, enemyHQ);
+        FormationFacing.NORTH, 95, iberianLightInfantryFn, leftFlank: true, rightFlank: true, enemyHQ);
       friendlyCommanderAI.RegisterDeploymentOrder(35, new Order(eCenter.UnitId, OrderType.ADVANCE));
       RegisterRoutAtPercentage(friendlyCommanderAI, eCenter, .80f);
 

@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using SpaceDodgeRL.library.encounter;
 using SpaceDodgeRL.scenes.components;
 using SpaceDodgeRL.scenes.components.AI;
 using SpaceDodgeRL.scenes.encounter;
@@ -62,6 +63,24 @@ namespace SpaceDodgeRL.scenes {
       this.GetNode<SidebarDisplay>("SceneFrame/SidebarDisplay").AddEncounterLogMessage(bbCodeMessage, encounterLogSize);
     }
 
+    private string _UnitOrderToActionText(UnitOrder order, bool rotating) {
+      if (order == UnitOrder.ADVANCE && !rotating) {
+        return "Advancing in formation.";
+      } else if (order == UnitOrder.ADVANCE && rotating) {
+        return "Rotating to the rear.";
+      } else if (order == UnitOrder.REFORM) {
+        return "Reforming.";
+      } else if (order == UnitOrder.RETREAT) {
+        return "Disengaging in formation.";
+      } else if (order == UnitOrder.ROUT) {
+        return "You should never see this, since you should get booted out of the unit as soon as the rout starts!";
+      } else if (order == UnitOrder.WITHDRAW) {
+        return "Withdrawing in good order.";
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+
     private void OnPlayerTurnStarted() {
       var player = this.EncounterState.Player;
       var playerComponent = player.GetComponent<PlayerComponent>();
@@ -75,7 +94,8 @@ namespace SpaceDodgeRL.scenes {
           formationText.Show();
           var order = this.EncounterState.GetUnit(player.GetComponent<UnitComponent>().UnitId).StandingOrder;
           var actions = player.GetComponent<PlayerAIComponent>().AllowedActions(this.EncounterState, player, order);
-          formationText.Text = "In formation. Approved actions: " + String.Join(",", actions);
+          var actionText = _UnitOrderToActionText(unit.StandingOrder, player.GetComponent<AIRotationComponent>().IsRotating);
+          formationText.Text = String.Format("{0} Actions: {1}", actionText, String.Join(",", actions));
         }
       }
     }
