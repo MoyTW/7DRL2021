@@ -39,7 +39,7 @@ namespace SpaceDodgeRL.scenes.components {
       return GetNode<Sprite>("Sprite").Position != encounterPosition || GetNode<AnimatedSprite>("ExplosionSprite").Visible == true;
     } }
 
-    public static PositionComponent Create(EncounterPosition position, string texturePath, int zIndex) {
+    public static PositionComponent Create(EncounterPosition position, string texturePath, int zIndex, bool visible) {
       var component = _scenePrefab.Instance() as PositionComponent;
 
       component._encounterPosition = position;
@@ -51,14 +51,18 @@ namespace SpaceDodgeRL.scenes.components {
       var explosionSprite = component.GetNode<AnimatedSprite>("ExplosionSprite");
       explosionSprite.Connect("animation_finished", component, nameof(OnExplosionAnimationFinished));
 
-      component.Show();
+      if (visible) {
+        component.Show();
+      } else {
+        component.Hide();
+      }
 
       return component;
     }
 
     public static PositionComponent Create(string saveData) {
       var loaded = JsonSerializer.Deserialize<SaveData>(saveData);
-      return PositionComponent.Create(loaded.EncounterPosition, loaded.TexturePath, loaded.ZIndex);
+      return PositionComponent.Create(loaded.EncounterPosition, loaded.TexturePath, loaded.ZIndex, loaded.Visible);
     }
 
     public void SetEncounterPosition(EncounterPosition position, bool show) {
@@ -159,6 +163,7 @@ namespace SpaceDodgeRL.scenes.components {
       public EncounterPosition EncounterPosition { get; set; }
       public string TexturePath { get; set; }
       public int ZIndex { get; set; }
+      public bool Visible { get; set; }
 
       public SaveData() { }
 
@@ -169,6 +174,7 @@ namespace SpaceDodgeRL.scenes.components {
         this.EncounterPosition = component.EncounterPosition;
         this.TexturePath = sprite.Texture.ResourcePath;
         this.ZIndex = sprite.ZIndex;
+        this.Visible = sprite.Visible;
       }
     }
 

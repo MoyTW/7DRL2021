@@ -204,7 +204,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       // Add the position component
       var spriteData = entity.GetComponent<DisplayComponent>();
-      var positionComponent = PositionComponent.Create(targetPosition, spriteData.TexturePath, spriteData.ZIndex);
+      var positionComponent = PositionComponent.Create(targetPosition, spriteData.TexturePath, spriteData.ZIndex, spriteData.Visible);
       entity.AddComponent(positionComponent);
 
       var entityPosition = positionComponent.EncounterPosition;

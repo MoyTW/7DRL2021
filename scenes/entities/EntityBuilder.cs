@@ -71,7 +71,7 @@ namespace SpaceDodgeRL.scenes.entities {
     }
 
     public static Entity CreateHeadquartersEntity(int currentTick, FactionName faction) {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "Headquarters: " + faction.ToString());
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Hidden Commander Unit");
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
@@ -80,7 +80,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(9999, 9999, 9999, 9999, 9999, isInvincible: true));
-      e.AddComponent(DisplayComponent.Create(_texCarrierPath, "Headquarters: " + faction.ToString(), false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texCarrierPath, "Hidden Commander Unit", false, ENTITY_Z_INDEX, visible: false));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
       e.AddComponent(XPValueComponent.Create(xpValue: 9999));

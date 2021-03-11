@@ -8,7 +8,8 @@ namespace SpaceDodgeRL.scenes.components {
 
   public enum FactionName {
     PLAYER,
-    ENEMY
+    ENEMY,
+    NEUTRAL
   }
 
   public class FactionComponent : Component {
