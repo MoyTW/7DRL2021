@@ -332,13 +332,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     }
 
     public void ZoomOut() {
-      GD.Print(Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").GetChildCount());
-      if (this.IsInsideTree() && GetTree().GetNodesInGroup("ENCOUNTER_CAMERA_GROUP").Count == 0) {
-        var camera = new Camera2D();
-        camera.AddToGroup("ENCOUNTER_CAMERA_GROUP");
-        camera.Current = true;
-        Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(camera);
-      }
       Camera2D cam = (Camera2D)GetTree().GetNodesInGroup("ENCOUNTER_CAMERA_GROUP")[0];
       var oldZoom = cam.Zoom;
       cam.Zoom = new Vector2(oldZoom.x + .2f, oldZoom.y + .2f);

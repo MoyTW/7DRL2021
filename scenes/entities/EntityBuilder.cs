@@ -99,10 +99,62 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 4, meleeAttack: 50, rangedAttack: 30));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: 50, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 45, maxFooting: 80, meleeDefense: 25, rangedDefense: 25));
-      e.AddComponent(DisplayComponent.Create(_texScoutPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 45, maxFooting: 80, meleeDefense: 25, rangedDefense: 25));
+      e.AddComponent(DisplayComponent.Create(_texScoutPath, "A young and eager soldier.", false, ENTITY_Z_INDEX));
+      e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
+      e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
+      e.AddComponent(XPValueComponent.Create(xpValue: 30));
+
+      return e;
+    }
+
+    public static Entity CreatePrincepsEntity(int currentTick, int formationNumber, Unit unit, FactionName faction,
+        int numPilas=1, int startingMorale=65) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Princeps");
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      // Princeps AI is essentially the same as Hastatus AI
+      e.AddComponent(new HastatusAIComponent(numPilas));
+      e.AddComponent(AIRotationComponent.Create(.60, false));
+      e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 55, rangedAttack: 30));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 65, maxFooting: 100, meleeDefense: 30, rangedDefense: 30));
+      e.AddComponent(DisplayComponent.Create(_texDestroyerPath, "An experienced swordsman with good equipment.", false, ENTITY_Z_INDEX));
+      e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
+      e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
+      e.AddComponent(XPValueComponent.Create(xpValue: 30));
+
+      return e;
+    }
+
+    public static Entity CreateTriariusEntity(int currentTick, int formationNumber, Unit unit, FactionName faction,
+        int startingMorale=85) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Triarius");
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      // TODO: different AI
+      e.AddComponent(new HastatusAIComponent(0));
+      e.AddComponent(AIRotationComponent.Create(.60, false));
+      e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 65, rangedAttack: 30));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 3, maxHp: 85, maxFooting: 120, meleeDefense: 45, rangedDefense: 45));
+      e.AddComponent(DisplayComponent.Create(_texCruiserPath, "An elite spearman of the legion.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -123,10 +175,10 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 60, rangedAttack: 10));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 65, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 30, maxFooting: 60, meleeDefense: 25, rangedDefense: 5));
-      e.AddComponent(DisplayComponent.Create(_texFighterPath, "A small scout craft, armed with a shotgun.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 1, maxHp: 40, maxFooting: 75, meleeDefense: 35, rangedDefense: 5));
+      e.AddComponent(DisplayComponent.Create(_texFighterPath, "A fast, deatly, and barely armored Iberian swordsman.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 80));
