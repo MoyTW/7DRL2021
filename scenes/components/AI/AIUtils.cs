@@ -146,7 +146,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       } else if (facing == FormationFacing.SOUTH) {
         return new Tuple<int, int>(-dx - 1, -dy);
       } else if (facing == FormationFacing.WEST) { // TODO: uh, is that...right. test out east/west alignment.
-        return new Tuple<int, int>(-dy, dx - 1);
+        return new Tuple<int, int>(-dy - 1, dx);
       } else {
         throw new NotImplementedException();
       }

@@ -157,7 +157,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         for (int i = 0; i < this.NumLanes; i++) {
           var laneX = leftX + (i * interval);
           var laneCenterPos = AIUtils.RotateAndProject(this.CenterPos, laneX, 0, this.AttackerFacing);
-          GD.Print(String.Format("Lane i={0}, laneX={1}, laneCenter={2} & leftX={3}, facing={4}", i, laneX, laneCenterPos, leftX, this.AttackerFacing));
           this.Lanes.Add(new Lane(laneCenterPos));
         }
       }
