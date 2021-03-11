@@ -1,5 +1,6 @@
 using SpaceDodgeRL.library.encounter;
 using SpaceDodgeRL.library.encounter.rulebook;
+using SpaceDodgeRL.library.encounter.rulebook.actions;
 using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
 using System;
@@ -70,6 +71,25 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return actions;
     }
 
+    private List<EncounterAction> MoveAndAttack(EncounterState state, int dx, int dy) {
+      var positionComponent = state.Player.GetComponent<PositionComponent>();
+      var oldPos = positionComponent.EncounterPosition;
+      var moveAction = new MoveAction(state.Player.EntityId, new EncounterPosition(oldPos.X + dx, oldPos.Y + dy));
+      return new List<EncounterAction>() { moveAction };
+    }
+
+    private List<EncounterAction> HandleMoveCommand(EncounterState state, string actionMapping) {
+      if (actionMapping == InputHandler.ActionMapping.MOVE_N) { return MoveAndAttack(state, 0, -1); }
+      else if (actionMapping == InputHandler.ActionMapping.MOVE_NE) { return MoveAndAttack(state, 1, -1); }
+      else if (actionMapping == InputHandler.ActionMapping.MOVE_E) { return MoveAndAttack(state, 1, 0); }
+      else if (actionMapping == InputHandler.ActionMapping.MOVE_SE) { return MoveAndAttack(state, 1, 1); }
+      else if (actionMapping == InputHandler.ActionMapping.MOVE_S) { return MoveAndAttack(state, 0, 1); }
+      else if (actionMapping == InputHandler.ActionMapping.MOVE_SW) { return MoveAndAttack(state, -1, 1); }
+      else if (actionMapping == InputHandler.ActionMapping.MOVE_W) { return MoveAndAttack(state, -1, 0); }
+      else if (actionMapping == InputHandler.ActionMapping.MOVE_NW) { return MoveAndAttack(state, -1, -1); }
+      else { throw new NotImplementedException(); }
+    }
+
     public List<EncounterAction> DecideNextActionForInput(EncounterState state, Entity parent, string actionMapping) {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
       var unitComponent = parent.GetComponent<UnitComponent>();
@@ -86,7 +106,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
           return null;
         }
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
-        return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
+        if (this.AllowedActions(state, parent, unit.StandingOrder).Contains(actionMapping) && actionMapping != InputHandler.ActionMapping.WAIT) {
+          return HandleMoveCommand(state, actionMapping);
+        } else {
+          return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
+        }
       } else if (unit.StandingOrder == UnitOrder.RETREAT) {
         if (actionMapping == InputHandler.ActionMapping.WAIT) {
           return AIUtils.ActionsForUnitRetreat(state, parent, unit);
