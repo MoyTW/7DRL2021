@@ -70,7 +70,7 @@ namespace SpaceDodgeRL.scenes.entities {
       return newEntity;
     }
 
-    public static Entity CreateHeadquartersEntity(int currentTick, FactionName faction) {
+    public static Entity CreateCommanderEntity(int currentTick, FactionName faction) {
       var e = CreateEntity(Guid.NewGuid().ToString(), "Hidden Commander Unit");
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();

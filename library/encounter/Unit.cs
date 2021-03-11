@@ -13,6 +13,20 @@ namespace SpaceDodgeRL.library.encounter {
     LINE_20
   }
 
+  public static class FormationFacingExtensions{
+    public static FormationFacing Opposite(this FormationFacing facing) {
+      if (facing == FormationFacing.NORTH) {
+        return FormationFacing.SOUTH;
+      } else if (facing == FormationFacing.EAST) {
+        return FormationFacing.WEST;
+      } else if (facing == FormationFacing.SOUTH) {
+        return FormationFacing.NORTH;
+      } else {
+        return FormationFacing.EAST;
+      }
+    }
+  }
+
   public enum FormationFacing {
     NORTH,
     EAST,

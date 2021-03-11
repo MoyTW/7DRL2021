@@ -196,7 +196,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     public void PlaceEntity(Entity entity, EncounterPosition targetPosition, bool ignoreCollision = false) {
       if (!IsInBounds(targetPosition)) {
-        throw new NotImplementedException("out of bounds");
+        throw new NotImplementedException(String.Format("({0}, {1}) out of bounds", targetPosition.X, targetPosition.Y));
       }
       if (!ignoreCollision && IsPositionBlocked(targetPosition)) {
         throw new NotImplementedException("probably handle this more gracefully than exploding");
