@@ -3,17 +3,17 @@ Commenced at Saturday March 6, 8pm Pacific time.
 * Schedule
 
 ** Tuesday <- Formations & Combat
-1. Troops rotate in & out
-2. Units backpedal & advance (lines shift)
-3. Units break & reform
-4. Units can rout off the field
-5. Add in the armor, stamina, & footing
+1. DONE: Troops rotate in & out
+2. DONE: Units backpedal & advance (lines shift)
+3. PARTIAL: Units break & reform
+4. DONE: Units can rout off the field
+5. PARTIAL: Add in the armor, stamina, & footing
 
 ** Wednesday <- Full Game Loop
-1. Add a scoring system for the player
-2. Add a placeholder battle generator
-3. String together battles to make a campaign
-4. Update the UI
+1. PARTIAL: Add a scoring system for the player
+2. DONE: Add a placeholder battle generator
+3. PARTIAL: String together battles to make a campaign
+4. PARTIAL: Update the UI
 
 *** How does the game *play*?
 
@@ -55,6 +55,19 @@ caught out and stabbed to death by angry enemies.
 4. Possibly add in nice-to-haves
   a. Skirmishers
   b. Cavalry
+
+*** Bugs
++ 2 units can get hung up on each other due to the "enemy unit 2 squares in
+  front" code; this means they can hold up the entire advance by sitting way
+  back! you should, you know...fix this.
+
+*** Battle Generation
+
++ You ALWAYS have [n lanes]
+  - Every lane always has at LEAST 1 unit on each side
+  - TODO: You need to have some way for lines that rout their enemies off to sweep the sides
+  - Trivial generation is randomly pick units on each side, and throw them together
+  - Complex gen is create harder enemies the more levels you go on
 
 ** Friday <- Playtesting & Fixing
 ** Saturday <- Playtesting & Fixing (ends 8pm)
