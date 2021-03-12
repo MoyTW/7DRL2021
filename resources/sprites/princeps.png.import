@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/jump_point.png-0ad57b0d42d24ac5f52b7b8bd870ef0f.stex"
+path="res://.import/princeps.png-c4c9d84a3472fc576f7213d28082b93f.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/jump_point.png"
-dest_files=[ "res://.import/jump_point.png-0ad57b0d42d24ac5f52b7b8bd870ef0f.stex" ]
+source_file="res://resources/sprites/princeps.png"
+dest_files=[ "res://.import/princeps.png-c4c9d84a3472fc576f7213d28082b93f.stex" ]
 
 [params]
 

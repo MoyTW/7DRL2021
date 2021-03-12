@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/scout.png-1217d203a6e1877debd1dc604baf02c0.stex"
+path="res://.import/gallic_light_infantry.png-32fe59516fa2de5f9fab8c226ad572b0.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/scout.png"
-dest_files=[ "res://.import/scout.png-1217d203a6e1877debd1dc604baf02c0.stex" ]
+source_file="res://resources/sprites/gallic_light_infantry.png"
+dest_files=[ "res://.import/gallic_light_infantry.png-32fe59516fa2de5f9fab8c226ad572b0.stex" ]
 
 [params]
 

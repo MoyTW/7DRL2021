@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/gunship.png-84a40077e97a00d29b7984a2e5557208.stex"
+path="res://.import/punic_veteran_infantry.png-a832fee931e7140ead3e1b7aea7029ef.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/gunship.png"
-dest_files=[ "res://.import/gunship.png-84a40077e97a00d29b7984a2e5557208.stex" ]
+source_file="res://resources/sprites/punic_veteran_infantry.png"
+dest_files=[ "res://.import/punic_veteran_infantry.png-a832fee931e7140ead3e1b7aea7029ef.stex" ]
 
 [params]
 

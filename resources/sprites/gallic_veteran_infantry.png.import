@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/asteroid.png-9b5316bd9b85ac6c3c5ba5a6f5fdaff0.stex"
+path="res://.import/gallic_veteran_infantry.png-782d7d06b33b66b2824886b595c299f2.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/asteroid.png"
-dest_files=[ "res://.import/asteroid.png-9b5316bd9b85ac6c3c5ba5a6f5fdaff0.stex" ]
+source_file="res://resources/sprites/gallic_veteran_infantry.png"
+dest_files=[ "res://.import/gallic_veteran_infantry.png-782d7d06b33b66b2824886b595c299f2.stex" ]
 
 [params]
 

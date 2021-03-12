@@ -15,14 +15,14 @@ namespace SpaceDodgeRL.scenes.entities {
     private static int PROJECTILE_Z_INDEX = 1;
     private static int ITEM_Z_INDEX = 0;
 
-    private static string _texCarrierPath = "res://resources/sprites/carrier.png";
-    private static string _texCruiserPath = "res://resources/sprites/cruiser.png";
-    private static string _texDestroyerPath = "res://resources/sprites/destroyer.png";
-    private static string _texDiplomatPath = "res://resources/sprites/diplomat.png";
-    private static string _texEdgeBlockerPath = "res://resources/sprites/edge_blocker.png";
-    private static string _texGunshipPath = "res://resources/sprites/gunship.png";
-    private static string _texFighterPath = "res://resources/sprites/fighter.png";
-    private static string _texFrigatePath = "res://resources/sprites/frigate.png";
+    private static string _texHastatusPath = "res://resources/sprites/hastatus.png";
+    private static string _texPrincepsPath = "res://resources/sprites/princeps.png";
+    private static string _texTriariusPath = "res://resources/sprites/triarius.png";
+    private static string _texIberianLightInfantryPath = "res://resources/sprites/iberian_light_infantry.png";
+    private static string _texGallicLightInfantryPath = "res://resources/sprites/gallic_light_infantry.png";
+    private static string _texGallicVeteranInfantryPath = "res://resources/sprites/gallic_veteran_infantry.png";
+    private static string _texPunicVeteranInfantryPath = "res://resources/sprites/punic_veteran_infantry.png";
+    private static string _texPunicHeavyInfantryPath = "res://resources/sprites/punic_heavy_infantry.png";
     private static string _texIntelPath = "res://resources/sprites/intel.png";
     private static string _texJumpPointPath = "res://resources/sprites/jump_point.png";
     private static string _texPlayerPath = "res://resources/sprites/player.png";
@@ -80,7 +80,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(9999, 9999, 9999, 9999, 9999, isInvincible: true));
-      e.AddComponent(DisplayComponent.Create(_texCarrierPath, "Hidden Commander Unit", false, ENTITY_Z_INDEX, visible: false));
+      e.AddComponent(DisplayComponent.Create(_texTriariusPath, "Hidden Commander Unit", false, ENTITY_Z_INDEX, visible: false));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
       e.AddComponent(XPValueComponent.Create(xpValue: 9999));
@@ -102,7 +102,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: 50, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 45, maxFooting: 80, meleeDefense: 15, rangedDefense: 25));
-      e.AddComponent(DisplayComponent.Create(_texScoutPath, "A young and eager soldier.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texHastatusPath, "A young and eager soldier.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -128,7 +128,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 55, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 65, maxFooting: 100, meleeDefense: 20, rangedDefense: 30));
-      e.AddComponent(DisplayComponent.Create(_texDestroyerPath, "An experienced swordsman with good equipment.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texPrincepsPath, "An experienced swordsman with good equipment.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -154,7 +154,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 65, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 3, maxHp: 85, maxFooting: 120, meleeDefense: 30, rangedDefense: 45));
-      e.AddComponent(DisplayComponent.Create(_texCruiserPath, "An elite spearman of the legion.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texTriariusPath, "An elite spearman of the legion.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -178,7 +178,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: 55, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 1, maxHp: 40, maxFooting: 75, meleeDefense: 20, rangedDefense: 5));
-      e.AddComponent(DisplayComponent.Create(_texFighterPath, "A fast, deatly, and barely armored Iberian swordsman.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texIberianLightInfantryPath, "A fast, deatly, and barely armored Iberian swordsman.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 80));
@@ -203,7 +203,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 45, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 35, maxFooting: 60, meleeDefense: 30, rangedDefense: 45));
-      e.AddComponent(DisplayComponent.Create(_texBatteryPath, "A fast and strong Gallic soldier. Fights defensively, but hits hard.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texGallicLightInfantryPath, "A fast and strong Gallic soldier. Fights defensively, but hits hard.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 90));
@@ -214,7 +214,7 @@ namespace SpaceDodgeRL.scenes.entities {
       return e;
     }
 
-    public static Entity CreateGallicVeteran(int currentTick, int formationNumber, Unit unit, FactionName faction) {
+    public static Entity CreateGallicVeteranInfantry(int currentTick, int formationNumber, Unit unit, FactionName faction) {
       var e = CreateEntity(Guid.NewGuid().ToString(), "Gallic Veteran Infantry");
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
@@ -228,7 +228,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AttackerComponent.Create(e.EntityId, 9, meleeAttack: 50, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 55, maxFooting: 110, meleeDefense: 35, rangedDefense: 45));
-      e.AddComponent(DisplayComponent.Create(_texGunshipPath, "An armored Gallic veteran. Fights defensively, but hits hard.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texGallicVeteranInfantryPath, "An armored Gallic veteran. Fights defensively, but hits hard.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -253,7 +253,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 55, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 60, maxFooting: 100, meleeDefense: 25, rangedDefense: 35));
-      e.AddComponent(DisplayComponent.Create(_texFrigatePath, "Hardened, armored Punic mercenaries.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texPunicVeteranInfantryPath, "Hardened, armored Punic mercenaries.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -278,7 +278,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AttackerComponent.Create(e.EntityId, 11, meleeAttack: 55, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
       e.AddComponent(DefenderComponent.Create(baseDefense: 4, maxHp: 80, maxFooting: 140, meleeDefense: 45, rangedDefense: 45));
-      e.AddComponent(DisplayComponent.Create(_texFrigatePath, "Carthage's very best heavy infantry.", false, ENTITY_Z_INDEX));
+      e.AddComponent(DisplayComponent.Create(_texPunicHeavyInfantryPath, "Carthage's very best heavy infantry.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
@@ -330,27 +330,6 @@ namespace SpaceDodgeRL.scenes.entities {
 
       return e;
     }
-
-    public static Entity CreateEdgeBlockerEntity() {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "boundary sign");
-
-      e.AddComponent(CollisionComponent.Create(true, false));
-      e.AddComponent(DefenderComponent.Create(9999, 9999, 9999, 9999, 9999, logDamage: false, isInvincible: true));
-      e.AddComponent(DisplayComponent.Create(_texEdgeBlockerPath, "Trying to run away, eh? Get back to your mission!", true, ENTITY_Z_INDEX));
-
-      return e;
-    }
-
-    // public static Entity CreateSatelliteEntity() {
-    //   var e = CreateEntity(Guid.NewGuid().ToString(), "satellite");
-
-    //   e.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: true));
-    //   e.AddComponent(DefenderComponent.Create(baseDefense: int.MaxValue, maxHp: int.MaxValue, isInvincible: true, logDamage: false));
-    //   e.AddComponent(DisplayComponent.Create(_texSatellitePath, "Space junk. Blocks movement and projectiles. Cannot be destroyed.", true, ENTITY_Z_INDEX));
-
-    //   return e;
-    // }
-
     public static Entity CreateStairsEntity() {
       var e = CreateEntity(Guid.NewGuid().ToString(), "jump point");
 

@@ -367,13 +367,23 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         this.Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(camera);
       }
 
-      // Set the background image - stretch it out so that it covers visible OOB areas too.
-      var background = GetNode<Sprite>("Background");
-      var pixelsWidth = PositionComponent.STEP_X * this.MapWidth + PositionComponent.START_X;
-      var pixelsHeight = PositionComponent.STEP_Y * this.MapWidth + PositionComponent.START_Y;
-      background.Position = new Vector2(pixelsWidth / 2, pixelsHeight / 2);
-      background.RegionEnabled = true;
-      background.RegionRect = new Rect2(new Vector2(0, 0), pixelsWidth * 2, pixelsHeight * 2);
+      // TODO: Set up the TileMap for the terrain
+      
+      var terrainMap = GetNode<TileMap>("MapTiles");
+      terrainMap.Clear();
+
+      // Update the range indicator
+      var mapTilesRand = new Random(1);
+      for (int x = 0; x <= this.MapWidth; x++) {
+        for (int y = 0; y <= this.MapHeight; y++) {
+          // 16 options
+          var selection = mapTilesRand.Next(80);
+          if (selection > 15) {
+            selection = 0;
+          }
+          terrainMap.SetCell(x, y, selection);
+        }
+      }
     }
 
     // TODO: Move into map gen & save/load

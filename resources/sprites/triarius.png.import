@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/destroyer.png-0e69b2f5ef013362931c6e08e55a9af1.stex"
+path="res://.import/triarius.png-8a1041e6fea4c28785a171a40a999c19.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/destroyer.png"
-dest_files=[ "res://.import/destroyer.png-0e69b2f5ef013362931c6e08e55a9af1.stex" ]
+source_file="res://resources/sprites/triarius.png"
+dest_files=[ "res://.import/triarius.png-8a1041e6fea4c28785a171a40a999c19.stex" ]
 
 [params]
 

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/fighter.png-4c9c7788d541fa806586eebf0b43802a.stex"
+path="res://.import/1-bit-colored-packed-doubled.png-61564bfe749d5ab2acba9b22c7e7590f.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/fighter.png"
-dest_files=[ "res://.import/fighter.png-4c9c7788d541fa806586eebf0b43802a.stex" ]
+source_file="res://resources/sprites/1-bit-colored-packed-doubled.png"
+dest_files=[ "res://.import/1-bit-colored-packed-doubled.png-61564bfe749d5ab2acba9b22c7e7590f.stex" ]
 
 [params]
 
