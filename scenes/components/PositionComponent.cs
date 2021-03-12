@@ -68,7 +68,7 @@ namespace SpaceDodgeRL.scenes.components {
     public void SetEncounterPosition(EncounterPosition position, bool show) {
       var dx = position.X - _encounterPosition.X;
       var dy = position.Y - _encounterPosition.Y;
-      RotateSpriteTowards(dx, dy);
+      //RotateSpriteTowards(dx, dy);
 
       _encounterPosition = position;
       Tween(IndexToVector(position.X, position.Y));
