@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Godot;
 using SpaceDodgeRL.library.encounter;
 using SpaceDodgeRL.scenes.components;
@@ -81,6 +84,31 @@ namespace SpaceDodgeRL.scenes {
       }
     }
 
+    private static Dictionary<string, string> _actionToReadableString = new Dictionary<string, string>() {
+      { InputHandler.ActionMapping.WAIT, "Wait (Space, N5)" },
+      { InputHandler.ActionMapping.ROTATE, "Rotate (r)" },
+      { InputHandler.ActionMapping.LEAVE_FORMATION, "Flee (x)" },
+      { InputHandler.ActionMapping.MOVE_N, "N (h, N8)" },
+      { InputHandler.ActionMapping.MOVE_NE, "NE (u, N9)" },
+      { InputHandler.ActionMapping.MOVE_E, "E (l, N6)" },
+      { InputHandler.ActionMapping.MOVE_SE, "SE (n, N3)" },
+      { InputHandler.ActionMapping.MOVE_S, "S (j, N2)" },
+      { InputHandler.ActionMapping.MOVE_SW, "SW (b, N1)" },
+      { InputHandler.ActionMapping.MOVE_W, "W (k, N4)" },
+      { InputHandler.ActionMapping.MOVE_NW, "NW (y, N7)" },
+    };
+
+    private static HashSet<string> _moveActions = new HashSet<string>() {
+      InputHandler.ActionMapping.MOVE_N,
+      InputHandler.ActionMapping.MOVE_NE,
+      InputHandler.ActionMapping.MOVE_E,
+      InputHandler.ActionMapping.MOVE_SE,
+      InputHandler.ActionMapping.MOVE_S,
+      InputHandler.ActionMapping.MOVE_SW,
+      InputHandler.ActionMapping.MOVE_W,
+      InputHandler.ActionMapping.MOVE_NW
+    };
+
     private void OnPlayerTurnStarted() {
       var player = this.EncounterState.Player;
       var playerComponent = player.GetComponent<PlayerComponent>();
@@ -104,7 +132,11 @@ namespace SpaceDodgeRL.scenes {
           var order = this.EncounterState.GetUnit(player.GetComponent<UnitComponent>().UnitId).StandingOrder;
           var actions = player.GetComponent<PlayerAIComponent>().AllowedActions(this.EncounterState, player, order);
           var actionText = _UnitOrderToActionText(unit.StandingOrder, player.GetComponent<AIRotationComponent>().IsRotating);
-          formationText.Text = String.Format("{0} Actions: {1}", actionText, String.Join(",", actions));
+
+          var moveStrings = actions.Where((s) => _moveActions.Contains(s)).Select((s) => _actionToReadableString[s]);
+          var nonMoveStrings = actions.Where((s) => !_moveActions.Contains(s)).Select((s) => _actionToReadableString[s]);
+
+          formationText.Text = String.Format("{0}\nApproved Moves: {1}\n{2}", actionText, String.Join(", ", moveStrings), String.Join(" ", nonMoveStrings));
         }
       }
     }

@@ -175,7 +175,6 @@ namespace SpaceDodgeRL.scenes.encounter {
         }
         // Autopilot if allowed actions are LEAVE & WAIT
         var playerAllowedActions = playerAI.AllowedActions(state, entity, playerUnit.StandingOrder);
-        GD.Print("NUM ALLOWED ACTIONS ", playerAllowedActions.Count);
         if (playerAllowedActions.Count == 2) { // You can always wait or leave the formation
           var commands = playerAI.DecideNextActionForInput(state, entity, InputHandler.ActionMapping.WAIT);
           if (commands != null) { 

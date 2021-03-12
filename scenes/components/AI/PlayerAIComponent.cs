@@ -50,12 +50,9 @@ namespace SpaceDodgeRL.scenes.components.AI {
     public List<string> AllowedActions(EncounterState state, Entity parent, UnitOrder standingOrder) {
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
-      var actions = new List<string>() { InputHandler.ActionMapping.LEAVE_FORMATION, InputHandler.ActionMapping.WAIT };
+      var actions = new List<string>();
       
       if (standingOrder == UnitOrder.ADVANCE && !parent.GetComponent<AIRotationComponent>().IsRotating) {
-        if (parent.GetComponent<AIRotationComponent>().BackSecure(state, parent, unit)) {
-          actions.Add(InputHandler.ActionMapping.ROTATE);
-        }
         // Directly ahead pos
         var validEndPositions = new List<EncounterPosition>() {
           AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),
@@ -75,7 +72,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
             actions.Add(ToCardinalDirection(parentPos, possible));
           }
         }
+        if (parent.GetComponent<AIRotationComponent>().BackSecure(state, parent, unit)) {
+          actions.Add(InputHandler.ActionMapping.ROTATE);
+        }
       }
+
+      actions.Add(InputHandler.ActionMapping.WAIT);
+      actions.Add(InputHandler.ActionMapping.LEAVE_FORMATION);
 
       return actions;
     }
