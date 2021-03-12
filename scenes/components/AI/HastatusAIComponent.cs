@@ -54,6 +54,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var unitComponent = parent.GetComponent<UnitComponent>();
 
       if (unit.StandingOrder == UnitOrder.REFORM) {
+        if (state.CurrentTurn < 30) {
+            if (state.EncounterRand.Next(50) == 0) {
+              parent.GetComponent<PositionComponent>().PlaySpeechBubble("Huphuphup!");
+            }
+          }
         return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
         var pilaAction = this.TryThrowPilaAction(state, parent);

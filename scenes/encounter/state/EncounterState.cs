@@ -53,6 +53,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public string RunStatus { get; private set; }
     private ActionTimeline _actionTimeline;
     public int CurrentTick { get => _actionTimeline.CurrentTick; }
+    public int CurrentTurn { get => Mathf.FloorToInt(_actionTimeline.CurrentTick / 100); }
     public Entity NextEntity { get => _actionTimeline.NextEntity; }
     public Entity Player { get; private set; }
 

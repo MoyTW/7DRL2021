@@ -50,6 +50,8 @@ namespace SpaceDodgeRL.scenes.components {
 
       var explosionSprite = component.GetNode<AnimatedSprite>("ExplosionSprite");
       explosionSprite.Connect("animation_finished", component, nameof(OnExplosionAnimationFinished));
+      var timer = component.GetNode<Timer>("SpeechBubbleTimer");
+      timer.Connect("timeout", component, nameof(OnSpeechBubbleTimerTimeout));
 
       if (visible) {
         component.Show();
@@ -68,7 +70,7 @@ namespace SpaceDodgeRL.scenes.components {
     public void SetEncounterPosition(EncounterPosition position, bool show) {
       var dx = position.X - _encounterPosition.X;
       var dy = position.Y - _encounterPosition.Y;
-      RotateSpriteTowards(dx, dy);
+      //RotateSpriteTowards(dx, dy); don't rotate anymore
 
       _encounterPosition = position;
       Tween(IndexToVector(position.X, position.Y));
@@ -148,6 +150,21 @@ namespace SpaceDodgeRL.scenes.components {
     private void OnExplosionAnimationFinished() {
       var explosionSprite = this.GetNode<AnimatedSprite>("ExplosionSprite");
       explosionSprite.Visible = false;
+    }
+
+    public void PlaySpeechBubble(string speech) {
+      var timer = GetNode<Timer>("SpeechBubbleTimer");
+      if (timer.IsStopped()) {
+        var speechLabel = GetNode<Label>("Sprite/SpeechLabel");
+        speechLabel.Text = speech;
+        speechLabel.Show();
+        timer.Start(1);
+      }
+    }
+
+    private void OnSpeechBubbleTimerTimeout() {
+      var speechLabel = GetNode<Label>("Sprite/SpeechLabel");
+      speechLabel.Hide();
     }
 
     public static EncounterPosition VectorToIndex(float x, float y) {
