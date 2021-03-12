@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/night_sky.png-474201eb4783e57313fcbb23e4f96df4.stex"
+path="res://.import/1-bit-colored-packed-doubled.png-61564bfe749d5ab2acba9b22c7e7590f.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/night_sky.png"
-dest_files=[ "res://.import/night_sky.png-474201eb4783e57313fcbb23e4f96df4.stex" ]
+source_file="res://resources/sprites/1-bit-colored-packed-doubled.png"
+dest_files=[ "res://.import/1-bit-colored-packed-doubled.png-61564bfe749d5ab2acba9b22c7e7590f.stex" ]
 
 [params]
 
@@ -19,7 +19,7 @@ compress/lossy_quality=0.7
 compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
-flags/repeat=1
+flags/repeat=0
 flags/filter=true
 flags/mipmaps=false
 flags/anisotropic=false
