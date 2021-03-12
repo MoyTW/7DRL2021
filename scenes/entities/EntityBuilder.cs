@@ -215,7 +215,7 @@ namespace SpaceDodgeRL.scenes.entities {
     }
 
     public static Entity CreateGallicVeteran(int currentTick, int formationNumber, Unit unit, FactionName faction) {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "Gallic Veteran");
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Gallic Veteran Infantry");
       
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
