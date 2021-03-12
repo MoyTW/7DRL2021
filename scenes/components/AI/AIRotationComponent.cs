@@ -47,11 +47,10 @@ namespace SpaceDodgeRL.scenes.components {
       return false;
     }
 
-    public void DecideIfShouldRotate(Entity parent, bool backSecure) {
-      if (this.IsPlayer) { return; }
-      if (!backSecure) {
-        return;
-      }
+    // Returns true if rotation CHANGED
+    public bool DecideIfShouldRotate(Entity parent, bool backSecure) {
+      if (this.IsPlayer) { return false; }
+      if (!backSecure) { return false; }
 
       var defender = parent.GetComponent<DefenderComponent>();
       if (this.RotateAtHpThreshold == -1) {
@@ -65,8 +64,11 @@ namespace SpaceDodgeRL.scenes.components {
 
       bool underFootingThreshold = defender.PercentageFooting < this.RotateAtFootingPercentThreshold;
 
-      if (underHPThreshold || underFootingThreshold) {
+      if ((underHPThreshold || underFootingThreshold) && !this.IsRotating) {
         this.IsRotating = true;
+        return true;
+      } else {
+        return false;
       }
     }
 

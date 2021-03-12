@@ -382,7 +382,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
     public static List<EncounterAction> ActionsForUnitAdvanceInLine(EncounterState state, Entity parent, Unit unit) {
       var rotationComponent = parent.GetComponent<AIRotationComponent>();
       var backSecure = rotationComponent.BackSecure(state, parent, unit);
-      rotationComponent.DecideIfShouldRotate(parent, backSecure);
+      // ugh so decideifshouldrotate has a stateful side-effect and i have like, an hour to get this done so ugh let's leave it but!
+      var decidedToRotate = rotationComponent.DecideIfShouldRotate(parent, backSecure);
+      if (decidedToRotate) {
+        parent.GetComponent<PositionComponent>().PlaySpeechBubble("Rotating!");
+      }
       if (rotationComponent.IsRotating) {
         return ActionsUnitAdvanceRotateOut(state, parent, unit, backSecure);
       } else {
