@@ -66,6 +66,10 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
       var actions = new List<string>();
       var parentIsLagging = AIUtils.IsPositionTooFarBehind(parentPos, unit);
+      // TODO: this is a silly place to run this check
+      if (parentIsLagging) {
+        parent.GetComponent<AIRotationComponent>().NotifyRotationCompleted();
+      }
       
       if (standingOrder == UnitOrder.ADVANCE && !parent.GetComponent<AIRotationComponent>().IsRotating) {
         // Directly ahead pos available if not too far ahead OR if too far behind
@@ -132,6 +136,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
       else { throw new NotImplementedException(); }
     }
 
+    public static string AUTOPILOT = "AUTOPILOT_SPECIAL_STR";
+
+    public List<EncounterAction> DecideNextActionForInput(EncounterState state, Entity parent) {
+      return this.DecideNextActionForInput(state, parent, AUTOPILOT);
+    }
+
     public List<EncounterAction> DecideNextActionForInput(EncounterState state, Entity parent, string actionMapping) {
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
       var unitComponent = parent.GetComponent<UnitComponent>();
@@ -142,20 +152,22 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
 
       if (unit.StandingOrder == UnitOrder.REFORM) {
-        if (actionMapping == InputHandler.ActionMapping.WAIT) {
+        if (actionMapping == AUTOPILOT) {
           return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
         } else {
           return null;
         }
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
-        if (this.AllowedActions(state, parent, unit.StandingOrder).Contains(actionMapping) && actionMapping != InputHandler.ActionMapping.WAIT) {
+        if (this.AllowedActions(state, parent, unit.StandingOrder).Contains(actionMapping)) {
           if (actionMapping == InputHandler.ActionMapping.ROTATE) {
             parent.GetComponent<AIRotationComponent>().PlayerSetRotation(true);
             return null;
+          } else if (actionMapping == InputHandler.ActionMapping.WAIT) {
+            return new List<EncounterAction>() { new WaitAction(parent.EntityId) };
           } else {
             return HandleMoveCommand(state, actionMapping);
           }
-        } else {
+        } else if (actionMapping == AUTOPILOT) {
           var actions = AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
           // Check the stating autopilot
           if (AIUtils.AdjacentHostiles(state, FactionName.PLAYER, parent.GetComponent<PositionComponent>().EncounterPosition).Count > 0) {
@@ -171,13 +183,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
             }
           }
           return actions;
-        }
-      } else if (unit.StandingOrder == UnitOrder.RETREAT) {
-        if (actionMapping == InputHandler.ActionMapping.WAIT) {
-          return AIUtils.ActionsForUnitRetreat(state, parent, unit);
         } else {
           return null;
         }
+      } else if (unit.StandingOrder == UnitOrder.RETREAT) {
+        throw new NotImplementedException();
       } else if (unit.StandingOrder == UnitOrder.ROUT) {
         return null;
       } else {
