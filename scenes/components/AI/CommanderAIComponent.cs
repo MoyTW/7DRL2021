@@ -127,6 +127,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
       this.Trigger = trigger;
       this.Order = order;
     }
+
+    public static TriggeredOrder AdvanceIfUnitRetreatsRoutsOrWithdraws(Unit watchedUnit, Unit advanceUnit) {
+      var trigger = new OrderTrigger(OrderTriggerType.UNIT_HAS_STANDING_ORDER, false,
+        new List<string>() { watchedUnit.UnitId }, new List<UnitOrder>() { UnitOrder.RETREAT, UnitOrder.ROUT, UnitOrder.WITHDRAW });
+      return new TriggeredOrder(trigger, new Order(advanceUnit.UnitId, OrderType.ADVANCE));
+    }
   }
 
   public class CommanderAIComponent : AIComponent {
@@ -167,6 +173,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
         this.LastDeploymentTurn = turn;
       }
       this.DeploymentComplete = false;
+    }
+
+    public void RegisterTriggeredOrder(TriggeredOrder triggeredOrder) {
+      if (!this._TriggerOrders.ContainsKey(triggeredOrder.Order.UnitId)) {
+        this._TriggerOrders[triggeredOrder.Order.UnitId] = new List<TriggeredOrder>();
+      }
+      this._TriggerOrders[triggeredOrder.Order.UnitId].Add(triggeredOrder);
     }
 
     public void RegisterTriggeredOrder(OrderTrigger trigger, Order order) {

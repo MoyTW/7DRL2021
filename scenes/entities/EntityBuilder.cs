@@ -101,7 +101,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: 50, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 45, maxFooting: 80, meleeDefense: 25, rangedDefense: 25));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 45, maxFooting: 80, meleeDefense: 15, rangedDefense: 25));
       e.AddComponent(DisplayComponent.Create(_texScoutPath, "A young and eager soldier.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -127,7 +127,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 55, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 65, maxFooting: 100, meleeDefense: 30, rangedDefense: 30));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 65, maxFooting: 100, meleeDefense: 20, rangedDefense: 30));
       e.AddComponent(DisplayComponent.Create(_texDestroyerPath, "An experienced swordsman with good equipment.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -153,7 +153,7 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(ActionTimeComponent.Create(currentTick));
       e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 65, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 3, maxHp: 85, maxFooting: 120, meleeDefense: 45, rangedDefense: 45));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 3, maxHp: 85, maxFooting: 120, meleeDefense: 30, rangedDefense: 45));
       e.AddComponent(DisplayComponent.Create(_texCruiserPath, "An elite spearman of the legion.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -175,13 +175,113 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 65, rangedAttack: 10));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: 55, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 1, maxHp: 40, maxFooting: 75, meleeDefense: 35, rangedDefense: 5));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 1, maxHp: 40, maxFooting: 75, meleeDefense: 20, rangedDefense: 5));
       e.AddComponent(DisplayComponent.Create(_texFighterPath, "A fast, deatly, and barely armored Iberian swordsman.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 80));
+      e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
+      e.AddComponent(XPValueComponent.Create(xpValue: 30));
+
+      return e;
+    }
+
+    public static Entity CreateGallicLightInfantry(int currentTick, int formationNumber, Unit unit, FactionName faction) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Gallic Light Infantry");
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      // TODO: one day I'll have different AIs
+      e.AddComponent(new IberianLightInfantryAIComponent());
+      e.AddComponent(AIRotationComponent.Create(.4, false));
+      e.AddComponent(AIMoraleComponent.Create(100, 90));
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 45, rangedAttack: 10));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 35, maxFooting: 60, meleeDefense: 30, rangedDefense: 45));
+      e.AddComponent(DisplayComponent.Create(_texBatteryPath, "A fast and strong Gallic soldier. Fights defensively, but hits hard.", false, ENTITY_Z_INDEX));
+      e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 90));
+      e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
+      e.AddComponent(XPValueComponent.Create(xpValue: 30));
+
+      return e;
+    }
+
+    public static Entity CreateGallicVeteran(int currentTick, int formationNumber, Unit unit, FactionName faction) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Gallic Veteran");
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      // TODO: one day I'll have different AIs
+      e.AddComponent(new IberianLightInfantryAIComponent());
+      e.AddComponent(AIRotationComponent.Create(.4, false));
+      e.AddComponent(AIMoraleComponent.Create(100, 90));
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 9, meleeAttack: 50, rangedAttack: 10));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 55, maxFooting: 110, meleeDefense: 35, rangedDefense: 45));
+      e.AddComponent(DisplayComponent.Create(_texGunshipPath, "An armored Gallic veteran. Fights defensively, but hits hard.", false, ENTITY_Z_INDEX));
+      e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
+      e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
+      e.AddComponent(XPValueComponent.Create(xpValue: 30));
+
+      return e;
+    }
+
+    public static Entity CreatePunicVeteranInfantry(int currentTick, int formationNumber, Unit unit, FactionName faction) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Punic Veteran Infantry");
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      // TODO: one day I'll have different AIs
+      e.AddComponent(new IberianLightInfantryAIComponent());
+      e.AddComponent(AIRotationComponent.Create(.4, false));
+      e.AddComponent(AIMoraleComponent.Create(100, 90));
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 55, rangedAttack: 10));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 60, maxFooting: 100, meleeDefense: 25, rangedDefense: 35));
+      e.AddComponent(DisplayComponent.Create(_texFrigatePath, "Hardened, armored Punic mercenaries.", false, ENTITY_Z_INDEX));
+      e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
+      e.AddComponent(statusEffectTrackerComponent);
+      e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
+      e.AddComponent(XPValueComponent.Create(xpValue: 30));
+
+      return e;
+    }
+
+    public static Entity CreatePunicHeavyInfantry(int currentTick, int formationNumber, Unit unit, FactionName faction) {
+      var e = CreateEntity(Guid.NewGuid().ToString(), "Punic Heavy Infantry");
+      
+      var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
+
+      // TODO: one day I'll have different AIs
+      e.AddComponent(new IberianLightInfantryAIComponent());
+      e.AddComponent(AIRotationComponent.Create(.4, false));
+      e.AddComponent(AIMoraleComponent.Create(100, 90));
+
+      e.AddComponent(ActionTimeComponent.Create(currentTick));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 11, meleeAttack: 55, rangedAttack: 10));
+      e.AddComponent(CollisionComponent.CreateDefaultActor());
+      e.AddComponent(DefenderComponent.Create(baseDefense: 4, maxHp: 80, maxFooting: 140, meleeDefense: 45, rangedDefense: 45));
+      e.AddComponent(DisplayComponent.Create(_texFrigatePath, "Carthage's very best heavy infantry.", false, ENTITY_Z_INDEX));
+      e.AddComponent(FactionComponent.Create(faction));
+      e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
+      e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
       e.AddComponent(statusEffectTrackerComponent);
       e.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
       e.AddComponent(XPValueComponent.Create(xpValue: 30));
