@@ -116,7 +116,10 @@ namespace SpaceDodgeRL.scenes.components {
     }
 
     public void RestoreFooting() {
-      this.CurrentFooting = this.MaxFooting;
+      this.CurrentFooting += this.MaxFooting / 3;
+      if (this.CurrentFooting > this.MaxFooting) {
+        this.CurrentFooting = this.MaxFooting;
+      }
     }
 
     public string Save() {
