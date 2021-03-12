@@ -250,6 +250,16 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return forwardVec.Item2 < - Mathf.CeilToInt(unit.Depth / 2) - 1;
     }
 
+    private static void TryAddAttackAdjacent(EncounterState state, Entity parent, List<EncounterAction> actions,
+        FactionName parentFaction, EncounterPosition targetEndPos) {
+      var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, targetEndPos);
+      if (adjacentHostiles.Count > 0) {
+        // TODO: don't attack randomly
+        var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
+        actions.Add(new MeleeAttackAction(parent.EntityId, target));
+      }
+    }
+
     private static List<EncounterAction> ActionsUnitAdvanceFight(EncounterState state, Entity parent, Unit unit) {
       var actions = new List<EncounterAction>();
 
@@ -264,6 +274,16 @@ namespace SpaceDodgeRL.scenes.components.AI {
         if (IsNextRowTooFarAhead(parentPos, unit)) {
           tryAdvance = false;
         }
+      }
+
+      // Override for if you're too far back
+      var directlyBehindPosition = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
+      var behindVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, directlyBehindPosition.X, directlyBehindPosition.Y, unit.UnitFacing);
+      if (behindVec.Item2 > - Mathf.CeilToInt(unit.Depth / 2) + 1) {
+        var aheadPos = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
+        actions.Add(new MoveAction(parent.EntityId, aheadPos));
+        TryAddAttackAdjacent(state, parent, actions, parentFaction, aheadPos);
+        return actions;
       }
 
       // Morale check for advancing directly into an enemy
@@ -317,12 +337,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
           actions.Add(new MoveAction(parent.EntityId, targetEndPos));
         }
       }
-      var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, targetEndPos);
-      if (adjacentHostiles.Count > 0) {
-        // TODO: don't attack randomly
-        var target = adjacentHostiles[state.EncounterRand.Next(adjacentHostiles.Count)];
-        actions.Add(new MeleeAttackAction(parent.EntityId, target));
-      }
+      TryAddAttackAdjacent(state, parent, actions, parentFaction, targetEndPos);
       if (actions.Count == 0) {
         actions.Add(new WaitAction(parent.EntityId));
       }
