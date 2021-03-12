@@ -258,7 +258,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 1
 theme = ExtResource( 6 )
 custom_fonts/font = ExtResource( 3 )
-text = "Scan Readout"
+text = "Mouse to examine (zoom's buggy sorry!)"
 align = 1
 
 [node name="NoEntityScannedLabel" type="Label" parent="SidebarVBox/ScanOptionBlock"]
@@ -269,7 +269,7 @@ margin_bottom = 187.0
 size_flags_vertical = 1
 theme = ExtResource( 6 )
 custom_fonts/font = SubResource( 1 )
-text = "NO ENTITY SCANNED"
+text = "?"
 align = 1
 autowrap = true
 

@@ -99,29 +99,35 @@ namespace SpaceDodgeRL.scenes.encounter {
 
         var descBuilder = new StringBuilder();
 
-        var attackerComponent = entity.GetComponent<AttackerComponent>();
-        if (attackerComponent != null) {
-          descBuilder.AppendLine(string.Format("[b]Damage:[/b] {0}", attackerComponent.Power));
-        }
-
         var defenderComponent = entity.GetComponent<DefenderComponent>();
         if (defenderComponent != null) {
           if (defenderComponent.IsInvincible) {
             descBuilder.AppendLine("[b]Invincible[/b]");
           } else {
-            descBuilder.AppendLine(string.Format("[b]HP:[/b] {0}/{1}", defenderComponent.CurrentHp, defenderComponent.MaxHp));
-            descBuilder.AppendLine(string.Format("[b]Armor:[/b] {0}", defenderComponent.BaseDR));
+            descBuilder.AppendLine(string.Format("[b]Hit Points:[/b] {0}/{1} [b]Footing:[/b] {2}/{3} ",
+              defenderComponent.CurrentHp, defenderComponent.MaxHp, defenderComponent.CurrentFooting, defenderComponent.MaxFooting));
           }
+        }
+
+        var attackerComponent = entity.GetComponent<AttackerComponent>();
+        if (attackerComponent != null) {         
+          descBuilder.AppendLine(string.Format("[b]Melee Attack:[/b] {0} [b]Attack Power:[/b] {0}",
+            attackerComponent.Power, attackerComponent.MeleeAttack));
+        }
+
+        if (defenderComponent != null && !defenderComponent.IsInvincible) {
+          descBuilder.AppendLine(string.Format("[b]Melee Defense:[/b] {0} [b]Armor:[/b] {1}",
+            defenderComponent.MeleeDefense, defenderComponent.BaseDR));
         }
 
         if (entity.GetComponent<SpeedComponent>() != null) {
           descBuilder.AppendLine(string.Format("[b]Speed:[/b] {0}", entity.GetComponent<SpeedComponent>().Speed));
         }
 
-        var xpValueComponent = entity.GetComponent<XPValueComponent>();
+        /*var xpValueComponent = entity.GetComponent<XPValueComponent>();
         if (xpValueComponent != null) {
           descBuilder.AppendLine(string.Format("[b]XP Value:[/b] {0}", xpValueComponent.XPValue));
-        }
+        }*/
 
         descBuilder.AppendLine(entity.GetComponent<DisplayComponent>().Description);
 
