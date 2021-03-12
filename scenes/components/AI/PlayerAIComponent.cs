@@ -53,7 +53,9 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var actions = new List<string>() { InputHandler.ActionMapping.LEAVE_FORMATION, InputHandler.ActionMapping.WAIT };
       
       if (standingOrder == UnitOrder.ADVANCE && !parent.GetComponent<AIRotationComponent>().IsRotating) {
-        actions.Add(InputHandler.ActionMapping.ROTATE);
+        if (parent.GetComponent<AIRotationComponent>().BackSecure(state, parent, unit)) {
+          actions.Add(InputHandler.ActionMapping.ROTATE);
+        }
         // Directly ahead pos
         var validEndPositions = new List<EncounterPosition>() {
           AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),

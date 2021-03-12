@@ -2,6 +2,8 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
+using SpaceDodgeRL.library.encounter;
+using SpaceDodgeRL.scenes.components.AI;
 using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
 
@@ -33,8 +35,23 @@ namespace SpaceDodgeRL.scenes.components {
       return JsonSerializer.Deserialize<AIRotationComponent>(saveData);
     }
 
-    public void DecideIfShouldRotate(Entity parent) {
+    public bool BackSecure(EncounterState state, Entity parent, Unit unit) {
+      var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+      var positionBack = AIUtils.RotateAndProject(parentPos, 0, 1, unit.UnitFacing);
+      var friendliesBack = AIUtils.FriendliesInPosition(state, parent, unit.UnitFaction, positionBack.X, positionBack.Y);
+      foreach (var friendly in friendliesBack) {
+        if (!friendly.IsRotating()) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    public void DecideIfShouldRotate(Entity parent, bool backSecure) {
       if (this.IsPlayer) { return; }
+      if (!backSecure) {
+        return;
+      }
 
       var defender = parent.GetComponent<DefenderComponent>();
       if (this.RotateAtHpThreshold == -1) {

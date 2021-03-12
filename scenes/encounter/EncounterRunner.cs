@@ -153,26 +153,41 @@ namespace SpaceDodgeRL.scenes.encounter {
           this._sceneManager.ShowCharacterMenu(state);
         }
 
+        // Update the player options text
+        EmitSignal(nameof(EncounterRunner.PlayerTurnStarted));
+        
+        var action = inputHandler.PopQueue();
+
+        // Autopilot section
         var playerComponent = entity.GetComponent<PlayerComponent>();
+        var playerUnit = state.GetUnit(entity.GetComponent<UnitComponent>().UnitId);
+        var playerAI = entity.GetComponent<PlayerAIComponent>();
         // Autopilot if beginning
         if (playerComponent.StartOfLevel) {
-          var playerAI = entity.GetComponent<PlayerAIComponent>();
           var commands = playerAI.DecideNextActionForInput(state, entity, InputHandler.ActionMapping.WAIT);
-
           if (commands != null) { 
             Rulebook.ResolveActionsAndEndTurn(commands, state);
             EmitSignal(nameof(EncounterRunner.TurnEnded));
             state.UpdatePlayerOverlays();
+            return;
           } else {
             return;
           }
         }
-
-        // Update the player options text
-        EmitSignal(nameof(EncounterRunner.PlayerTurnStarted));
-
-        
-        var action = inputHandler.PopQueue();
+        // Autopilot if allowed actions are LEAVE & WAIT
+        var playerAllowedActions = playerAI.AllowedActions(state, entity, playerUnit.StandingOrder);
+        GD.Print("NUM ALLOWED ACTIONS ", playerAllowedActions.Count);
+        if (playerAllowedActions.Count == 2) { // You can always wait or leave the formation
+          var commands = playerAI.DecideNextActionForInput(state, entity, InputHandler.ActionMapping.WAIT);
+          if (commands != null) { 
+            Rulebook.ResolveActionsAndEndTurn(commands, state);
+            EmitSignal(nameof(EncounterRunner.TurnEnded));
+            state.UpdatePlayerOverlays();
+            return;
+          } else {
+            return;
+          }
+        }
 
         // Super not a fan of the awkwardness of checking this twice! Switch string -> enum, maybe?
         if (action != null && AlwaysAvaiableActionMappingToActionDict.ContainsKey(action.Mapping)) {
@@ -180,7 +195,6 @@ namespace SpaceDodgeRL.scenes.encounter {
         } else if (action != null && !playerComponent.IsInFormation && FreeMovementActionMappingToActionDict.ContainsKey(action.Mapping) ) {
           FreeMovementActionMappingToActionDict[action.Mapping].Invoke(state, this, action);
         } else if (action != null && playerComponent.IsInFormation) {
-          var playerAI = entity.GetComponent<PlayerAIComponent>();
           var commands = playerAI.DecideNextActionForInput(state, entity, action.Mapping);
 
           if (commands != null) { 
