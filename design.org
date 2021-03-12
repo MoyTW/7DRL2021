@@ -61,6 +61,14 @@ caught out and stabbed to death by angry enemies.
   front" code; this means they can hold up the entire advance by sitting way
   back! you should, you know...fix this.
 + FIXED (probably): Enemies never seem to advance Westwards? something to do with...line formation...?
++ Bind ESCAPE to exit help menu
+
+*** MUST do
+
++ Better tutorializing
++ What is FOOTING?
++ Pictures lol
+  - https://www.kenney.nl/assets/bit-pack
 
 *** Battle Generation
 
