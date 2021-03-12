@@ -169,7 +169,6 @@ namespace SpaceDodgeRL.scenes.encounter {
             Rulebook.ResolveActionsAndEndTurn(commands, state);
             EmitSignal(nameof(EncounterRunner.TurnEnded));
             state.UpdatePlayerOverlays();
-            return;
           } else {
             return;
           }
@@ -183,7 +182,6 @@ namespace SpaceDodgeRL.scenes.encounter {
             Rulebook.ResolveActionsAndEndTurn(commands, state);
             EmitSignal(nameof(EncounterRunner.TurnEnded));
             state.UpdatePlayerOverlays();
-            return;
           } else {
             return;
           }
