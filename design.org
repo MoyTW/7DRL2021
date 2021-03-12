@@ -79,6 +79,21 @@ caught out and stabbed to death by angry enemies.
   - Complex gen is create harder enemies the more levels you go on
 
 ** Friday <- Playtesting & Fixing
+*** Issues
++ player autowaits
++ Intro screen
++ Description of footing
++ Melee & defense stats show footing penalty
++ HELP menu update
++ escape exits help menu
++ units can mysteriously lag way behind their units; put a "if you're behind
+  your unit go towards center" safeguard in it
++ make units sweep other lanes after completing their lane
++ make "wait" restore % of footing & change rotation to a stamina system
++ remove ranged weapons altogether
++ make the UI clearer
++ commit to the speech bubbles
+
 ** Saturday <- Playtesting & Fixing (ends 8pm)
 
 * Summary
