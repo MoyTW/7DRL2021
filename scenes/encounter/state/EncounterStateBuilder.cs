@@ -231,7 +231,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     private static Func<int, Unit, Entity> SecondLineEnemyFn(EncounterState state, Random seededRand) {
       if (seededRand.Next(2) == 0) {
-        return (formationNum, unit) => EntityBuilder.CreateGallicVeteran(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
+        return (formationNum, unit) => EntityBuilder.CreateGallicVeteranInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
       } else {
         return (formationNum, unit) => EntityBuilder.CreatePunicVeteranInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
       }

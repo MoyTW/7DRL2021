@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/cruiser.png-105b8997eb5076a9bfc8d9ae0ff34c6a.stex"
+path="res://.import/punic_heavy_infantry.png-d4620d3a80db6badd0d7960d15aac4a9.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/cruiser.png"
-dest_files=[ "res://.import/cruiser.png-105b8997eb5076a9bfc8d9ae0ff34c6a.stex" ]
+source_file="res://resources/sprites/punic_heavy_infantry.png"
+dest_files=[ "res://.import/punic_heavy_infantry.png-d4620d3a80db6badd0d7960d15aac4a9.stex" ]
 
 [params]
 

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/gunship.png-84a40077e97a00d29b7984a2e5557208.stex"
+path="res://.import/iberian_light_infantry.png-13142beaae76d61a576a8d08c8a35b04.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/gunship.png"
-dest_files=[ "res://.import/gunship.png-84a40077e97a00d29b7984a2e5557208.stex" ]
+source_file="res://resources/sprites/iberian_light_infantry.png"
+dest_files=[ "res://.import/iberian_light_infantry.png-13142beaae76d61a576a8d08c8a35b04.stex" ]
 
 [params]
 

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/frigate.png-a0859d76ba8f7be108cdc03e7955e9ef.stex"
+path="res://.import/princeps.png-c4c9d84a3472fc576f7213d28082b93f.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://resources/sprites/frigate.png"
-dest_files=[ "res://.import/frigate.png-a0859d76ba8f7be108cdc03e7955e9ef.stex" ]
+source_file="res://resources/sprites/princeps.png"
+dest_files=[ "res://.import/princeps.png-c4c9d84a3472fc576f7213d28082b93f.stex" ]
 
 [params]
 
