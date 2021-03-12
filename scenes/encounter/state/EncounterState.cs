@@ -433,7 +433,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       }
 
       // Populate all our initial caches
-      this.LogMessage(string.Format("Level {0} started!", dungeonLevel));
+      this.LogMessage(string.Format("Battle {0} has commenced!", dungeonLevel));
       // This is a deeply dumb, possibly redundant hack to get the camera to work properly, not gonna think on it
       // since it's 7DRL and I'm running outta time
       if (dungeonLevel > 1) {
