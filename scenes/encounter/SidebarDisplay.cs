@@ -37,17 +37,20 @@ namespace SpaceDodgeRL.scenes.encounter {
         playerDefenderComponent.MaxFooting, playerDefenderComponent.FootingPenalty);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/FootingLabel").Text = newFootingText;
 
+      var penalty = string.Format("Low Ftng Malus: {0}", -playerDefenderComponent.FootingPenalty);
+      GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/FootingPenaltyLabel").Text = penalty;
+
       var playerAttackerComponent = player.GetComponent<AttackerComponent>();
-      var newMAtkText = string.Format("Melee Attack: {0}", playerAttackerComponent.MeleeAttack);
+      var newMAtkText = string.Format("Attack: {0}", playerAttackerComponent.MeleeAttack - playerDefenderComponent.FootingPenalty);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/MeleeAttackLabel").Text = newMAtkText;
 
       var newAttackPowerText = string.Format("Attack Power: {0}", playerAttackerComponent.Power);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/AttackPowerLabel").Text = newAttackPowerText;
 
-      var newMDefText = string.Format("Melee Defense: {0}", playerDefenderComponent.MeleeDefense);
+      var newMDefText = string.Format("Defense: {0}", playerDefenderComponent.MeleeDefense - playerDefenderComponent.FootingPenalty);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/MeleeDefenseLabel").Text = newMDefText;
 
-      var newRDefText = string.Format("Ranged Defense: {0}", playerDefenderComponent.RangedDefense);
+      var newRDefText = string.Format("Armor: {0}", playerDefenderComponent.BaseDR);
       GetNode<Label>("SidebarVBox/StatsAndPositionHBox/StatsBlock/RangedDefenseLabel").Text = newRDefText;
 
       var speedComponent = player.GetComponent<SpeedComponent>();
