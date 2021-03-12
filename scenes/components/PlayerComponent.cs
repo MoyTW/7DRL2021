@@ -11,6 +11,8 @@ namespace SpaceDodgeRL.scenes.components {
 
     private Entity _parent;
     
+    // If start of level you should autopilot
+    [JsonInclude] public bool StartOfLevel { get; set; }
     [JsonInclude] public bool IsInFormation { get; private set; }
     [JsonInclude] public int Prestige { get; private set; }
     [JsonInclude] public int PilaRange { get; private set; }
@@ -21,6 +23,7 @@ namespace SpaceDodgeRL.scenes.components {
     ) {
       var component = new PlayerComponent();
       
+      component.StartOfLevel = true;
       component.IsInFormation = isInFormation;
       component.Prestige = 0;
       component.PilaRange = pilaRange;

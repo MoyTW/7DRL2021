@@ -130,7 +130,21 @@ namespace SpaceDodgeRL.scenes.components.AI {
             return HandleMoveCommand(state, actionMapping);
           }
         } else {
-          return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
+          var actions = AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
+          // Check the stating autopilot
+          if (AIUtils.AdjacentHostiles(state, FactionName.PLAYER, parent.GetComponent<PositionComponent>().EncounterPosition).Count > 0) {
+            state.Player.GetComponent<PlayerComponent>().StartOfLevel = false;
+            return null;
+          }
+          foreach (var action in actions) {
+            if (action.ActionType == ActionType.MOVE) {
+              if (AIUtils.AdjacentHostiles(state, FactionName.PLAYER, ((MoveAction)action).TargetPosition).Count > 0) {
+                state.Player.GetComponent<PlayerComponent>().StartOfLevel = false;
+                return null;
+              }
+            }
+          }
+          return actions;
         }
       } else if (unit.StandingOrder == UnitOrder.RETREAT) {
         if (actionMapping == InputHandler.ActionMapping.WAIT) {

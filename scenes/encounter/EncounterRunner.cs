@@ -153,10 +153,25 @@ namespace SpaceDodgeRL.scenes.encounter {
           this._sceneManager.ShowCharacterMenu(state);
         }
 
+        var playerComponent = entity.GetComponent<PlayerComponent>();
+        // Autopilot if beginning
+        if (playerComponent.StartOfLevel) {
+          var playerAI = entity.GetComponent<PlayerAIComponent>();
+          var commands = playerAI.DecideNextActionForInput(state, entity, InputHandler.ActionMapping.WAIT);
+
+          if (commands != null) { 
+            Rulebook.ResolveActionsAndEndTurn(commands, state);
+            EmitSignal(nameof(EncounterRunner.TurnEnded));
+            state.UpdatePlayerOverlays();
+          } else {
+            return;
+          }
+        }
+
         // Update the player options text
         EmitSignal(nameof(EncounterRunner.PlayerTurnStarted));
 
-        var playerComponent = entity.GetComponent<PlayerComponent>();
+        
         var action = inputHandler.PopQueue();
 
         // Super not a fan of the awkwardness of checking this twice! Switch string -> enum, maybe?
