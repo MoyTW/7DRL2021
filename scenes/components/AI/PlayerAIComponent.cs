@@ -47,37 +47,58 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
     }
 
+    private bool positionNotTooFarAheadAndMovable(EncounterState state, EncounterPosition parentPos, Unit unit, EncounterPosition possible) {
+      var entitiesAtPos = state.EntitiesAtPosition(possible.X, possible.Y);
+      if (!AIUtils.IsNextRowTooFarAhead(parentPos, unit) && entitiesAtPos.Count == 0) {
+        return true;
+      }
+
+      var hostilesAtPos = AIUtils.HostilesInPosition(state, FactionName.PLAYER, possible.X, possible.Y);
+      if (hostilesAtPos.Count > 0) {
+        return true;
+      }
+
+      return false;
+    }
+
     public List<string> AllowedActions(EncounterState state, Entity parent, UnitOrder standingOrder) {
       var parentPos = parent.GetComponent<PositionComponent>().EncounterPosition;
       var unit = state.GetUnit(parent.GetComponent<UnitComponent>().UnitId);
       var actions = new List<string>();
+      var parentIsLagging = AIUtils.IsPositionTooFarBehind(parentPos, unit);
       
       if (standingOrder == UnitOrder.ADVANCE && !parent.GetComponent<AIRotationComponent>().IsRotating) {
-        // Directly ahead pos
-        var validEndPositions = new List<EncounterPosition>() {
-          AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),
-          AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing),
+        // Directly ahead pos available if not too far ahead OR if too far behind
+        var validAheadPositions = new List<EncounterPosition>() {
           AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing),
           AIUtils.RotateAndProject(parentPos, 1, -1, unit.UnitFacing),
-          AIUtils.RotateAndProject(parentPos, 1, 0, unit.UnitFacing),
+          AIUtils.RotateAndProject(parentPos, -1, -1, unit.UnitFacing),
         };
-        foreach (var possible in validEndPositions) {
-          var entitiesAtPos = state.EntitiesAtPosition(possible.X, possible.Y);
-          if (!AIUtils.IsNextRowTooFarAhead(parentPos, unit) && entitiesAtPos.Count == 0) {
-            actions.Add(ToCardinalDirection(parentPos, possible));
-          }
-
-          var hostilesAtPos = AIUtils.HostilesInPosition(state, FactionName.PLAYER, possible.X, possible.Y);
-          if (hostilesAtPos.Count > 0) {
+        foreach (var possible in validAheadPositions) {
+          if (positionNotTooFarAheadAndMovable(state, parentPos, unit, possible) || parentIsLagging) {
             actions.Add(ToCardinalDirection(parentPos, possible));
           }
         }
+
+        // Flank positions available if not too far ahead AND not too far behind
+        var validFlankPositions = new List<EncounterPosition>() {
+          AIUtils.RotateAndProject(parentPos, 1, 0, unit.UnitFacing),
+          AIUtils.RotateAndProject(parentPos, -1, 0, unit.UnitFacing),
+        };
+        foreach (var possible in validFlankPositions) {
+          if (positionNotTooFarAheadAndMovable(state, parentPos, unit, possible) && !parentIsLagging) {
+            actions.Add(ToCardinalDirection(parentPos, possible));
+          }
+        }
+        
         if (parent.GetComponent<AIRotationComponent>().BackSecure(state, parent, unit)) {
           actions.Add(InputHandler.ActionMapping.ROTATE);
         }
       }
 
-      actions.Add(InputHandler.ActionMapping.WAIT);
+      if (!parentIsLagging) {
+        actions.Add(InputHandler.ActionMapping.WAIT);
+      }
       actions.Add(InputHandler.ActionMapping.LEAVE_FORMATION);
 
       return actions;

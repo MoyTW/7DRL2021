@@ -250,6 +250,11 @@ namespace SpaceDodgeRL.scenes.components.AI {
       return forwardVec.Item2 < - Mathf.CeilToInt(unit.Depth / 2) - 1;
     }
 
+    public static bool IsPositionTooFarBehind(EncounterPosition position, Unit unit) {
+      var behindVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, position.X, position.Y, unit.UnitFacing);
+      return behindVec.Item2 > - Mathf.CeilToInt(unit.Depth / 2) + 1;
+    }
+
     private static void TryAddAttackAdjacent(EncounterState state, Entity parent, List<EncounterAction> actions,
         FactionName parentFaction, EncounterPosition targetEndPos) {
       var adjacentHostiles = AIUtils.AdjacentHostiles(state, parentFaction, targetEndPos);
@@ -277,9 +282,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       }
 
       // Override for if you're too far back
-      var directlyBehindPosition = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
-      var behindVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, directlyBehindPosition.X, directlyBehindPosition.Y, unit.UnitFacing);
-      if (behindVec.Item2 > - Mathf.CeilToInt(unit.Depth / 2) + 1) {
+      if (IsPositionTooFarBehind(AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing), unit)) {
         var aheadPos = AIUtils.RotateAndProject(parentPos, 0, -1, unit.UnitFacing);
         actions.Add(new MoveAction(parent.EntityId, aheadPos));
         TryAddAttackAdjacent(state, parent, actions, parentFaction, aheadPos);
