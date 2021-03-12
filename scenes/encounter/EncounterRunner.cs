@@ -98,6 +98,13 @@ namespace SpaceDodgeRL.scenes.encounter {
       }
     }
 
+    private static void HandleClaimVictoryAction(EncounterState state, EncounterRunner runner, InputHandler.InputAction action) {
+      if (state.RunStatus == EncounterState.RUN_STATUS_ARMY_VICTORY) {
+        state.ResetStateForNewLevel(state.Player, state.DungeonLevel + 1);
+        state.WriteToFile();
+      }
+    }
+
     private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> AlwaysAvaiableActionMappingToActionDict =
       new Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>>()
     {
@@ -109,6 +116,7 @@ namespace SpaceDodgeRL.scenes.encounter {
       { InputHandler.ActionMapping.ZOOM_OUT, (s, r, a) => s.ZoomOut() },
       { InputHandler.ActionMapping.ZOOM_RESET, (s, r, a) => s.ZoomReset() },
       { InputHandler.ActionMapping.SCAN_POSITION, HandleScanAction },
+      { InputHandler.ActionMapping.CLAIM_VICTORY, HandleClaimVictoryAction },
     };
 
     private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> FreeMovementActionMappingToActionDict =

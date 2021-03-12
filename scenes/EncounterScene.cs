@@ -85,6 +85,15 @@ namespace SpaceDodgeRL.scenes {
       var player = this.EncounterState.Player;
       var playerComponent = player.GetComponent<PlayerComponent>();
 
+      if (this.EncounterState.RunStatus == EncounterState.RUN_STATUS_ARMY_DEFEAT) {
+        this.GetNode<Label>("CanvasLayer/DefeatText").Show();
+      } else if (this.EncounterState.RunStatus == EncounterState.RUN_STATUS_ARMY_VICTORY) {
+        this.GetNode<Label>("CanvasLayer/VictoryText").Show();
+      } else {
+        this.GetNode<Label>("CanvasLayer/VictoryText").Hide();
+        this.GetNode<Label>("CanvasLayer/DefeatText").Hide();
+      }
+
       if (playerComponent.IsInFormation) {
         var unit = this.EncounterState.GetUnit(player.GetComponent<UnitComponent>().UnitId);
         if (unit.StandingOrder == library.encounter.UnitOrder.ROUT) {
