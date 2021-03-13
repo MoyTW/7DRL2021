@@ -95,6 +95,7 @@ caught out and stabbed to death by angry enemies.
 + remove ranged weapons altogether
 + make the UI clearer
 + commit to the speech bubbles
++ It freezes when player's unit routs? (when player's out of unit and it routs?)
 
 ** Saturday <- Playtesting & Fixing (ends 8pm)
 

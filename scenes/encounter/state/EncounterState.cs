@@ -393,7 +393,11 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       this._entitiesById = new Dictionary<string, Entity>();
       this._unitTracker = new Dictionary<string, Unit>();
       this._unitsByFaction = null;
-      this.RunStatus = EncounterState.RUN_STATUS_RUNNING;
+      if (dungeonLevel == 10) {
+        this.RunStatus = EncounterState.RUN_STATUS_PLAYER_VICTORY;
+      } else {
+        this.RunStatus = EncounterState.RUN_STATUS_RUNNING;
+      }
       this._actionTimeline = new ActionTimeline(0);
       // We also need to reset the player's action time
       player.GetComponent<ActionTimeComponent>().SetNextTurnAtTo(0);

@@ -248,7 +248,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     private static void PopulateEnemyFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
         DeploymentInfo deploymentInfo, CommanderAIComponent commanderAI, Lane lane) {
-      var numLines = 2; //FIX: seededRand.Next(3) + 1;
+      var numLines = 1; //FIX: seededRand.Next(3) + 1;
 
       Unit firstRankUnit = null;
       if (numLines > 0) {
@@ -287,15 +287,12 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         int width = 300, int height = 300, int maxZoneGenAttempts = 100) {
       InitializeMap(state, width, height);
 
-      // Add the player to the map
-      var centerPos = new EncounterPosition(width / 2, height / 2);
-
-      Func<int, Unit, Entity> secondHastatusFn = (formationNum, unit) => EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER, startingMorale: 100);
-      Func<int, Unit, Entity> iberianLightInfantryFn = (formationNum, unit) => EntityBuilder.CreateIberianLightInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
+      // Reset player's start
+      player.GetComponent<PlayerComponent>().StartOfLevel = true;
 
       var commanderAI = CreateAndPlaceCommander(state);
 
-      var numLanes = 3; //FIX: seededRand.Next(3) + 1;
+      var numLanes = 1; //FIX: seededRand.Next(3) + 1;
       var deploymentInfo = new DeploymentInfo(width, height, seededRand, numLanes);
 
       foreach (var lane in deploymentInfo.Lanes) {
