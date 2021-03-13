@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
 
 namespace SpaceDodgeRL.scenes.components {
@@ -61,7 +62,7 @@ namespace SpaceDodgeRL.scenes.components {
     /**
      * Adds XP and returns true if the entity has levelled up.
      */
-    public bool AddXP(int xp) {
+    public bool AddXP(int xp, AttackerComponent attacker, DefenderComponent defender, EncounterState state) {
       bool levelledUp = false;
       this.XP += xp;
       while (this.XP >= this.NextLevelAtXP) {
@@ -70,6 +71,14 @@ namespace SpaceDodgeRL.scenes.components {
         this._UnusedLevelUps.Add(this.Level);
         levelledUp = true;
       }
+
+      if (levelledUp) {
+        state.LogMessage("[b]You've levelled up![/b] You gain +5 to maximum footing and +2 to attack and defense!");
+        attacker.MeleeAttack += 2;
+        defender.MeleeDefense += 2;
+        defender.MaxFooting += 5;
+      }
+
       return levelledUp;
     }
 

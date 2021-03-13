@@ -110,7 +110,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           var projectileSource = state.GetEntityById(attackerComponent.SourceEntityId);
           var xpValueComponent = defender.GetComponent<XPValueComponent>();
           if (projectileSource != null && xpValueComponent != null && projectileSource.GetComponent<XPTrackerComponent>() != null) {
-            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue);
+            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue, attackerComponent, defenderComponent, state);
             logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", projectileSource.EntityName, xpValueComponent.XPValue);
           }
 
@@ -265,7 +265,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           var projectileSource = state.GetEntityById(attackerComponent.SourceEntityId);
           var xpValueComponent = defender.GetComponent<XPValueComponent>();
           if (projectileSource != null && xpValueComponent != null && projectileSource.GetComponent<XPTrackerComponent>() != null) {
-            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue);
+            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue, attackerComponent, defenderComponent, state);
             logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", projectileSource.EntityName, xpValueComponent.XPValue);
           }
 

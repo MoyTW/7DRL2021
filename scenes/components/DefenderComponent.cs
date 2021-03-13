@@ -31,7 +31,7 @@ namespace SpaceDodgeRL.scenes.components {
      * If you take a hit, footing will shield for floor(damage * footing%), and take 3*floor(damage * footing%). So if
      * you get hit at 100% footing it ALL goes to footing, and then you start taking damage from there.
      */
-    [JsonInclude] public int MaxFooting { get; private set; }
+    [JsonInclude] public int MaxFooting { get; set; }
     [JsonInclude] public int CurrentFooting { get; private set; }
     [JsonIgnore] public double PercentageFooting { get => (double)this.CurrentFooting / (double)this.MaxFooting; }
     [JsonIgnore] public int FootingPenalty { get {
@@ -48,8 +48,8 @@ namespace SpaceDodgeRL.scenes.components {
       }
     } }
 
-    [JsonInclude] public int MeleeDefense { get; private set; }
-    [JsonInclude] public int RangedDefense { get; private set; }
+    [JsonInclude] public int MeleeDefense { get; set; }
+    [JsonInclude] public int RangedDefense { get; set; }
 
     [JsonInclude] public bool ShouldLogDamage { get; private set; }
     [JsonInclude] public bool IsInvincible { get; private set; }

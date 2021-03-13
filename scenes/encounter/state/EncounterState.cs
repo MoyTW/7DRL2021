@@ -388,7 +388,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     // TODO: Move into map gen & save/load
     public void ResetStateForNewLevel(Entity player, int dungeonLevel) {
-
       string ENCOUNTER_CAMERA_GROUP = "ENCOUNTER_CAMERA_GROUP";
       // TODO: Rather than re-using a state when we switch levels, I'd rather sub in a new one, but I think I need to think
       // about how that'd work in Godot, since we'd need to do some rewiring and the state has the camera, which is ugh.
