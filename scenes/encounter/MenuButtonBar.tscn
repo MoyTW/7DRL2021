@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://resources/ui/button_bar.png" type="Texture" id=1]
 [ext_resource path="res://scenes/encounter/MenuButtonBar.cs" type="Script" id=2]
 [ext_resource path="res://resources/menu_theme.tres" type="Theme" id=3]
+[ext_resource path="res://resources/fonts/Fira_Code_v5.2/ttf/FiraCode_Bold.tres" type="DynamicFont" id=4]
 
 [node name="MenuButtonBar" type="TextureRect"]
 theme = ExtResource( 3 )
@@ -38,6 +39,7 @@ margin_right = 192.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Rotate (r)"
 
@@ -47,6 +49,7 @@ margin_right = 400.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Flee Formation (x)"
 
@@ -56,6 +59,7 @@ margin_right = 608.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Wait (Space, N5)"
 
@@ -65,6 +69,7 @@ margin_right = 816.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Help (?)"
 
@@ -85,6 +90,7 @@ margin_right = 192.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Zoom Out (-)"
 
@@ -94,6 +100,7 @@ margin_right = 400.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Zoom In (=)"
 
@@ -103,6 +110,7 @@ margin_right = 608.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Reset Zoom (Bksp)"
 
@@ -112,5 +120,6 @@ margin_right = 816.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Menu (esc)"
