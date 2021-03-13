@@ -21,7 +21,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
     DECLARE_DEFEAT,
     PRINT,
     PREPARE_SWEEP_NEXT_LANE,
-    ROTATE_AND_REFORM
+    ROTATE_AND_REFORM_AT
   }
 
   public static class OrderFns {
@@ -68,7 +68,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var closestUnroutedEnemy = state.DeploymentInfo.Lanes[targetLane]
         .UnitsForFaction(unit.UnitFaction.Opposite())
         .Last((u) => state.GetUnit((u.UnitId)).StandingOrder != UnitOrder.ROUT);
-      var enemyPos = state.GetUnit(closestUnroutedEnemy.UnitId).AveragePosition;
+      var enemyUnit = state.GetUnit(closestUnroutedEnemy.UnitId); 
+      var enemyPos = enemyUnit.AveragePosition;
       var vectorToEnemy = AIUtils.VectorFromCenterRotated(unit.AveragePosition, enemyPos.X, enemyPos.Y, unit.UnitFacing);
       var stepsBehind = vectorToEnemy.Item2;
       GD.Print("UNIT IS BEHIND THE ENEMY UNIT BY: ", stepsBehind, " unit pos: ", unit.AveragePosition, " enemy pos: ", enemyPos, "facing: ", unit.UnitFacing);
@@ -83,20 +84,18 @@ namespace SpaceDodgeRL.scenes.components.AI {
       unit.RallyPoint = AIUtils.RotateAndProject(unit.AveragePosition, 0, -1 * stepsBehind - 25, unit.UnitFacing);;
       unit.UnitFacing = newFacing;
       unit.StandingOrder = UnitOrder.REFORM;
+
+      var behindEnemyUnit = AIUtils.RotateAndProject(enemyUnit.AveragePosition, 0, 15, enemyUnit.UnitFacing);
       
       // Order unit to advance after wheeling
-      var triggerStepsPlus40 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 40);
-      var sweepOrder = new TriggeredOrder(triggerStepsPlus40, new Order(unit.UnitId, OrderType.ADVANCE));
-
-      // Order unit to face back of enemy
-      var triggerStepsPlus60 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 60);
-      var reposition = new TriggeredOrder(triggerStepsPlus60, new Order(unit.UnitId, OrderType.ROTATE_AND_REFORM, newFacing: oldFacing.Opposite()));
+      var triggerStepsPlus40 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 15);
+      var sweepOrder = new TriggeredOrder(triggerStepsPlus40, new Order(unit.UnitId, OrderType.ROTATE_AND_REFORM_AT, newPosition: behindEnemyUnit, newFacing: oldFacing.Opposite()));
 
       // Order unit to finally advance
-      var triggerStepsPlus80 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 80);
-      var advance = new TriggeredOrder(triggerStepsPlus80, new Order(unit.UnitId, OrderType.ADVANCE));
+      var triggerStepsPlus60 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 50);
+      var advance = new TriggeredOrder(triggerStepsPlus60, new Order(unit.UnitId, OrderType.ADVANCE));
 
-      return new List<TriggeredOrder>() { sweepOrder, reposition, advance };
+      return new List<TriggeredOrder>() { sweepOrder, advance };
     }
   }
 
@@ -104,11 +103,13 @@ namespace SpaceDodgeRL.scenes.components.AI {
     [JsonInclude] public string UnitId;
     [JsonInclude] public OrderType OrderType;
     [JsonInclude] public FormationFacing NewFacing;
+    [JsonInclude] public EncounterPosition? NewPosition;
     
-    public Order(string unitId, OrderType orderType, FormationFacing newFacing=FormationFacing.NORTH) {
+    public Order(string unitId, OrderType orderType, FormationFacing newFacing=FormationFacing.NORTH, EncounterPosition? newPosition=null) {
       this.UnitId = unitId;
       this.OrderType = orderType;
       this.NewFacing = newFacing;
+      this.NewPosition = newPosition;
     }
 
     public List<TriggeredOrder> ExecuteOrder(EncounterState state) {
@@ -146,8 +147,12 @@ namespace SpaceDodgeRL.scenes.components.AI {
         return null;
       } else if (this.OrderType == OrderType.PREPARE_SWEEP_NEXT_LANE) {
         return OrderFns.ExecutePREPARE_SWEEP_NEXT_LANE(state, unit);
-      } else if (this.OrderType == OrderType.ROTATE_AND_REFORM) {
-        unit.RallyPoint = unit.AveragePosition;
+      } else if (this.OrderType == OrderType.ROTATE_AND_REFORM_AT) {
+        if (this.NewPosition == null) {
+          unit.RallyPoint = unit.AveragePosition;
+        } else {
+          unit.RallyPoint = this.NewPosition.Value;
+        }
         unit.UnitFacing = this.NewFacing;
         unit.StandingOrder = UnitOrder.REFORM;
         return null;
