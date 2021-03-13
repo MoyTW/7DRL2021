@@ -81,8 +81,8 @@ caught out and stabbed to death by angry enemies.
 ** Friday <- Playtesting & Fixing
 *** Issues
 + DONE: player autowaits
-+ decouple "wait" from "give control to the AI"
-+ Intro screen
++ DONE (& it caused a LOTTA bugs): decouple "wait" from "give control to the AI"
++ DONE: Intro screen
 + Description of footing
 + Melee & defense stats show footing penalty
 + HELP menu update
@@ -92,10 +92,10 @@ caught out and stabbed to death by angry enemies.
 + maybe also put a side drift safeguard?
 + make units sweep other lanes after completing their lane
 + make "wait" restore % of footing & change rotation to a stamina system
-+ remove ranged weapons altogether
++ DONE: remove ranged weapons altogether
 + make the UI clearer
 + commit to the speech bubbles
-+ It freezes when player's unit routs? (when player's out of unit and it routs?)
++ DONE: It freezes when player's unit routs? (when player's out of unit and it routs?)
 
 ** Saturday <- Playtesting & Fixing (ends 8pm)
 
