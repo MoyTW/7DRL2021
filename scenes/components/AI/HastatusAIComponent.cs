@@ -38,8 +38,6 @@ namespace SpaceDodgeRL.scenes.components.AI {
         return AIUtils.ActionsForUnitReform(state, parent, unitComponent.FormationNumber, unit);
       } else if (unit.StandingOrder == UnitOrder.ADVANCE) {
         return AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
-      } else if (unit.StandingOrder == UnitOrder.RETREAT) {
-        return AIUtils.ActionsForUnitRetreat(state, parent, unit);
       } else if (unit.StandingOrder == UnitOrder.ROUT) {
         return AIUtils.ActionsForUnitRetreat(state, parent, unit);
       } else {

@@ -49,8 +49,6 @@ namespace SpaceDodgeRL.scenes.components.AI {
         } else {
           unit.RallyPoint = firstUnitPos;
         }
-      } else if (this.OrderType == OrderType.RETREAT) {
-        unit.StandingOrder = UnitOrder.RETREAT;
       } else if (this.OrderType == OrderType.ROUT) {
         unit.StandingOrder = UnitOrder.ROUT;
       } else if (this.OrderType == OrderType.DECLARE_VICTORY) {
@@ -130,7 +128,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     public static TriggeredOrder AdvanceIfUnitRetreatsRoutsOrWithdraws(Unit watchedUnit, Unit advanceUnit) {
       var trigger = new OrderTrigger(OrderTriggerType.UNIT_HAS_STANDING_ORDER, false,
-        new List<string>() { watchedUnit.UnitId }, new List<UnitOrder>() { UnitOrder.RETREAT, UnitOrder.ROUT, UnitOrder.WITHDRAW });
+        new List<string>() { watchedUnit.UnitId }, new List<UnitOrder>() { UnitOrder.ROUT });
       return new TriggeredOrder(trigger, new Order(advanceUnit.UnitId, OrderType.ADVANCE));
     }
   }

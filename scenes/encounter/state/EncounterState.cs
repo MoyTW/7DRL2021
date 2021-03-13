@@ -451,8 +451,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public void NotifyPlayerRetreat() {
       var playerComponent = this.Player.GetComponent<PlayerComponent>();
       var unit = this.GetUnit(this.Player.GetComponent<UnitComponent>().UnitId);
-      if (unit.StandingOrder != UnitOrder.WITHDRAW && 
-          this.RunStatus != EncounterState.RUN_STATUS_ARMY_DEFEAT && 
+      if (this.RunStatus != EncounterState.RUN_STATUS_ARMY_DEFEAT && 
           this.RunStatus != EncounterState.RUN_STATUS_ARMY_VICTORY) {
         playerComponent.AddPrestige(-50, this, "You have fled the battlefield in disgrace! [b]You lose 50 prestige.[/b]");
       }

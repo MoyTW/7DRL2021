@@ -73,12 +73,8 @@ namespace SpaceDodgeRL.scenes {
         return "Rotating to the rear.";
       } else if (order == UnitOrder.REFORM) {
         return "Reforming.";
-      } else if (order == UnitOrder.RETREAT) {
-        return "Disengaging in formation.";
       } else if (order == UnitOrder.ROUT) {
         return "You should never see this, since you should get booted out of the unit as soon as the rout starts!";
-      } else if (order == UnitOrder.WITHDRAW) {
-        return "Withdrawing in good order.";
       } else {
         throw new NotImplementedException();
       }

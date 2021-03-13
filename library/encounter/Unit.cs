@@ -36,9 +36,7 @@ namespace SpaceDodgeRL.library.encounter {
 
   public enum UnitOrder {
     ADVANCE,  // Advance and fight
-    RETREAT,  // Retreat behind the next line
     REFORM,   // Reform and rest
-    WITHDRAW, // Move off the battlefield
     ROUT    // Flee
   }
 
