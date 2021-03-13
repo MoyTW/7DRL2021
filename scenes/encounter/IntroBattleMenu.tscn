@@ -50,25 +50,24 @@ valign = 1
 [node name="TextLabel" type="Label" parent="."]
 margin_top = 120.0
 margin_right = 1280.0
-margin_bottom = 559.0
+margin_bottom = 505.0
 size_flags_vertical = 7
 theme = ExtResource( 1 )
 custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = ExtResource( 2 )
-text = "In front of you, your ranks meet those of the enemy. It is very loud. There is a lot of screaming. There's other sounds, too, but the screaming seems the loudest.
+text = "In front of you, your ranks meet those of the enemy. There is a terrific din, and a lot of screaming. You shift your weight nervously. This is your first battle, your first chance to win glory, but the first battle is also the riskiest.
 
-You are supposed to be watching the soldier in front of you. You swallow. It is very hard to concentrate, but it's important that you watch the soldier in front of you. You need to be ready, in case he rotates out, or in case he falls. It is important that you be ready, or he might stumble back into you and then you might fall, and if you might fall you might die, and you don't want to die. You definitely don't want to die.
+You watch the soldier in front of you, waiting for him to rotate out. When the first man pulls back, the next in line is responsible for pushing forwards. When that man pulls back, another from behind replaces him, so that the enemy seems to be fighting an unending tide.
 
-\"Rotating!\" cries the soldier in front of you. You swallow and prepare to replace him.
-"
+\"Rotating!\" cries the soldier in front of you. You swallow and prepare to move up."
 align = 1
 valign = 1
 autowrap = true
 
 [node name="HeaderLabel3" type="Label" parent="."]
-margin_top = 559.0
+margin_top = 505.0
 margin_right = 1280.0
-margin_bottom = 599.0
+margin_bottom = 545.0
 theme = ExtResource( 1 )
 custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = SubResource( 1 )
@@ -77,18 +76,21 @@ align = 1
 valign = 1
 
 [node name="TextLabel2" type="Label" parent="."]
-margin_top = 599.0
+margin_top = 545.0
 margin_right = 1280.0
 margin_bottom = 984.0
+size_flags_horizontal = 3
 size_flags_vertical = 7
 theme = ExtResource( 1 )
 custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = ExtResource( 2 )
-text = "Your goal is to survive nine battles, after which you can go home, a celebrated veteran of the legion.
+text = "
+Your goal is to win as much prestige as possible. You win prestige by participating in winning battles, wounding or slaying foes, and sticking to your formation.
 
-Secondary to surviving is wining prestige (score). You win prestige by participating in winning battles, wounding or slaying foes, and sticking to your formation.
+You lose prestige by rotating to the rear of the line. Of course, it's better to lose some prestige than to die! You can also throw down your weapons and break out of the formation completely, but no true Roman soldier would flee from battle like that, would they? On the other hand, if the entire army is already defeated, you'll lose no prestige for managing to escape.
 
-You lose prestige by rotating to the rear of the line. Of course, it's better to lose some prestige than to die! You can also throw down your weapons and break out of the formation completely, if you're being overwhelmed, but no true Roman soldier would flee from battle like that, would they? On the other hand, if the entire army is already defeated, you'll lose no prestige for managing to escape."
+After nine battles, you will return to Rome, a decorated veteran. Of course, the more prestige you garner, the better!
+"
 align = 1
 valign = 1
 autowrap = true
