@@ -190,7 +190,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       if (numLines > 0) {
         Func<int, Unit, Entity> hastatusFn = (formationNum, unit) => EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
         if (lane.LaneIdx == deploymentInfo.NumLanes / 2) {
-          hastatusFn = WrapWithPlayerFn(state, hastatusFn, seededRand.Next(20));
+          hastatusFn = WrapWithPlayerFn(state, hastatusFn, seededRand.Next(16) + 43);
         }
         hastatusUnit = CreateAndDeployUnit(seededRand, state, FactionName.PLAYER,
             lane, 1, UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,

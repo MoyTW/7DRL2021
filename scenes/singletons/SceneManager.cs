@@ -13,6 +13,9 @@ namespace SpaceDodgeRL.scenes.singletons {
     private Viewport root;
     private List<Node> sceneStack;
 
+    private IntroFormUpMenu _introFormUpMenu;
+    private IntroBattleMenu _introBattleMenu;
+
     private CharacterMenu _characterMenu;
     private CreditsMenu _creditsMenu;
     private DefeatMenu _defeatMenu;
@@ -26,6 +29,9 @@ namespace SpaceDodgeRL.scenes.singletons {
       root = GetTree().Root;
       sceneStack = new List<Node>();
 
+      _introFormUpMenu = GD.Load<PackedScene>("res://scenes/encounter/IntroFormUpMenu.tscn").Instance() as IntroFormUpMenu;
+      _introBattleMenu = GD.Load<PackedScene>("res://scenes/encounter/IntroBattleMenu.tscn").Instance() as IntroBattleMenu;
+
       _characterMenu = GD.Load<PackedScene>("res://scenes/encounter/CharacterMenu.tscn").Instance() as CharacterMenu;
       _creditsMenu = GD.Load<PackedScene>("res://scenes/CreditsMenu.tscn").Instance() as CreditsMenu;
       _defeatMenu = GD.Load<PackedScene>("res://scenes/encounter/DefeatMenu.tscn").Instance() as DefeatMenu;
@@ -34,6 +40,22 @@ namespace SpaceDodgeRL.scenes.singletons {
       _inventoryMenu = GD.Load<PackedScene>("res://scenes/encounter/InventoryMenu.tscn").Instance() as InventoryMenu;
       _settingsMenu = GD.Load<PackedScene>("res://scenes/SettingsMenu.tscn").Instance() as SettingsMenu;
       _victoryMenu = GD.Load<PackedScene>("res://scenes/encounter/VictoryMenu.tscn").Instance() as VictoryMenu;
+    }
+
+    public void ShowIntroFormUpMenu() {
+      CallDeferred(nameof(DeferredIntroFormUpMenu));
+    }
+
+    private void DeferredIntroFormUpMenu() {
+      DeferredSwitchScene(_introFormUpMenu);
+    }
+
+    public void ShowIntroBattleMenu() {
+      CallDeferred(nameof(DeferredIntroBattleMenu));
+    }
+
+    private void DeferredIntroBattleMenu() {
+      DeferredSwitchScene(_introBattleMenu);
     }
 
     #region Character Menu

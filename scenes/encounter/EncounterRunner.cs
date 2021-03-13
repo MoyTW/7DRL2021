@@ -108,7 +108,7 @@ namespace SpaceDodgeRL.scenes.encounter {
     private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> AlwaysAvaiableActionMappingToActionDict =
       new Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>>()
     {
-      { InputHandler.ActionMapping.CHARACTER, (s, r, a) => r._sceneManager.ShowCharacterMenu(s) },
+      //{ InputHandler.ActionMapping.CHARACTER, (s, r, a) => r._sceneManager.ShowCharacterMenu(s) },
       { InputHandler.ActionMapping.ESCAPE_MENU, (s, r, a) => r._sceneManager.ShowEscapeMenu(s) },
       { InputHandler.ActionMapping.HELP_MENU, (s, r, a) => r._sceneManager.ShowHelpMenu() },
       { InputHandler.ActionMapping.INVENTORY, (s, r, a) => r._sceneManager.ShowInventoryMenu(s) },
@@ -142,16 +142,27 @@ namespace SpaceDodgeRL.scenes.encounter {
         return;
       }
 
-      Action<EncounterState, EncounterRunner> lol = (s, runner) => runner._sceneManager.ShowCharacterMenu(s);
-
       var entity = state.NextEntity;
       var actionTimeComponent = entity.GetComponent<ActionTimeComponent>();
 
       if (entity.IsInGroup(PlayerComponent.ENTITY_GROUP)) {
-        // We force the player to pick a level-up if they have any available.
+        var playerComponent = entity.GetComponent<PlayerComponent>();
+        // If intro not played, play intro
+        if (!playerComponent.SeenIntroFormUp) {
+          playerComponent.SeenIntroFormUp = true;
+          this._sceneManager.ShowIntroFormUpMenu();
+          return;
+        }
+        if (!playerComponent.SeenIntroBattle && !playerComponent.StartOfLevel) {
+          playerComponent.SeenIntroBattle = true;
+          this._sceneManager.ShowIntroBattleMenu();
+          return;
+        }
+
+        /* // We force the player to pick a level-up if they have any available.
         if (entity.GetComponent<XPTrackerComponent>().UnusedLevelUps.Count > 0) {
           this._sceneManager.ShowCharacterMenu(state);
-        }
+        } */
 
         // Update the player options text
         EmitSignal(nameof(EncounterRunner.PlayerTurnStarted));
@@ -159,7 +170,7 @@ namespace SpaceDodgeRL.scenes.encounter {
         var action = inputHandler.PopQueue();
 
         // Autopilot section
-        var playerComponent = entity.GetComponent<PlayerComponent>();
+        
         var playerUnit = state.GetUnit(entity.GetComponent<UnitComponent>().UnitId);
         var playerAI = entity.GetComponent<PlayerAIComponent>();
         // Autopilot if beginning
