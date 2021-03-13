@@ -18,7 +18,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
     RETREAT,
     ROUT, // This isn't really an "order" but it can be modelled as such
     DECLARE_VICTORY,
-    DECLARE_DEFEAT
+    DECLARE_DEFEAT,
+    PRINT
   }
 
   public class Order {
@@ -55,8 +56,10 @@ namespace SpaceDodgeRL.scenes.components.AI {
         state.NotifyArmyVictory();
       } else if (this.OrderType == OrderType.DECLARE_DEFEAT) {
         state.NotifyArmyDefeat();
+      } else if (this.OrderType == OrderType.PRINT) {
+        GD.Print("!!!!!!! PRINT ORDER EXECUTED !!!!!!!!!");
       } else {
-        throw new NotImplementedException();
+        throw new NotImplementedException("lol: " + this.OrderType);
       }
     }
   }
@@ -113,6 +116,24 @@ namespace SpaceDodgeRL.scenes.components.AI {
           }
         }
         return true;
+      } else if (this.TriggerType == OrderTriggerType.LANE_CLEAR_OF_UNITS_FROM_FACTION) {
+        if (this.TriggerFaction == FactionName.NEUTRAL || this.WatchedUnitIds.Count != 1) {
+          throw new ArgumentException("didn't set faction or proper watched unit ID, Fs in chat");
+        }
+
+        Lane closestLane = null;
+        double closestDistance = 9999.0;
+        Unit unit = state.GetUnit(this.WatchedUnitIds[0]);
+        foreach (var lane in state.DeploymentInfo.Lanes) {
+          var d = lane.LaneCenter.DistanceTo(unit.AveragePosition);
+          if (d < closestDistance) {
+            closestDistance = d;
+            closestLane = lane;
+          }
+        }
+        return closestLane.UnitsForFaction(this.TriggerFaction)
+          .Select((unitAtLanePosition) => state.GetUnit(unitAtLanePosition.UnitId).StandingOrder)
+          .All((order) => order == UnitOrder.ROUT);
       } else {
         throw new NotImplementedException();
       }
@@ -182,6 +203,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
     }
 
     public void RegisterTriggeredOrder(OrderTrigger trigger, Order order) {
+      GD.Print(String.Format("Registering order - Trigger: {0}, Order: {1}", trigger.TriggerType, order.OrderType));
       if (!this._TriggerOrders.ContainsKey(order.UnitId)) {
         this._TriggerOrders[order.UnitId] = new List<TriggeredOrder>();
       }
