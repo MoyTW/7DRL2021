@@ -1,9 +1,20 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
 
 namespace SpaceDodgeRL.scenes.components {
+
+  public enum PrestigeSource {
+    VICTORIES,
+    DEFEATING_FOES,
+    LANDING_HITS,
+    ROTATING,
+    BREAKING_FORMATION,
+    FLEEING
+  }
 
   public class PlayerComponent : Component {
     public static readonly string ENTITY_GROUP = "PLAYER_COMPONENT_GROUP";
@@ -16,7 +27,10 @@ namespace SpaceDodgeRL.scenes.components {
     [JsonInclude] public bool SeenIntroBattle { get; set; }
     [JsonInclude] public bool StartOfLevel { get; set; }
     [JsonInclude] public bool IsInFormation { get; private set; }
-    [JsonInclude] public int Prestige { get; private set; }
+    [JsonIgnore] public int Prestige { get {
+      return this._PrestigeBySource.Values.Sum();
+    } }
+    [JsonInclude] public Dictionary<PrestigeSource, int> _PrestigeBySource { get; private set; }
     [JsonInclude] public int PilaRange { get; private set; }
 
     public static PlayerComponent Create(
@@ -29,7 +43,14 @@ namespace SpaceDodgeRL.scenes.components {
       component.SeenIntroBattle = false;
       component.StartOfLevel = true;
       component.IsInFormation = isInFormation;
-      component.Prestige = 0;
+      component._PrestigeBySource = new Dictionary<PrestigeSource, int>() {
+        { PrestigeSource.VICTORIES, 0 },
+        { PrestigeSource.DEFEATING_FOES, 0 },
+        { PrestigeSource.LANDING_HITS, 0 },
+        { PrestigeSource.ROTATING, 0 },
+        { PrestigeSource.BREAKING_FORMATION, 0 },
+        { PrestigeSource.FLEEING, 0 },
+      };
       component.PilaRange = pilaRange;
 
       return component;
@@ -43,16 +64,20 @@ namespace SpaceDodgeRL.scenes.components {
     public void LeaveFormation(EncounterState state, Entity parent) {
       this.IsInFormation = false;
       state.GetUnit(parent.GetComponent<UnitComponent>().UnitId).NotifyEntityRouted(parent);
-      this.AddPrestige(-10, state, "Your allies will remember how you broke from formation! [b]You lose 10 prestige.[/b]");
+      this.AddPrestige(-10, state, "Your allies will remember how you broke from formation! [b]You lose 10 prestige.[/b]", PrestigeSource.BREAKING_FORMATION);
     }
 
     public static PlayerComponent Create(string saveData) {
       return JsonSerializer.Deserialize<PlayerComponent>(saveData);
     }
 
-    public void AddPrestige(int dPrestige, EncounterState state, string message) {
-      this.Prestige += dPrestige;
+    public void AddPrestige(int dPrestige, EncounterState state, string message, PrestigeSource source) {
+      this._PrestigeBySource[source] += dPrestige;
       state.LogMessage(message);
+    }
+
+    public int PrestigeFrom(PrestigeSource source) {
+      return this._PrestigeBySource[source];
     }
 
     public string Save() {

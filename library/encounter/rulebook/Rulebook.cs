@@ -129,10 +129,10 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         // Finally, assign player prestige
         if (isPlayer && killed) {
           var logMessage = string.Format("Your allies witness you slaying the [b]{0}[/b]. [b]You gain 5 prestige![/b]", defender.EntityName);
-          attacker.GetComponent<PlayerComponent>().AddPrestige(5, state, logMessage);
+          attacker.GetComponent<PlayerComponent>().AddPrestige(5, state, logMessage, PrestigeSource.DEFEATING_FOES);
         } else if (isPlayer && hit) {
           var logMessage = string.Format("Your allies will remember that injured the [b]{0}[/b]. [b]You gain 1 prestige![/b]", defender.EntityName);
-          attacker.GetComponent<PlayerComponent>().AddPrestige(1, state, logMessage);
+          attacker.GetComponent<PlayerComponent>().AddPrestige(1, state, logMessage, PrestigeSource.LANDING_HITS);
         }
       }
       return true;

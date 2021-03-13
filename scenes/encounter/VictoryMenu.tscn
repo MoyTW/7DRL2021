@@ -48,7 +48,7 @@ custom_styles/normal = ExtResource( 7 )
 custom_fonts/font = ExtResource( 1 )
 text = "You meander slowly down the dirt road from Rome. This march a strange one, given your recent experiences. Instead of marching in formation, you walk alone. Instead of driving with urgency, you trek with leisure. Instead of the gut-wrenching terror of certain death and pain, you feel anticipation. Soon you'll be able to see your wife, to greet your parents, and to return to the life you were so certain you would never see again.
 
-The midday sun shines bright. You spy a tree by the side of the road, casting a nice, relaxing shadow. You take refuge in its shadow, fish out a loaf of bread from your pack (and what bread! those army merchants just don't make it like they do at home!) and sit down to enjoy your lunch."
+The midday sun shines bright. You spy a tree by the side of the road, casting a nice, relaxing shadow. You take refuge in its shadow, fish out a loaf of bread from your pack (glorious bread! those army merchants just don't make it like they do at home!) and sit down to enjoy your lunch."
 align = 1
 valign = 1
 autowrap = true
@@ -79,7 +79,7 @@ custom_styles/normal = ExtResource( 7 )
 custom_fonts/font = ExtResource( 1 )
 align = 1
 
-[node name="VictoriesLabel" type="Label" parent="."]
+[node name="PrestigeVictoriesLabel" type="Label" parent="."]
 margin_top = 727.0
 margin_right = 1280.0
 margin_bottom = 758.0
@@ -88,7 +88,7 @@ custom_fonts/font = ExtResource( 1 )
 text = "You gained [POINTS] from your victories in battle."
 align = 1
 
-[node name="DefeatingFoesLabel" type="Label" parent="."]
+[node name="PrestigeDefeatingFoesLabel" type="Label" parent="."]
 margin_top = 758.0
 margin_right = 1280.0
 margin_bottom = 789.0
@@ -97,7 +97,7 @@ custom_fonts/font = ExtResource( 1 )
 text = "You gained [POINTS] from defeating foes."
 align = 1
 
-[node name="LandingHitsLabel" type="Label" parent="."]
+[node name="PrestigeLandingHitsLabel" type="Label" parent="."]
 margin_top = 789.0
 margin_right = 1280.0
 margin_bottom = 820.0
@@ -106,7 +106,7 @@ custom_fonts/font = ExtResource( 1 )
 text = "You gained [POINTS] from landing hits on foes."
 align = 1
 
-[node name="RotatingLabel" type="Label" parent="."]
+[node name="PrestigeRotatingLabel" type="Label" parent="."]
 margin_top = 820.0
 margin_right = 1280.0
 margin_bottom = 851.0
@@ -115,7 +115,7 @@ custom_fonts/font = ExtResource( 1 )
 text = "You lost [POINTS] from rotating to the rear."
 align = 1
 
-[node name="BreakingFormationLabel" type="Label" parent="."]
+[node name="PrestigeBreakingFormationLabel" type="Label" parent="."]
 margin_top = 851.0
 margin_right = 1280.0
 margin_bottom = 882.0
@@ -124,7 +124,7 @@ custom_fonts/font = ExtResource( 1 )
 text = "You lost [POINTS] for breaking formation."
 align = 1
 
-[node name="FleeingLabel" type="Label" parent="."]
+[node name="PrestigeFleeingLabel" type="Label" parent="."]
 margin_top = 882.0
 margin_right = 1280.0
 margin_bottom = 913.0
