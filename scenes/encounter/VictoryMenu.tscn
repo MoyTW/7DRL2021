@@ -1,61 +1,157 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://resources/fonts/Fira_Code_v5.2/ttf/FiraCode_Bold.tres" type="DynamicFont" id=1]
-[ext_resource path="res://resources/fonts/Fira_Code_v5.2/ttf/FiraCode_Regular.tres" type="DynamicFont" id=2]
+[ext_resource path="res://resources/fonts/fira_24.tres" type="DynamicFont" id=1]
+[ext_resource path="res://resources/fonts/fira_32_bold.tres" type="DynamicFont" id=2]
 [ext_resource path="res://scenes/encounter/VictoryMenu.cs" type="Script" id=3]
 [ext_resource path="res://resources/menu_theme.tres" type="Theme" id=4]
+[ext_resource path="res://resources/fonts/fira_64.tres" type="DynamicFont" id=5]
+[ext_resource path="res://resources/fonts/fira_32.tres" type="DynamicFont" id=6]
+[ext_resource path="res://resources/StyleBoxRedLabel.tres" type="StyleBox" id=7]
 
-[node name="VictoryMenu" type="Control"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
+[node name="VictoryMenu" type="VBoxContainer"]
+anchor_right = 1.0
+margin_bottom = 1024.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme = ExtResource( 4 )
+custom_constants/separation = 0
 script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CenterContainer" type="VBoxContainer" parent="."]
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Title" type="Label" parent="CenterContainer"]
-margin_right = 320.0
-margin_bottom = 20.0
-custom_fonts/font = ExtResource( 1 )
-text = "You have won!"
+[node name="Title" type="Label" parent="."]
+margin_right = 1280.0
+margin_bottom = 80.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 5 )
+text = "You have survived!"
 align = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PlaceholderLabel" type="Label" parent="CenterContainer"]
-margin_top = 24.0
-margin_right = 320.0
-margin_bottom = 44.0
-text = "TODO: Add some cool stats here."
-
-[node name="PlaceholderLabel2" type="Label" parent="CenterContainer"]
-margin_top = 48.0
-margin_right = 320.0
-margin_bottom = 68.0
-text = "TODO: record runs in Run History"
-
-[node name="MainMenuButton" type="Button" parent="CenterContainer"]
-margin_top = 72.0
-margin_right = 320.0
-margin_bottom = 92.0
+[node name="PlaceholderLabel2" type="Label" parent="."]
+margin_top = 80.0
+margin_right = 1280.0
+margin_bottom = 120.0
+custom_styles/normal = ExtResource( 7 )
 custom_fonts/font = ExtResource( 2 )
+text = "Noon, Somewhere In The Italian Countryside"
+align = 1
+
+[node name="PlaceholderLabel4" type="Label" parent="."]
+margin_top = 120.0
+margin_right = 1280.0
+margin_bottom = 625.0
+size_flags_vertical = 3
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+text = "You meander slowly down the dirt road from Rome. This march a strange one, given your recent experiences. Instead of marching in formation, you walk alone. Instead of driving with urgency, you trek with leisure. Instead of the gut-wrenching terror of certain death and pain, you feel anticipation. Soon you'll be able to see your wife, to greet your parents, and to return to the life you were so certain you would never see again.
+
+The midday sun shines bright. You spy a tree by the side of the road, casting a nice, relaxing shadow. You take refuge in its shadow, fish out a loaf of bread from your pack (and what bread! those army merchants just don't make it like they do at home!) and sit down to enjoy your lunch."
+align = 1
+valign = 1
+autowrap = true
+
+[node name="PlaceholderLabel" type="Label" parent="."]
+margin_top = 625.0
+margin_right = 1280.0
+margin_bottom = 665.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 2 )
+text = "Prestige"
+align = 1
+
+[node name="PrestigeTotalLabel" type="Label" parent="."]
+margin_top = 665.0
+margin_right = 1280.0
+margin_bottom = 696.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+text = "You have won with [POINTS] prestige."
+align = 1
+
+[node name="SpacerLabel2" type="Label" parent="."]
+margin_top = 696.0
+margin_right = 1280.0
+margin_bottom = 727.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+align = 1
+
+[node name="VictoriesLabel" type="Label" parent="."]
+margin_top = 727.0
+margin_right = 1280.0
+margin_bottom = 758.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+text = "You gained [POINTS] from your victories in battle."
+align = 1
+
+[node name="DefeatingFoesLabel" type="Label" parent="."]
+margin_top = 758.0
+margin_right = 1280.0
+margin_bottom = 789.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+text = "You gained [POINTS] from defeating foes."
+align = 1
+
+[node name="LandingHitsLabel" type="Label" parent="."]
+margin_top = 789.0
+margin_right = 1280.0
+margin_bottom = 820.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+text = "You gained [POINTS] from landing hits on foes."
+align = 1
+
+[node name="RotatingLabel" type="Label" parent="."]
+margin_top = 820.0
+margin_right = 1280.0
+margin_bottom = 851.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+text = "You lost [POINTS] from rotating to the rear."
+align = 1
+
+[node name="BreakingFormationLabel" type="Label" parent="."]
+margin_top = 851.0
+margin_right = 1280.0
+margin_bottom = 882.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+text = "You lost [POINTS] for breaking formation."
+align = 1
+
+[node name="FleeingLabel" type="Label" parent="."]
+margin_top = 882.0
+margin_right = 1280.0
+margin_bottom = 913.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+text = "You lost [POINTS] for fleeing the battlefield."
+align = 1
+
+[node name="SpacerLabel" type="Label" parent="."]
+margin_top = 913.0
+margin_right = 1280.0
+margin_bottom = 944.0
+custom_styles/normal = ExtResource( 7 )
+custom_fonts/font = ExtResource( 1 )
+align = 1
+
+[node name="MainMenuButton" type="Button" parent="."]
+margin_top = 944.0
+margin_right = 1280.0
+margin_bottom = 984.0
+custom_fonts/font = ExtResource( 6 )
 text = "Exit to Main Menu"
 
-[node name="SaveAndQuitButton" type="Button" parent="CenterContainer"]
-margin_top = 96.0
-margin_right = 320.0
-margin_bottom = 116.0
-custom_fonts/font = ExtResource( 2 )
+[node name="SaveAndQuitButton" type="Button" parent="."]
+margin_top = 984.0
+margin_right = 1280.0
+margin_bottom = 1024.0
+custom_fonts/font = ExtResource( 6 )
 text = "Exit to Desktop"

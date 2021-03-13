@@ -2,7 +2,7 @@ using Godot;
 using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.singletons;
 
-public class VictoryMenu : Control {
+public class VictoryMenu : VBoxContainer {
 
   private Button _mainMenuBotton;
   private EncounterState _state;
