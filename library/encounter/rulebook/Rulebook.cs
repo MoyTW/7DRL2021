@@ -17,11 +17,9 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       { ActionType.MELEE_ATTACK, (a, s) => ResolveMeleeAttack(a as MeleeAttackAction, s) },
       { ActionType.MOVE, (a, s) => ResolveMove(a as MoveAction, s) },
       { ActionType.FIRE_PROJECTILE, (a, s) => ResolveFireProjectile(a as FireProjectileAction, s) },
-      { ActionType.GET_ITEM, (a, s) => ResolveGetItem(a as GetItemAction, s) },
       { ActionType.DESTROY, (a, s) => ResolveDestroy(a as DestroyAction, s) },
       { ActionType.RANGED_ATTACK, (a, s) => ResolveRangedAttack(a as RangedAttackAction, s) },
       { ActionType.SPAWN_ENTITY, (a, s) => ResolveSpawnEntity(a as SpawnEntityAction, s) },
-      { ActionType.USE, (a, s) => ResolveUse(a as UseAction, s) },
       { ActionType.USE_STAIRS, (a, s) => ResolveUseStairs(a as UseStairsAction, s) },
       { ActionType.WAIT, (a, s) => ResolveWait(a as WaitAction, s) }
     };
@@ -187,37 +185,6 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       return true;
     }
 
-    private static bool ResolveGetItem(GetItemAction action, EncounterState state) {
-      var actor = state.GetEntityById(action.ActorId);
-      var inventoryComponent = actor.GetComponent<InventoryComponent>();
-      var actorPosition = actor.GetComponent<PositionComponent>().EncounterPosition;
-      var item = state.EntitiesAtPosition(actorPosition.X, actorPosition.Y)
-                      .FirstOrDefault(e => e.GetComponent<StorableComponent>() != null);
-
-      if (item == null) {
-        state.LogMessage("No item found!", failed: true);
-        return false;
-      } else if (item.GetComponent<UsableComponent>() != null && item.GetComponent<UsableComponent>().UseOnGet) {
-        // The responsibility for removing/not removing the usable from the EncounterState is in the usage code.
-        bool successfulUsage = ResolveUse(new UseAction(actor.EntityId, item.EntityId, false), state);
-        if (!successfulUsage) {
-          GD.PrintErr(string.Format("Item {0} was not successfully used after being picked up!", item.EntityName));
-        }
-        return true;
-      } else if (!inventoryComponent.CanFit(item)) {
-        state.LogMessage(string.Format("[b]{0}[/b] can't fit the [b]{1}[/b] in its inventory!",
-          actor.EntityName, item.EntityName), failed: true);
-        return false;
-      } else {
-        state.RemoveEntity(item);
-        actor.GetComponent<InventoryComponent>().AddEntity(item);
-
-        var logMessage = string.Format("[b]{0}[/b] has taken the [b]{1}[/b]", actor.EntityName, item.EntityName);
-        state.LogMessage(logMessage);
-        return true;
-      }
-    }
-
     private static bool ResolveOnDeathEffect(DestroyAction action, string effectType, EncounterState state) {
       if (effectType == OnDeathEffectType.PLAYER_VICTORY) {
         state.NotifyPlayerVictory();
@@ -356,42 +323,6 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           }
         }
       }
-    }
-
-    // Currently, each use effect is its own component. If we run into a case where we have too many effects, we can push the
-    // effects into the usable component itself, similarly to status effects (though status effects are their own mess right now)
-    // which would probably be better for building on.
-    private static bool ResolveUse(UseAction action, EncounterState state) {
-      var user = state.GetEntityById(action.ActorId);
-
-      // This is another issue that'd be solved with a global Entity lookup - though not the removal part.
-      Entity usable = null;
-      if (action.FromInventory) {
-        var userInventory = user.GetComponent<InventoryComponent>();
-        usable = userInventory.StoredEntityById(action.UsableId);
-        if (usable.GetComponent<UsableComponent>() == null) {
-          state.LogMessage(string.Format("{0} is not usable!", usable.EntityName), failed: true);
-          return false;
-        } else {
-          userInventory.RemoveEntity(usable);
-        }
-      } else {
-        usable = state.GetEntityById(action.UsableId);
-        if (usable.GetComponent<UsableComponent>() == null) {
-          state.LogMessage(string.Format("{0} is not usable!", usable.EntityName), failed: true);
-          return false;
-        } else {
-          state.RemoveEntity(usable);
-        }
-      }
-
-      state.LogMessage(string.Format("{0} used {1}!", user.EntityName, usable.EntityName));
-
-      ResolveUseEffects(user, usable, state);
-
-      // We assume all items are single-use; this will change if I deviate from the reference implementation!
-      usable.QueueFree();
-      return true;
     }
 
     private static bool ResolveUseStairs(UseStairsAction action, EncounterState state) {

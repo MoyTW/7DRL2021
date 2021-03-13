@@ -110,7 +110,6 @@ namespace SpaceDodgeRL.scenes.encounter {
       //{ InputHandler.ActionMapping.CHARACTER, (s, r, a) => r._sceneManager.ShowCharacterMenu(s) },
       { InputHandler.ActionMapping.ESCAPE_MENU, (s, r, a) => r._sceneManager.ShowEscapeMenu(s) },
       { InputHandler.ActionMapping.HELP_MENU, (s, r, a) => r._sceneManager.ShowHelpMenu() },
-      { InputHandler.ActionMapping.INVENTORY, (s, r, a) => r._sceneManager.ShowInventoryMenu(s) },
       { InputHandler.ActionMapping.ZOOM_IN, (s, r, a) => s.ZoomIn() },
       { InputHandler.ActionMapping.ZOOM_OUT, (s, r, a) => s.ZoomOut() },
       { InputHandler.ActionMapping.ZOOM_RESET, (s, r, a) => s.ZoomReset() },
@@ -257,11 +256,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           }
         }
       }
-    }
-
-    public void HandleUseItemSelection(string itemIdToUse) {
-      var playerId = this._encounterState.Player.EntityId;
-      PlayerExecuteTurnEndingAction(new UseAction(playerId, itemIdToUse, true), this._encounterState);
     }
   }
 }

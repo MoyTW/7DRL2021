@@ -305,7 +305,6 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 70, maxFooting: 95, meleeDefense: 30, rangedDefense: 60, isInvincible: false));
       e.AddComponent(DisplayComponent.Create(_texPlayerPath, "It's you!", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(FactionName.PLAYER));
-      e.AddComponent(InventoryComponent.Create(inventorySize: 26));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.PLAYER_DEFEAT }));
       e.AddComponent(PlayerComponent.Create(isInFormation: true));
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));

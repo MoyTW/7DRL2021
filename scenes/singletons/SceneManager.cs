@@ -21,7 +21,6 @@ namespace SpaceDodgeRL.scenes.singletons {
     private DefeatMenu _defeatMenu;
     private EscapeMenu _escapeMenu;
     private HelpMenu _helpMenu;
-    private InventoryMenu _inventoryMenu;
     private SettingsMenu _settingsMenu;
     private VictoryMenu _victoryMenu;
 
@@ -37,7 +36,6 @@ namespace SpaceDodgeRL.scenes.singletons {
       _defeatMenu = GD.Load<PackedScene>("res://scenes/encounter/DefeatMenu.tscn").Instance() as DefeatMenu;
       _escapeMenu = GD.Load<PackedScene>("res://scenes/encounter/EscapeMenu.tscn").Instance() as EscapeMenu;
       _helpMenu = GD.Load<PackedScene>("res://scenes/encounter/HelpMenu.tscn").Instance() as HelpMenu;
-      _inventoryMenu = GD.Load<PackedScene>("res://scenes/encounter/InventoryMenu.tscn").Instance() as InventoryMenu;
       _settingsMenu = GD.Load<PackedScene>("res://scenes/SettingsMenu.tscn").Instance() as SettingsMenu;
       _victoryMenu = GD.Load<PackedScene>("res://scenes/encounter/VictoryMenu.tscn").Instance() as VictoryMenu;
     }
@@ -138,29 +136,6 @@ namespace SpaceDodgeRL.scenes.singletons {
 
     private void DeferredShowEncounterScene(EncounterScene scene) {
       DeferredSwitchScene(scene);
-    }
-
-    #endregion
-
-    #region Inventory Menu
-
-    public void ShowInventoryMenu(EncounterState state) {
-      CallDeferred(nameof(DeferredShowInventoryMenu), state);
-    }
-
-    private void DeferredShowInventoryMenu(EncounterState state) {
-      DeferredSwitchScene(_inventoryMenu);
-      _inventoryMenu.PrepMenu(state.Player.GetComponent<InventoryComponent>());
-    }
-
-    public void HandleItemToUseSelected(string itemIdToUse) {
-      CallDeferred(nameof(DeferredHandleItemToUseSelected), itemIdToUse);
-    }
-
-    private void DeferredHandleItemToUseSelected(string itemIdToUse) {
-      var previousScene = sceneStack[sceneStack.Count - 1] as EncounterScene;
-      DeferredReturnToPreviousScene();
-      previousScene.HandleItemToUseSelected(itemIdToUse);
     }
 
     #endregion
