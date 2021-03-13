@@ -98,6 +98,13 @@ caught out and stabbed to death by angry enemies.
 + DONE: It freezes when player's unit routs? (when player's out of unit and it routs?)
 
 ** Saturday <- Playtesting & Fixing (ends 8pm)
+*** Issues
+
++ Units sweep other lanes after completing their lane (until 10am)
++ You can rejoin another unit (until 11am)
++ Prestige & Victory & Defeat Screens
++ Reword objectives
++ Find a way to make the game less repetitive
 
 * Summary
 
