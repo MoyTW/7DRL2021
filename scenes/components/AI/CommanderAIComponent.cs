@@ -80,7 +80,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     public OrderTrigger(OrderTriggerType triggerType, bool repeating, List<string> watchedUnitIds=null,
         List<UnitOrder> awaitedStandingOrders=null, float belowStrengthPercent=9999,
-        FactionName triggerFaction=FactionName.ENEMY) {
+        FactionName triggerFaction=FactionName.NEUTRAL) {
       this.TriggerType = triggerType;
       this.Repeating = repeating;
       this.WatchedUnitIds = watchedUnitIds;
