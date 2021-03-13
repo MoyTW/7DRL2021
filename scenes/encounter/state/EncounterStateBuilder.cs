@@ -8,6 +8,7 @@ using SpaceDodgeRL.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace SpaceDodgeRL.scenes.encounter.state {
 
@@ -35,6 +36,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       var unit = new Unit(Guid.NewGuid().ToString(), faction, center, order, type, facing);
       state.AddUnit(unit);
       commanderAI.RegisterUnit(unit);
+      lane.RegisterUnitAtPosition(unit, lanePosition);
 
       var width = (int)Math.Ceiling(Math.Sqrt(size));
       
@@ -99,86 +101,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
           return EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
         }
       };
-    }
-
-    class Lane {
-      public DeploymentInfo Parent { get; private set; }
-      public int LaneIdx { get; private set; }
-      public EncounterPosition LaneCenter { get; private set; }
-
-      public Lane(DeploymentInfo parent, int laneIdx, EncounterPosition laneCenter) {
-        this.Parent = parent;
-        this.LaneIdx = laneIdx;
-        this.LaneCenter = laneCenter;
-      }
-
-      public bool IsOnFlank(FactionName faction, Flank flank) {
-        if (faction == this.Parent.Attacker) {
-          if (flank == Flank.LEFT && this.LaneIdx == 0) { return true; } // This works
-          else if (flank == Flank.RIGHT && this.LaneIdx == this.Parent.NumLanes - 1) { return true; } // This doesn't!
-        }
-        else if (faction == this.Parent.Defender) {
-          if (flank == Flank.RIGHT && this.LaneIdx == 0) { return true; } // This also works
-          else if (flank == Flank.LEFT && this.LaneIdx == this.Parent.NumLanes - 1) { return true; }
-        }
-        return false;
-      }
-
-      // Line indices are "lower towards enemy" - 0th = skirmishers, first = hastatus, third = triarius, highest = reserves
-      public EncounterPosition PositionFor(FormationFacing facing, int line, int interval=15) {
-        // The facing has to be swapped in order for the position to work - an army FACING north should be DEPLOYED south
-        return AIUtils.RotateAndProject(this.LaneCenter, 0, (-interval * line) - interval / 5, facing.Opposite());
-      }
-    }
-
-    class DeploymentInfo {
-      public FactionName Attacker { get; private set; }
-      public FactionName Defender { get; private set; }
-      public FormationFacing AttackerFacing { get; private set; }
-      public FormationFacing DefenderFacing { get; private set; }
-
-      public FormationFacing PlayerFacing { get; private set; }
-      public FormationFacing EnemyFacing { get; private set; }
-
-      public EncounterPosition CenterPos { get; private set; }
-      public int NumLanes { get; private set; }
-      public List<Lane> Lanes { get; private set; }
-
-      public DeploymentInfo(int width, int height, Random seededRand, int numLanes) {
-        if (seededRand.Next(2) == 0) {
-          this.Attacker = FactionName.PLAYER;
-          this.Defender = FactionName.ENEMY;
-        } else {
-          this.Attacker = FactionName.ENEMY;
-          this.Defender = FactionName.PLAYER;
-        }
-        this.AttackerFacing = (FormationFacing)seededRand.Next(4);
-        this.DefenderFacing = this.AttackerFacing.Opposite();
-        GD.Print("Attacking faction is: ", this.Attacker);
-
-        if (this.Attacker == FactionName.PLAYER) {
-          this.PlayerFacing = this.AttackerFacing;
-          this.EnemyFacing = this.DefenderFacing;
-        } else {
-          this.PlayerFacing = this.DefenderFacing;
-          this.EnemyFacing = this.AttackerFacing;
-        }
-
-        var interval = 20;
-        this.CenterPos = new EncounterPosition(width / 2, height / 2);
-        this.NumLanes = numLanes;
-        this.Lanes = new List<Lane>();
-        var leftX = -(Mathf.FloorToInt(this.NumLanes / 2) * interval);
-        if (numLanes % 2 == 0) {
-          leftX = -(this.NumLanes / 2 * interval) + (interval / 2);
-        }
-        for (int i = 0; i < this.NumLanes; i++) {
-          var laneX = leftX + (i * interval);
-          // Lanes are laid out from the perspective of the attacker
-          var laneCenterPos = AIUtils.RotateAndProject(this.CenterPos, laneX, 0, this.AttackerFacing);
-          this.Lanes.Add(new Lane(this, i, laneCenterPos));
-        }
-      }
     }
 
     private static void PopulatePlayerFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
@@ -304,7 +226,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       // var numLanes = seededRand.Next(3) + 1;
       var numLanes = 3;
-      var deploymentInfo = new DeploymentInfo(width, height, seededRand, numLanes);
+      var deploymentInfo = DeploymentInfo.Create(width, height, seededRand, numLanes);
+      state.DeploymentInfo = deploymentInfo;
 
       foreach (var lane in deploymentInfo.Lanes) {
         PopulatePlayerFactionLane(dungeonLevel, state, seededRand, deploymentInfo, commanderAI, lane);

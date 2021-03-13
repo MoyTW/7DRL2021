@@ -43,6 +43,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public EncounterTile[,] _encounterTiles;
     public int LevelsInDungeon { get => 10; } // TODO: Properly pass this in!
     public int DungeonLevel { get; private set; }
+    public DeploymentInfo DeploymentInfo { get; set; } 
 
     // Entity tracking
     private Dictionary<string, Unit> _unitTracker;
@@ -478,6 +479,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       public string PlayerId { get; set; }
       public int LevelsInDungeon { get; set; }
       public int DungeonLevel { get; set; }
+      public DeploymentInfo DeploymentInfo { get; set; }
       // For now we're just gonna...not deal with the rand; that's a whole OTHER issue. Probably solution is re-seed every
       // invocation and store the re-seed though. Or we just say "eh we don't care, it can go be random however".
       // public Random EncounterRand { get; private set; }
@@ -533,6 +535,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       state.Player = entitiesById[data.PlayerId];
       // TODO: Dungeon height
       state.DungeonLevel = data.DungeonLevel;
+      state.DeploymentInfo = data.DeploymentInfo;
 
       // TODO: save rand
       state.EncounterRand = new Random(1);
@@ -590,6 +593,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       data.PlayerId = this.Player.EntityId;
       data.LevelsInDungeon = this.LevelsInDungeon;
       data.DungeonLevel = this.DungeonLevel;
+      data.DeploymentInfo = this.DeploymentInfo;
 
       return JsonSerializer.Serialize(data);
     }
