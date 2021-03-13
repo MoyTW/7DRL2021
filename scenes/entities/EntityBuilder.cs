@@ -99,9 +99,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: 50, rangedAttack: 30));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: -9999, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 45, maxFooting: 80, meleeDefense: 15, rangedDefense: 25));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 45, maxFooting: 80, meleeDefense: 50, rangedDefense: 25));
       e.AddComponent(DisplayComponent.Create(_texHastatusPath, "A young and eager soldier.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));

@@ -183,13 +183,16 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     private static void PopulatePlayerFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
         DeploymentInfo deploymentInfo, CommanderAIComponent commanderAI, Lane lane) {
-      var numLines = seededRand.Next(3) + 1;
-      // var numLines = 2;
+      // var numLines = seededRand.Next(3) + 1;
+      var numLines = 1;
 
       Unit hastatusUnit = null;
       if (numLines > 0) {
         var numHastati = seededRand.Next(80, 120);
         Func<int, Unit, Entity> hastatusFn = (formationNum, unit) => EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
+        if (lane.LaneIdx == 2) {
+          hastatusFn = (formationNum, unit) => EntityBuilder.CreateTriariusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
+        }
         if (lane.LaneIdx == deploymentInfo.NumLanes / 2) {
           hastatusFn = WrapWithPlayerFn(state, hastatusFn, numHastati-3);
           // hastatusFn = WrapWithPlayerFn(state, hastatusFn, 9);
@@ -250,8 +253,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     private static void PopulateEnemyFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
         DeploymentInfo deploymentInfo, CommanderAIComponent commanderAI, Lane lane) {
-      var numLines = seededRand.Next(3) + 1;
-      // var numLines = 1;
+      // var numLines = seededRand.Next(3) + 1;
+      var numLines = 1;
 
       Unit firstRankUnit = null;
       if (numLines > 0) {
@@ -299,8 +302,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       var commanderAI = CreateAndPlaceCommander(state);
 
-      var numLanes = seededRand.Next(3) + 1;
-      // var numLanes = 1;
+      // var numLanes = seededRand.Next(3) + 1;
+      var numLanes = 3;
       var deploymentInfo = new DeploymentInfo(width, height, seededRand, numLanes);
 
       foreach (var lane in deploymentInfo.Lanes) {
