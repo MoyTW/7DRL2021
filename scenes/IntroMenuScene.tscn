@@ -40,25 +40,25 @@ __meta__ = {
 [node name="SaveSlot1" parent="CenterContainer" instance=ExtResource( 5 )]
 margin_top = 167.0
 margin_right = 1053.0
-margin_bottom = 198.0
+margin_bottom = 207.0
 SlotNumber = 1
 
 [node name="SaveSlot2" parent="CenterContainer" instance=ExtResource( 5 )]
-margin_top = 202.0
+margin_top = 211.0
 margin_right = 1053.0
-margin_bottom = 233.0
+margin_bottom = 251.0
 SlotNumber = 2
 
 [node name="SaveSlot3" parent="CenterContainer" instance=ExtResource( 5 )]
-margin_top = 237.0
+margin_top = 255.0
 margin_right = 1053.0
-margin_bottom = 268.0
+margin_bottom = 295.0
 SlotNumber = 3
 
 [node name="SettingsButton" type="Button" parent="CenterContainer"]
-margin_top = 272.0
+margin_top = 299.0
 margin_right = 1053.0
-margin_bottom = 312.0
+margin_bottom = 339.0
 custom_fonts/font = ExtResource( 1 )
 text = "Game Settings"
 __meta__ = {
@@ -66,9 +66,9 @@ __meta__ = {
 }
 
 [node name="CreditsButton" type="Button" parent="CenterContainer"]
-margin_top = 316.0
+margin_top = 343.0
 margin_right = 1053.0
-margin_bottom = 356.0
+margin_bottom = 383.0
 custom_fonts/font = ExtResource( 1 )
 text = "Credits"
 __meta__ = {
@@ -76,9 +76,9 @@ __meta__ = {
 }
 
 [node name="ExitButton" type="Button" parent="CenterContainer"]
-margin_top = 360.0
+margin_top = 387.0
 margin_right = 1053.0
-margin_bottom = 400.0
+margin_bottom = 427.0
 custom_fonts/font = ExtResource( 1 )
 text = "Exit To Desktop"
 

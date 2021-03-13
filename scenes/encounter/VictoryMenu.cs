@@ -8,9 +8,9 @@ public class VictoryMenu : VBoxContainer {
   private EncounterState _state;
 
   public override void _Ready() {
-    this._mainMenuBotton = this.GetNode<Button>("CenterContainer/MainMenuButton");
+    this._mainMenuBotton = this.GetNode<Button>("MainMenuButton");
     this._mainMenuBotton.Connect("pressed", this, nameof(OnMainMenuBttonPressed));
-    this.GetNode<Button>("CenterContainer/SaveAndQuitButton").Connect("pressed", this, nameof(OnSaveAndQuitButtonPressed));
+    this.GetNode<Button>("SaveAndQuitButton").Connect("pressed", this, nameof(OnSaveAndQuitButtonPressed));
   }
 
   public void PrepMenu(EncounterState state) {
