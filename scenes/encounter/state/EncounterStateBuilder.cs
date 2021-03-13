@@ -64,7 +64,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       var laneClearTrigger = new OrderTrigger(OrderTriggerType.LANE_CLEAR_OF_UNITS_FROM_FACTION, true,
         watchedUnitIds: new List<string>() { unit.UnitId }, triggerFaction: unit.UnitFaction.Opposite());
-      commanderAIComponent.RegisterTriggeredOrder(laneClearTrigger, new Order(unit.UnitId, OrderType.PRINT));
+      commanderAIComponent.RegisterTriggeredOrder(laneClearTrigger, new Order(unit.UnitId, OrderType.PREPARE_SWEEP_NEXT_LANE));
     }
 
     private static void AddPlayerToUnit(Entity player, Unit unit, int formationNumber) {
