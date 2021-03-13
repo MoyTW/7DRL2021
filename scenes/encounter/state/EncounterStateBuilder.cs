@@ -184,19 +184,21 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     private static void PopulatePlayerFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
         DeploymentInfo deploymentInfo, CommanderAIComponent commanderAI, Lane lane) {
-      var numLines = 2; //FIX: seededRand.Next(3) + 1;
+      var numLines = seededRand.Next(3) + 1;
+      // var numLines = 2;
 
       Unit hastatusUnit = null;
       if (numLines > 0) {
+        var numHastati = seededRand.Next(80, 120);
         Func<int, Unit, Entity> hastatusFn = (formationNum, unit) => EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
         if (lane.LaneIdx == deploymentInfo.NumLanes / 2) {
-          // FIX: hastatusFn = WrapWithPlayerFn(state, hastatusFn, seededRand.Next(16) + 43);
-          hastatusFn = WrapWithPlayerFn(state, hastatusFn, 9);
+          hastatusFn = WrapWithPlayerFn(state, hastatusFn, numHastati-3);
+          // hastatusFn = WrapWithPlayerFn(state, hastatusFn, 9);
         }
         hastatusUnit = CreateAndDeployUnit(seededRand, state, FactionName.PLAYER,
             lane, 1, UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
             deploymentInfo.PlayerFacing, 
-            20, //FIX: seededRand.Next(80, 120),
+            numHastati,
             hastatusFn, commanderAI);
         commanderAI.RegisterDeploymentOrder(20, new Order(hastatusUnit.UnitId, OrderType.OPEN_MANIPULE));
         commanderAI.RegisterDeploymentOrder(35, new Order(hastatusUnit.UnitId, OrderType.ADVANCE));
@@ -208,7 +210,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         princepsUnit = CreateAndDeployUnit(seededRand, state, FactionName.PLAYER,
             lane, 2, UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
             deploymentInfo.PlayerFacing,
-            20, //FIX: seededRand.Next(80, 120),
+            seededRand.Next(80, 120),
+            // 20,
             princepsFn, commanderAI);
         commanderAI.RegisterDeploymentOrder(30, new Order(princepsUnit.UnitId, OrderType.OPEN_MANIPULE));
         commanderAI.RegisterTriggeredOrder(TriggeredOrder.AdvanceIfUnitRetreatsRoutsOrWithdraws(hastatusUnit, princepsUnit));
@@ -248,7 +251,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     private static void PopulateEnemyFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
         DeploymentInfo deploymentInfo, CommanderAIComponent commanderAI, Lane lane) {
-      var numLines = 1; //FIX: seededRand.Next(3) + 1;
+      var numLines = seededRand.Next(3) + 1;
+      // var numLines = 1;
 
       Unit firstRankUnit = null;
       if (numLines > 0) {
@@ -256,7 +260,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         firstRankUnit = CreateAndDeployUnit(seededRand, state, FactionName.ENEMY,
             lane, 1, UnitOrder.REFORM, FormationType.LINE_20,
             deploymentInfo.EnemyFacing,
-            20, //FIX: seededRand.Next(80, 120),
+            seededRand.Next(80, 120),
+            // 20,
             enemyFn, commanderAI);
         commanderAI.RegisterDeploymentOrder(25, new Order(firstRankUnit.UnitId, OrderType.ADVANCE));
         RegisterRoutAtPercentage(commanderAI, firstRankUnit, .80f);
@@ -267,7 +272,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         secondRankUnit = CreateAndDeployUnit(seededRand, state, FactionName.ENEMY,
             lane, 2, UnitOrder.REFORM, FormationType.LINE_20,
             deploymentInfo.EnemyFacing,
-            20, //FIX: seededRand.Next(80, 120),
+            seededRand.Next(80, 120),
+            // 20,
             enemyFn, commanderAI);
         commanderAI.RegisterTriggeredOrder(TriggeredOrder.AdvanceIfUnitRetreatsRoutsOrWithdraws(firstRankUnit, secondRankUnit));
         RegisterRoutAtPercentage(commanderAI, secondRankUnit, .60f);
@@ -292,7 +298,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       var commanderAI = CreateAndPlaceCommander(state);
 
-      var numLanes = 1; //FIX: seededRand.Next(3) + 1;
+      var numLanes = seededRand.Next(3) + 1;
+      // var numLanes = 1;
       var deploymentInfo = new DeploymentInfo(width, height, seededRand, numLanes);
 
       foreach (var lane in deploymentInfo.Lanes) {
