@@ -6,6 +6,17 @@ using SpaceDodgeRL.scenes.entities;
 
 namespace SpaceDodgeRL.scenes.components {
 
+  public static class FactionNameExtensions {
+    public static FactionName Opposite(this FactionName faction) {
+      if (faction == FactionName.PLAYER) {
+        return FactionName.ENEMY;
+      } else if (faction == FactionName.ENEMY) {
+        return FactionName.PLAYER;
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+  }
   public enum FactionName {
     PLAYER,
     ENEMY,

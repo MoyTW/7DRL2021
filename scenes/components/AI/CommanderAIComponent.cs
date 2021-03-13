@@ -64,7 +64,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
   public enum OrderTriggerType {
     UNIT_HAS_STANDING_ORDER,
     UNIT_BELOW_STRENGTH_PERCENT,
-    ALL_UNITS_OF_FACTION_ROUTED
+    ALL_UNITS_OF_FACTION_ROUTED,
+    LANE_CLEAR_OF_UNITS_FROM_FACTION
   }
 
   // This is a mess; I'm doing it like this so that the save system can work properly, because I forgot how to set up
