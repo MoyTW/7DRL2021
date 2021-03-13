@@ -252,7 +252,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     public static bool IsPositionTooFarBehind(EncounterPosition position, Unit unit) {
       var behindVec = AIUtils.VectorFromCenterRotated(unit.AveragePosition, position.X, position.Y, unit.UnitFacing);
-      return behindVec.Item2 > - Mathf.CeilToInt(unit.Depth / 2) + 1;
+      // This can't be too restrictive or it stops you from sitting at the back of the line when rotating.
+      return behindVec.Item2 > - Mathf.CeilToInt(unit.Depth / 2) + 5;
     }
 
     private static void TryAddAttackAdjacent(EncounterState state, Entity parent, List<EncounterAction> actions,
