@@ -337,7 +337,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       } else if (this.DeploymentComplete) {
         foreach (var kvp in this._TriggerOrders) {
           var unit = state.GetUnit(kvp.Key);
-          if (unit.StandingOrder == UnitOrder.ROUT) { break; }
+          if (unit.StandingOrder == UnitOrder.ROUT) { continue; }
           var removeThese = new List<TriggeredOrder>();
           var addThese = new List<TriggeredOrder>();
 
