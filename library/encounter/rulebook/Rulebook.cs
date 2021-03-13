@@ -16,7 +16,6 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
     private static Dictionary<ActionType, Func<EncounterAction, EncounterState, bool>> _actionMapping = new Dictionary<ActionType, Func<EncounterAction, EncounterState, bool>>() {
       { ActionType.MELEE_ATTACK, (a, s) => ResolveMeleeAttack(a as MeleeAttackAction, s) },
       { ActionType.MOVE, (a, s) => ResolveMove(a as MoveAction, s) },
-      { ActionType.FIRE_PROJECTILE, (a, s) => ResolveFireProjectile(a as FireProjectileAction, s) },
       { ActionType.DESTROY, (a, s) => ResolveDestroy(a as DestroyAction, s) },
       { ActionType.RANGED_ATTACK, (a, s) => ResolveRangedAttack(a as RangedAttackAction, s) },
       { ActionType.SPAWN_ENTITY, (a, s) => ResolveSpawnEntity(a as SpawnEntityAction, s) },
@@ -168,21 +167,6 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         }
         return true;
       }
-    }
-
-    private static bool ResolveFireProjectile(FireProjectileAction action, EncounterState state) {
-      var actorPosition = state.GetEntityById(action.ActorId).GetComponent<PositionComponent>().EncounterPosition;
-      Entity projectile = EntityBuilder.CreateProjectileEntity(
-        state.GetEntityById(action.ActorId),
-        action.ProjectileType,
-        action.Power,
-        action.PathFunction(actorPosition),
-        action.Target,
-        action.Speed,
-        state.CurrentTick
-      );
-      state.PlaceEntity(projectile, actorPosition, true);
-      return true;
     }
 
     private static bool ResolveOnDeathEffect(DestroyAction action, string effectType, EncounterState state) {

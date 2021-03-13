@@ -23,47 +23,7 @@ namespace SpaceDodgeRL.scenes.entities {
     private static string _texGallicVeteranInfantryPath = "res://resources/sprites/gallic_veteran_infantry.png";
     private static string _texPunicVeteranInfantryPath = "res://resources/sprites/punic_veteran_infantry.png";
     private static string _texPunicHeavyInfantryPath = "res://resources/sprites/punic_heavy_infantry.png";
-    private static string _texIntelPath = "res://resources/sprites/intel.png";
-    private static string _texJumpPointPath = "res://resources/sprites/jump_point.png";
     private static string _texPlayerPath = "res://resources/sprites/player.png";
-    private static string _texSatellitePath = "res://resources/sprites/asteroid.png";
-    private static string _texScoutPath = "res://resources/sprites/scout.png";
-
-    // Items
-    private static string _texBatteryPath = "res://resources/sprites/item/battery.png";
-    private static string _texDuctTapePath = "res://resources/sprites/item/duct_tape.png";
-    private static string _texEMPPath = "res://resources/sprites/item/emp.png";
-    private static string _texRedPaintPath = "res://resources/sprites/item/red_paint.png";
-
-    // Projectiles
-    private static string _texCuttingLaserPath = "res://resources/sprites/projectile/cutting_laser.png";
-    private static string _texSmallCannonPath = "res://resources/sprites/projectile/small_cannon.png";
-    private static string _texSmallGatlingPath = "res://resources/sprites/projectile/small_gatling.png";
-    private static string _texSmallShotgunPath = "res://resources/sprites/projectile/small_shotgun.png";
-    private static string _texRailgunPath = "res://resources/sprites/projectile/railgun.png";
-    private static string _texReverserPath = "res://resources/sprites/projectile/reverser.png";
-
-    private class ProjectileDisplayData {
-      public ProjectileType Type { get; }
-      public string Name { get; }
-      public string TexturePath { get; }
-
-      public ProjectileDisplayData(ProjectileType type, string name, string texturePath) {
-        this.Type = type;
-        this.Name = name;
-        this.TexturePath = texturePath;
-      }
-    }
-
-    private static Dictionary<ProjectileType, ProjectileDisplayData> projectileTypeToProjectileDisplay = new Dictionary<ProjectileType, ProjectileDisplayData>() {
-      { ProjectileType.PILA, new ProjectileDisplayData(ProjectileType.CUTTING_LASER, "cutting laser beam", _texCuttingLaserPath) },
-      { ProjectileType.CUTTING_LASER, new ProjectileDisplayData(ProjectileType.CUTTING_LASER, "cutting laser beam", _texCuttingLaserPath) },
-      { ProjectileType.SMALL_CANNON, new ProjectileDisplayData(ProjectileType.SMALL_CANNON, "small cannon shell", _texSmallCannonPath) },
-      { ProjectileType.SMALL_GATLING, new ProjectileDisplayData(ProjectileType.SMALL_GATLING, "small gatling shell", _texSmallGatlingPath) },
-      { ProjectileType.SMALL_SHOTGUN, new ProjectileDisplayData(ProjectileType.SMALL_SHOTGUN, "small shotgun pellet", _texSmallShotgunPath) },
-      { ProjectileType.RAILGUN, new ProjectileDisplayData(ProjectileType.RAILGUN, "railgun slug", _texRailgunPath) },
-      { ProjectileType.REVERSER, new ProjectileDisplayData(ProjectileType.REVERSER, "reverser shot", _texReverserPath) }
-    };
 
     private static Entity CreateEntity(string id, string name) {
       Entity newEntity = Entity.Create(id, name);
@@ -310,41 +270,6 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(SpeedComponent.Create(baseSpeed: 100));
       e.AddComponent(statusEffectTrackerComponent);
       e.AddComponent(XPTrackerComponent.Create(levelUpBase: 200, levelUpFactor: 150));
-
-      return e;
-    }
-
-    public static Entity CreateProjectileEntity(Entity source, ProjectileType type, int power, EncounterPath path, Entity target, int speed, int currentTick) {
-      var displayData = projectileTypeToProjectileDisplay[type];
-
-      var e = CreateEntity(Guid.NewGuid().ToString(), displayData.Name);
-
-      e.AddComponent(ProjectileAIComponent.Create(path, target.EntityId));
-
-      e.AddComponent(ActionTimeComponent.Create(currentTick)); // Should it go instantly or should it wait for its turn...?
-      e.AddComponent(AttackerComponent.Create(source.EntityId, power, meleeAttack: 9999, rangedAttack: 9999)); // TODO: ranged attack
-      e.AddComponent(CollisionComponent.Create(false, false, true, true));
-      e.AddComponent(DisplayComponent.Create(displayData.TexturePath, "A projectile.", false, PROJECTILE_Z_INDEX));
-      e.AddComponent(SpeedComponent.Create(speed));
-
-      return e;
-    }
-    public static Entity CreateStairsEntity() {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "jump point");
-
-      e.AddComponent(DisplayComponent.Create(_texJumpPointPath, "The jump point to the next sector.", true, ITEM_Z_INDEX));
-      e.AddComponent(StairsComponent.Create());
-
-      return e;
-    }
-
-    public static Entity CreateIntelEntity(int targetDungeonLevel) {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "intel for sector " + targetDungeonLevel);
-
-      e.AddComponent(DisplayComponent.Create(_texIntelPath, "Intel! Gives you zone information for the next sector. You want this.", true, ITEM_Z_INDEX));
-      e.AddComponent(StorableComponent.Create());
-      e.AddComponent(UsableComponent.Create(useOnGet: true));
-      e.AddComponent(UseEffectAddIntelComponent.Create(targetDungeonLevel));
 
       return e;
     }

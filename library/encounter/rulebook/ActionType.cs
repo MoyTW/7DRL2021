@@ -1,7 +1,6 @@
 namespace SpaceDodgeRL.library.encounter.rulebook {
 
   public enum ActionType {
-    FIRE_PROJECTILE,
     MELEE_ATTACK,
     MOVE,
     DESTROY,
