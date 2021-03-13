@@ -43,14 +43,16 @@ namespace SpaceDodgeRL.scenes.components {
     public void LeaveFormation(EncounterState state, Entity parent) {
       this.IsInFormation = false;
       state.GetUnit(parent.GetComponent<UnitComponent>().UnitId).NotifyEntityRouted(parent);
+      this.AddPrestige(-10, state, "Your allies will remember how you broke from formation! [b]You lose 10 prestige.[/b]");
     }
 
     public static PlayerComponent Create(string saveData) {
       return JsonSerializer.Deserialize<PlayerComponent>(saveData);
     }
 
-    public void AddPrestige(int dPrestige) {
+    public void AddPrestige(int dPrestige, EncounterState state, string message) {
       this.Prestige += dPrestige;
+      state.LogMessage(message);
     }
 
     public string Save() {

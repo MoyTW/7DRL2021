@@ -440,7 +440,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     // Refers to "army declares victory"
     public void NotifyArmyVictory() {
       var playerComponent = this.Player.GetComponent<PlayerComponent>();
-      playerComponent.AddPrestige(25);
+      playerComponent.AddPrestige(25, this, "Your army has routed the foe! [b]You gain 25 prestige.[/b]");
       this.RunStatus = EncounterState.RUN_STATUS_ARMY_VICTORY;
     }
 
@@ -454,7 +454,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       if (unit.StandingOrder != UnitOrder.WITHDRAW && 
           this.RunStatus != EncounterState.RUN_STATUS_ARMY_DEFEAT && 
           this.RunStatus != EncounterState.RUN_STATUS_ARMY_VICTORY) {
-        playerComponent.AddPrestige(-50);
+        playerComponent.AddPrestige(-50, this, "You have fled the battlefield in disgrace! [b]You lose 50 prestige.[/b]");
       }
       playerComponent.JoinFormation(this, this.Player);
       this.ResetStateForNewLevel(this.Player, this.DungeonLevel + 1);

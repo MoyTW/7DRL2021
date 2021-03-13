@@ -161,8 +161,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
         if (this.AllowedActions(state, parent, unit.StandingOrder).Contains(actionMapping)) {
           if (actionMapping == InputHandler.ActionMapping.ROTATE) {
             parent.GetComponent<AIRotationComponent>().PlayerSetRotation(true);
-            parent.GetComponent<PlayerComponent>().AddPrestige(-2);
-            state.LogMessage("You cry out [b]'Rotation!'[/b]' and, after a brief standoff with the foes opposite you, pull back through your lines. [b]You lose 2 prestige.[/b]");
+            parent.GetComponent<PlayerComponent>().AddPrestige(-2, state,
+              "You cry out [b]'Rotation!'[/b]' and pull back through your lines. [b]You lose 2 prestige.[/b]");
             return null;
           } else if (actionMapping == InputHandler.ActionMapping.WAIT) {
             return new List<EncounterAction>() { new WaitAction(parent.EntityId) };
