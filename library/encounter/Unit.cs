@@ -25,6 +25,28 @@ namespace SpaceDodgeRL.library.encounter {
         return FormationFacing.EAST;
       }
     }
+    public static FormationFacing LeftOf(this FormationFacing facing) {
+      if (facing == FormationFacing.NORTH) {
+        return FormationFacing.WEST;
+      } else if (facing == FormationFacing.EAST) {
+        return FormationFacing.NORTH;
+      } else if (facing == FormationFacing.SOUTH) {
+        return FormationFacing.EAST;
+      } else {
+        return FormationFacing.SOUTH;
+      }
+    }
+    public static FormationFacing RightOf(this FormationFacing facing) {
+      if (facing == FormationFacing.NORTH) {
+        return FormationFacing.EAST;
+      } else if (facing == FormationFacing.EAST) {
+        return FormationFacing.SOUTH;
+      } else if (facing == FormationFacing.SOUTH) {
+        return FormationFacing.WEST;
+      } else {
+        return FormationFacing.NORTH;
+      }
+    }
   }
 
   public enum FormationFacing {
