@@ -58,7 +58,6 @@ namespace SpaceDodgeRL.scenes.encounter {
 
       // After the player executes their turn we need to update the UI
       EmitSignal(nameof(EncounterRunner.TurnEnded));
-      state.UpdatePlayerOverlays();
     }
 
     private void PlayerMove(EncounterState state, int dx, int dy) {
@@ -179,7 +178,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           if (commands != null) { 
             Rulebook.ResolveActionsAndEndTurn(commands, state);
             EmitSignal(nameof(EncounterRunner.TurnEnded));
-            state.UpdatePlayerOverlays();
           } else {
             return;
           }
@@ -191,7 +189,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           if (commands != null) { 
             Rulebook.ResolveActionsAndEndTurn(commands, state);
             EmitSignal(nameof(EncounterRunner.TurnEnded));
-            state.UpdatePlayerOverlays();
           } else {
             return;
           }
@@ -208,7 +205,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           if (commands != null) { 
             Rulebook.ResolveActionsAndEndTurn(commands, state);
             EmitSignal(nameof(EncounterRunner.TurnEnded));
-            state.UpdatePlayerOverlays();
           } else {
             return;
           }

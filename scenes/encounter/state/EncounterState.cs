@@ -291,23 +291,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     // ##########################################################################################################################
     #region Display caches
 
-    public void UpdatePlayerOverlays() {
-      var overlaysMap = GetNode<TileMap>("PlayerOverlays");
-      overlaysMap.Clear();
-
-      // Update the range indicator
-      var laserRange = this.Player.GetComponent<PlayerComponent>().PilaRange;
-      var playerPos = this.Player.GetComponent<PositionComponent>().EncounterPosition;
-      for (int x = playerPos.X - laserRange; x <= playerPos.X + laserRange; x++) {
-        for (int y = playerPos.Y - laserRange; y <= playerPos.Y + laserRange; y++) {
-          var distance = playerPos.DistanceTo(x, y);
-          if (distance <= laserRange && distance > laserRange - 1 && IsInBounds(x, y)) {
-            overlaysMap.SetCell(x, y, 0);
-          }
-        }
-      }
-    }
-
     #endregion
     // ##########################################################################################################################
 
@@ -443,7 +426,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
           Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(cam);
         }
       }
-      this.UpdatePlayerOverlays();
     }
 
     // Refers to "manage to not die for 12 battles"
@@ -557,8 +539,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       camera.AddToGroup(ENCOUNTER_CAMERA_GROUP);
       camera.Current = true;
       state.Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(camera);
-
-      state.UpdatePlayerOverlays();
 
       stopwatch.Stop();
       GD.Print("EncounterState saveData -> EncounterState completed, elapsed time: ", stopwatch.ElapsedMilliseconds);
