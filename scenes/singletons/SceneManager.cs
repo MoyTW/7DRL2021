@@ -16,7 +16,6 @@ namespace SpaceDodgeRL.scenes.singletons {
     private IntroFormUpMenu _introFormUpMenu;
     private IntroBattleMenu _introBattleMenu;
 
-    private CharacterMenu _characterMenu;
     private CreditsMenu _creditsMenu;
     private DefeatMenu _defeatMenu;
     private EscapeMenu _escapeMenu;
@@ -31,7 +30,6 @@ namespace SpaceDodgeRL.scenes.singletons {
       _introFormUpMenu = GD.Load<PackedScene>("res://scenes/encounter/IntroFormUpMenu.tscn").Instance() as IntroFormUpMenu;
       _introBattleMenu = GD.Load<PackedScene>("res://scenes/encounter/IntroBattleMenu.tscn").Instance() as IntroBattleMenu;
 
-      _characterMenu = GD.Load<PackedScene>("res://scenes/encounter/CharacterMenu.tscn").Instance() as CharacterMenu;
       _creditsMenu = GD.Load<PackedScene>("res://scenes/CreditsMenu.tscn").Instance() as CreditsMenu;
       _defeatMenu = GD.Load<PackedScene>("res://scenes/encounter/DefeatMenu.tscn").Instance() as DefeatMenu;
       _escapeMenu = GD.Load<PackedScene>("res://scenes/encounter/EscapeMenu.tscn").Instance() as EscapeMenu;
@@ -55,26 +53,6 @@ namespace SpaceDodgeRL.scenes.singletons {
     private void DeferredIntroBattleMenu() {
       DeferredSwitchScene(_introBattleMenu);
     }
-
-    #region Character Menu
-
-    public void ShowCharacterMenu(EncounterState state) {
-      CallDeferred(nameof(DeferredShowCharacterMenu), state);
-    }
-
-    private void DeferredShowCharacterMenu(EncounterState state) {
-      DeferredSwitchScene(_characterMenu);
-      _characterMenu.PrepMenu(state);
-    }
-
-    // Definitely an awkward call structuring here that could be nicer with signals
-    public void HandleLevelUpSelected(string levelUpSelection) {
-      var previousScene = sceneStack[sceneStack.Count - 1] as EncounterScene;
-      previousScene.HandleLevelUpSelected(previousScene.EncounterState.Player, levelUpSelection);
-      _characterMenu.PrepMenu(previousScene.EncounterState);
-    }
-
-    #endregion
 
     #region Credits Menu
 

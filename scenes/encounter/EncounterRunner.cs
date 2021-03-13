@@ -107,7 +107,6 @@ namespace SpaceDodgeRL.scenes.encounter {
     private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> AlwaysAvaiableActionMappingToActionDict =
       new Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>>()
     {
-      //{ InputHandler.ActionMapping.CHARACTER, (s, r, a) => r._sceneManager.ShowCharacterMenu(s) },
       { InputHandler.ActionMapping.ESCAPE_MENU, (s, r, a) => r._sceneManager.ShowEscapeMenu(s) },
       { InputHandler.ActionMapping.HELP_MENU, (s, r, a) => r._sceneManager.ShowHelpMenu() },
       { InputHandler.ActionMapping.ZOOM_IN, (s, r, a) => s.ZoomIn() },
@@ -156,11 +155,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           this._sceneManager.ShowIntroBattleMenu();
           return;
         }
-
-        /* // We force the player to pick a level-up if they have any available.
-        if (entity.GetComponent<XPTrackerComponent>().UnusedLevelUps.Count > 0) {
-          this._sceneManager.ShowCharacterMenu(state);
-        } */
 
         // Update the player options text
         EmitSignal(nameof(EncounterRunner.PlayerTurnStarted));
