@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://resources/fonts/fira_24.tres" type="DynamicFont" id=1]
 [ext_resource path="res://scenes/CreditsMenu.cs" type="Script" id=2]
 [ext_resource path="res://resources/fonts/fira_64.tres" type="DynamicFont" id=3]
 [ext_resource path="res://resources/menu_theme.tres" type="Theme" id=4]
 [ext_resource path="res://resources/StyleBoxRedLabel.tres" type="StyleBox" id=5]
+[ext_resource path="res://resources/fonts/fira_32_bold.tres" type="DynamicFont" id=6]
 
 [node name="CreditsMenu" type="VBoxContainer"]
 anchor_right = 1.0
@@ -19,28 +20,43 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CreditsHeader" type="Label" parent="."]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
 margin_right = 1280.0
+margin_bottom = 980.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+margin_right = 1268.0
+margin_bottom = 2242.0
+size_flags_horizontal = 3
+
+[node name="CreditsHeader" type="Label" parent="ScrollContainer/VBoxContainer"]
+margin_right = 1268.0
 margin_bottom = 80.0
+size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 3 )
 text = "Credits"
 align = 1
 
-[node name="CreditsLine" type="Label" parent="."]
+[node name="CreditsLine" type="Label" parent="ScrollContainer/VBoxContainer"]
 margin_top = 84.0
-margin_right = 1280.0
+margin_right = 1268.0
 margin_bottom = 115.0
+size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
-text = "Programming, Design: Travis Moy"
+text = "Dev: Travis Moy (MuffiTuffiWuffi on the RL discord, email's moytravis@gmail.com)"
 align = 1
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CreditsLine2" type="Label" parent="."]
+[node name="CreditsLine2" type="Label" parent="ScrollContainer/VBoxContainer"]
 margin_top = 119.0
-margin_right = 1280.0
+margin_right = 1268.0
 margin_bottom = 184.0
+size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 1 )
 text = "Terrain & Unit Sprites: Kenney's 1-Bit Pack (CC0 1.0 Universal) from https://www.kenney.nl/assets/bit-pack"
 align = 1
@@ -49,10 +65,68 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ExitButton" type="Button" parent="."]
+[node name="Spacer" type="Label" parent="ScrollContainer/VBoxContainer"]
 margin_top = 188.0
+margin_right = 1268.0
+margin_bottom = 219.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 1 )
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CreditsHeader2" type="Label" parent="ScrollContainer/VBoxContainer"]
+margin_top = 223.0
+margin_right = 1268.0
+margin_bottom = 303.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 3 )
+text = "Postscript"
+align = 1
+
+[node name="CreditsLine3" type="Label" parent="ScrollContainer/VBoxContainer"]
+margin_top = 307.0
+margin_right = 1268.0
+margin_bottom = 2242.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+custom_fonts/font = ExtResource( 1 )
+text = "First things first, I just want to note that I'm aware that there's almost zero evidence for the relief process depicted in this 7DRL. We do have textual evidence of the Romans rotating their soldiers in and out of combat, but they always refer to units of soldiers, not individual ones, and the method by which it was actually accomplished is lost to the mists of time.
+
+Now that that's clear...here's a blog post, but in my game instead, because I don't have a blog.
+
+This 7DRL was inspired by an awesome game called A Legionary's Life. It's like $8 on Steam, it's got compelling gameplay and great atmosphere, it's an absolutely incredible game. It's not a roguelike but you can, and will, die a lot. So go pick it up!
+
+The major concept for this game was basically \"What would it mean to have a roguelike where you were part of a large group?\" My initial thought was that maybe you'd command a large group and you'd be, like, a katamari of angry dwarves fighting orcs or goblins or something. Then I realized that's basically Pikmin, and also how the heck would I implement Pikmin in 7 days, that sounds hard.
+
+Then I thought about flipping it around, and making you an individual in the katamari, and seemed like it could be really unique. One thing about roguelikes, and almost all character games in general, is that you tend to have, let's say, full agency. You are the one hero/adventurer/whatever doing all the things. There are basically no roguelikes where you're not the one calling the shots. In fact I can't think of any at all, and if you can, message me on the RL discord of send me an email, that'd be something I'd love to check out.
+
+Anyways, that seemed like a really interesting design space to explore. Like, a game where you're not the one calling the shots, but the shots being called are visible. Like a game where you're could be marching towards the enemy and you spot a bunch of guys over to the side and it's like, \"Uh that bunch of guys over there look like they're gonna flank us, does the general see that? This seems bad!\" but you have to march anyways because if you leave you'll just get caught out and have to 1vArmy.
+
+Anyways that isn't this game. This game is a ripoff of  A Legionary's Life, which did have that kind of vibe but it was accomplished via text, and there weren't any agents behind it.
+
+That said, simulations are surprisingly difficult to hash out in time-constrained situations, did you know!? It was a chore just getting them to march in formation, and hideously inefficient, at that! Plus, I couldn't figure out how to easily get them to attack perpendicular to the line after routing the opposing unit, without it totally losing cohesion, and so I just sort of threw in the towel on the formations.
+
+Also the commander AI I tried to throw together wasn't successful so the units instead just march up to each other and go fisticuffs, one after another.
+
+Also I didn't have any time to do an optimization pass, and it runs terribly!
+
+Further, I think I failed in giving this attempt good gameplay. In fact, the optimal gameplay is very, very simple; if you are surrounded, you rotate. If you have low footing, you rest. Otherwise you just attack the enemy with the lowest footing.
+
+So, all in all, I wouldn't call this thing a good game. But I would call it an interesting experiment, and honestly, better interesting and bad than boring and good! Obviously interesting and good is best, but hey, seven days ain't long."
+align = 1
+valign = 1
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ExitButton" type="Button" parent="."]
+margin_top = 984.0
 margin_right = 1280.0
-margin_bottom = 208.0
+margin_bottom = 1024.0
+custom_fonts/font = ExtResource( 6 )
 text = "Exit to Main Menu"
 
 [node name="Node2D" type="Node2D" parent="."]
