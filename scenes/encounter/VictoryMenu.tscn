@@ -1,11 +1,10 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://resources/fonts/fira_24.tres" type="DynamicFont" id=1]
 [ext_resource path="res://resources/fonts/fira_32_bold.tres" type="DynamicFont" id=2]
 [ext_resource path="res://scenes/encounter/VictoryMenu.cs" type="Script" id=3]
 [ext_resource path="res://resources/menu_theme.tres" type="Theme" id=4]
 [ext_resource path="res://resources/fonts/fira_64.tres" type="DynamicFont" id=5]
-[ext_resource path="res://resources/fonts/fira_32.tres" type="DynamicFont" id=6]
 [ext_resource path="res://resources/StyleBoxRedLabel.tres" type="StyleBox" id=7]
 
 [node name="VictoryMenu" type="VBoxContainer"]
@@ -146,12 +145,12 @@ align = 1
 margin_top = 944.0
 margin_right = 1280.0
 margin_bottom = 984.0
-custom_fonts/font = ExtResource( 6 )
+custom_fonts/font = ExtResource( 2 )
 text = "Exit to Main Menu"
 
 [node name="SaveAndQuitButton" type="Button" parent="."]
 margin_top = 984.0
 margin_right = 1280.0
 margin_bottom = 1024.0
-custom_fonts/font = ExtResource( 6 )
+custom_fonts/font = ExtResource( 2 )
 text = "Exit to Desktop"
