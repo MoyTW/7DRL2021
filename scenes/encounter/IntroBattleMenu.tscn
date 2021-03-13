@@ -4,19 +4,14 @@
 [ext_resource path="res://resources/fonts/fira_24.tres" type="DynamicFont" id=2]
 [ext_resource path="res://resources/fonts/Fira_Code_v5.2/ttf/FiraCode-Bold.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://scenes/encounter/IntroBattleMenu.cs" type="Script" id=4]
+[ext_resource path="res://resources/StyleBoxRedLabel.tres" type="StyleBox" id=5]
+[ext_resource path="res://resources/fonts/fira_64.tres" type="DynamicFont" id=6]
 
-[sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0.498039, 0, 0, 1 )
-
-[sub_resource type="DynamicFont" id=2]
-size = 64
-font_data = ExtResource( 3 )
-
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=1]
 size = 32
 font_data = ExtResource( 3 )
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=2]
 size = 32
 font_data = ExtResource( 3 )
 
@@ -35,8 +30,8 @@ __meta__ = {
 margin_right = 1280.0
 margin_bottom = 80.0
 theme = ExtResource( 1 )
-custom_styles/normal = SubResource( 1 )
-custom_fonts/font = SubResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 6 )
 text = "A Fierce Battle"
 align = 1
 valign = 1
@@ -46,8 +41,8 @@ margin_top = 80.0
 margin_right = 1280.0
 margin_bottom = 120.0
 theme = ExtResource( 1 )
-custom_styles/normal = SubResource( 1 )
-custom_fonts/font = SubResource( 3 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = SubResource( 1 )
 text = "An Hour Past Noon, Somewhere Near Carthage"
 align = 1
 valign = 1
@@ -58,7 +53,7 @@ margin_right = 1280.0
 margin_bottom = 559.0
 size_flags_vertical = 7
 theme = ExtResource( 1 )
-custom_styles/normal = SubResource( 1 )
+custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = ExtResource( 2 )
 text = "In front of you, your ranks meet those of the enemy. It is very loud. There is a lot of screaming. There's other sounds, too, but the screaming seems the loudest.
 
@@ -75,9 +70,9 @@ margin_top = 559.0
 margin_right = 1280.0
 margin_bottom = 599.0
 theme = ExtResource( 1 )
-custom_styles/normal = SubResource( 1 )
-custom_fonts/font = SubResource( 3 )
-text = "Tutorial"
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = SubResource( 1 )
+text = "A Brief Tutorial (press ? for a mechanics explanation)"
 align = 1
 valign = 1
 
@@ -87,11 +82,11 @@ margin_right = 1280.0
 margin_bottom = 984.0
 size_flags_vertical = 7
 theme = ExtResource( 1 )
-custom_styles/normal = SubResource( 1 )
+custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = ExtResource( 2 )
 text = "Your goal is to survive nine battles, after which you can go home, a celebrated veteran of the legion.
 
-Secondary to surviving is wining prestige. You win prestige by participating in winning battles, wounding or slaying foes, and sticking to your formation.
+Secondary to surviving is wining prestige (score). You win prestige by participating in winning battles, wounding or slaying foes, and sticking to your formation.
 
 You lose prestige by rotating to the rear of the line. Of course, it's better to lose some prestige than to die! You can also throw down your weapons and break out of the formation completely, if you're being overwhelmed, but no true Roman soldier would flee from battle like that, would they? On the other hand, if the entire army is already defeated, you'll lose no prestige for managing to escape."
 align = 1
@@ -103,5 +98,5 @@ margin_top = 984.0
 margin_right = 1280.0
 margin_bottom = 1024.0
 theme = ExtResource( 1 )
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 2 )
 text = "Step Forward"

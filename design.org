@@ -85,7 +85,7 @@ caught out and stabbed to death by angry enemies.
 + DONE: Intro screen
 + Description of footing
 + Melee & defense stats show footing penalty
-+ HELP menu update
++ DONE: HELP menu update
 + escape exits help menu
 + DONE: units can mysteriously lag way behind their units; put a "if you're
   behind your unit go towards center" safeguard in it
