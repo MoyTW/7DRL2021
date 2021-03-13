@@ -386,9 +386,9 @@ namespace SpaceDodgeRL.scenes.components.AI {
       var backSecure = rotationComponent.BackSecure(state, parent, unit);
       // ugh so decideifshouldrotate has a stateful side-effect and i have like, an hour to get this done so ugh let's leave it but!
       var decidedToRotate = rotationComponent.DecideIfShouldRotate(parent, backSecure);
-      if (decidedToRotate) {
+      /* if (decidedToRotate) {
         parent.GetComponent<PositionComponent>().PlaySpeechBubble("Rotating!");
-      }
+      } */
       if (rotationComponent.IsRotating) {
         return ActionsUnitAdvanceRotateOut(state, parent, unit, backSecure);
       } else {

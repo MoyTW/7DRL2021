@@ -155,16 +155,22 @@ namespace SpaceDodgeRL.scenes.components {
     public void PlaySpeechBubble(string speech) {
       var timer = GetNode<Timer>("SpeechBubbleTimer");
       if (timer.IsStopped()) {
-        var speechLabel = GetNode<Label>("Sprite/SpeechLabel");
+        var bubble = GetNode<NinePatchRect>("Sprite/NinePatchRect");
+        var speechLabel = GetNode<Label>("Sprite/NinePatchRect/SpeechLabel");
         speechLabel.Text = speech;
-        speechLabel.Show();
+        var newSize = new Vector2(10, speechLabel.RectSize.y);
+        speechLabel.RectSize = newSize;
+        bubble.RectMinSize = new Vector2(speech.Length * 10 + 25, bubble.RectSize.y);
+        bubble.Show();
         timer.Start(1);
       }
     }
 
     private void OnSpeechBubbleTimerTimeout() {
-      var speechLabel = GetNode<Label>("Sprite/SpeechLabel");
-      speechLabel.Hide();
+      var bubble = GetNode<NinePatchRect>("Sprite/NinePatchRect");
+      bubble.Hide();
+      var timer = GetNode<Timer>("SpeechBubbleTimer");
+      timer.Stop();
     }
 
     public static EncounterPosition VectorToIndex(float x, float y) {

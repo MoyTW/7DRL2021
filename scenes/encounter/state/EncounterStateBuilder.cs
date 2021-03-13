@@ -107,6 +107,8 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       };
     }
 
+    public static int ADVANCE_AT_TURN = 50;
+
     private static void PopulatePlayerFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
         DeploymentInfo deploymentInfo, CommanderAIComponent commanderAI, Lane lane) {
       var numLines = seededRand.Next(3) + 1;
@@ -126,7 +128,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
             numHastati,
             hastatusFn, commanderAI);
         commanderAI.RegisterDeploymentOrder(20, new Order(hastatusUnit.UnitId, OrderType.OPEN_MANIPULE));
-        commanderAI.RegisterDeploymentOrder(35, new Order(hastatusUnit.UnitId, OrderType.ADVANCE));
+        commanderAI.RegisterDeploymentOrder(ADVANCE_AT_TURN, new Order(hastatusUnit.UnitId, OrderType.ADVANCE));
         RegisterRoutAtPercentage(commanderAI, hastatusUnit, .80f);
       }
       Unit princepsUnit = null;
@@ -188,7 +190,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
             seededRand.Next(80, 120),
             // 20,
             enemyFn, commanderAI);
-        commanderAI.RegisterDeploymentOrder(25, new Order(firstRankUnit.UnitId, OrderType.ADVANCE));
+        commanderAI.RegisterDeploymentOrder(ADVANCE_AT_TURN - 5, new Order(firstRankUnit.UnitId, OrderType.ADVANCE));
         RegisterRoutAtPercentage(commanderAI, firstRankUnit, .80f);
       }
       Unit secondRankUnit = null;
