@@ -98,11 +98,11 @@ namespace SpaceDodgeRL.library.encounter {
     [JsonIgnore] public int NumInFormation { get { return this._BattleReadyEntityIds.Count; } }
 
     public Unit(string unitId, FactionName unitFaction, EncounterPosition rallyPoint, UnitOrder standingOrder,
-        FormationType unitFormation, FormationFacing unitFacing, bool leftFlank, bool rightFlank) {
+        FormationType unitFormation, FormationFacing unitFacing) {
       this.UnitId = unitId;
       this.UnitFaction = unitFaction;
-      this.LeftFlank = leftFlank;
-      this.RightFlank = rightFlank;
+      this.LeftFlank = true;
+      this.RightFlank = true;
       this.RallyPoint = rallyPoint;
       this.AverageTrackerX = new AverageTracker();
       this.AverageTrackerY = new AverageTracker();

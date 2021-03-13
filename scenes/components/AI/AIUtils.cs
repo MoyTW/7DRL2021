@@ -218,7 +218,8 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
     // TODO: A more accurate algorithm than "is your position on the flank"
     public static bool IsOnFlank(int x, int y, Unit unit, Flank flank) {
-      return AIUtils.FormationDictionary[unit.UnitFormation].IsOnFlank(x, y, unit, flank);
+      //return AIUtils.FormationDictionary[unit.UnitFormation].IsOnFlank(x, y, unit, flank);
+      return true; // Let's just restrict units to their exact lane
     }
 
     public static List<EncounterAction> ActionsForUnitReform(EncounterState state, Entity parent, int formationNumber, Unit unit) {

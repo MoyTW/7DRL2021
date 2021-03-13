@@ -32,8 +32,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         Lane lane, int lanePosition, UnitOrder order, FormationType type, FormationFacing facing, int size,
         Func<int, Unit, Entity> entityFn, CommanderAIComponent commanderAI) {
       var center = lane.PositionFor(facing, lanePosition);
-      var unit = new Unit(Guid.NewGuid().ToString(), faction, center, order, type,
-        facing, lane.IsOnFlank(faction, Flank.LEFT), lane.IsOnFlank(faction, Flank.RIGHT));
+      var unit = new Unit(Guid.NewGuid().ToString(), faction, center, order, type, facing);
       state.AddUnit(unit);
       commanderAI.RegisterUnit(unit);
 
@@ -78,7 +77,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       // Commander unit is required for non-targeted commands to resolve properly
       var commanderUnit = new Unit(commanderUnitId, FactionName.NEUTRAL, commander.GetComponent<PositionComponent>().EncounterPosition,
-        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.SOUTH, true, true);
+        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.SOUTH);
       state.AddUnit(commanderUnit);
       commanderAI.RegisterUnit(commanderUnit);
       
