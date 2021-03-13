@@ -207,7 +207,7 @@ namespace SpaceDodgeRL.scenes.encounter {
       } else {
         var playerPos = state.Player.GetComponent<PositionComponent>().EncounterPosition;
 
-        int maxTurnsToRun = 300;
+        int maxTurnsToRun = 3000;
         int numTurnsRan = 0;
 
         var firstEntity = entity;
