@@ -294,7 +294,9 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       InitializeMap(state, width, height);
 
       // Reset player's start
+      // Heal the player
       player.GetComponent<PlayerComponent>().StartOfLevel = true;
+      player.GetComponent<DefenderComponent>().RestoreHP(9999);
 
       var commanderAI = CreateAndPlaceCommander(state);
 
