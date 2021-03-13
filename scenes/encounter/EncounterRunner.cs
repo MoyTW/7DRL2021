@@ -184,7 +184,7 @@ namespace SpaceDodgeRL.scenes.encounter {
         }
         // Autopilot if allowed actions are LEAVE & WAIT
         var playerAllowedActions = playerAI.AllowedActions(state, entity, playerUnit.StandingOrder);
-        if (playerAllowedActions.Count == 2 && playerAllowedActions.Contains(InputHandler.ActionMapping.WAIT)) {
+        if (playerComponent.IsInFormation && playerAllowedActions.Count == 2 && playerAllowedActions.Contains(InputHandler.ActionMapping.WAIT)) {
           var commands = playerAI.DecideNextActionForInput(state, entity);
           if (commands != null) { 
             Rulebook.ResolveActionsAndEndTurn(commands, state);
