@@ -83,6 +83,10 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           attacker.EntityName, defender.EntityName);
         LogAttack(attacker, defender, defenderComponent, logMessage, state);
       } else {
+        bool isPlayer = attacker == state.Player;
+        bool hit = false;
+        bool killed = false;
+
         var attackReport = AttackHits(state.EncounterRand, attackerComponent.MeleeAttack, attackerDefenderComponent.FootingPenalty,
           defenderComponent.MeleeDefense, defenderComponent.FootingPenalty);
         attackerDefenderComponent.NotifyParentHasAttacked();
@@ -99,27 +103,40 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         int damage = weaponDamage - shieldedByFooting;
         int footingDamage = shieldedByFooting * 3;
 
+        hit = true;
         defenderComponent.RemoveHp(damage);
         defenderComponent.RemoveFooting(footingDamage);
 
         if (defenderComponent.CurrentHp <= 0) {
-          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, destroying it! ({3}% chance to hit)",
+          killed = true;
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, killing it! ({3}% chance to hit)",
             attacker.EntityName, defender.EntityName, weaponDamage, attackReport.Item1);
 
           // Assign XP to the entity that fired the projectile
-          var projectileSource = state.GetEntityById(attackerComponent.SourceEntityId);
+          var attackerId = state.GetEntityById(attackerComponent.SourceEntityId);
           var xpValueComponent = defender.GetComponent<XPValueComponent>();
-          if (projectileSource != null && xpValueComponent != null && projectileSource.GetComponent<XPTrackerComponent>() != null) {
-            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue, attackerComponent, defenderComponent, state);
-            logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", projectileSource.EntityName, xpValueComponent.XPValue);
+          if (attackerId != null && xpValueComponent != null && attackerId.GetComponent<XPTrackerComponent>() != null) {
+            attackerId.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue, attackerComponent, defenderComponent, state);
+            logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", attackerId.EntityName, xpValueComponent.XPValue);
           }
 
           LogAttack(attacker, defender, defenderComponent, logMessage, state);
           ResolveAction(new DestroyAction(defender.EntityId), state);
         } else {
-          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage! ({3}% chance to hit)",
-            attacker.EntityName, defender.EntityName, weaponDamage, attackReport.Item1);
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} HP damage and {3} footing damage! ({4}% chance to hit)",
+            attacker.EntityName, defender.EntityName, weaponDamage, shieldedByFooting, attackReport.Item1);
             LogAttack(attacker, defender, defenderComponent, logMessage, state);
+        }
+
+        // Finally, assign player prestige
+        if (isPlayer && killed) {
+          attacker.GetComponent<PlayerComponent>().AddPrestige(5);
+          var logMessage = string.Format("Your allies witness you slaying the [b]{0}[/b]. [b]You gain 5 prestige![/b]", defender.EntityName);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
+        } else if (isPlayer && hit) {
+          attacker.GetComponent<PlayerComponent>().AddPrestige(1);
+          var logMessage = string.Format("Your allies will remember that injured the [b]{0}[/b]. [b]You gain 1 prestige![/b]", defender.EntityName);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
         }
       }
       return true;

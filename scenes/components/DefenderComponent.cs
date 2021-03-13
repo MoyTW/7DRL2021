@@ -13,7 +13,7 @@ namespace SpaceDodgeRL.scenes.components {
     // Right now we don't do defense buffs, but we could later!
     public int Defense { get => this.BaseDR; }
 
-    [JsonInclude] public int MaxHp { get; private set; }
+    [JsonInclude] public int MaxHp { get; set; }
     [JsonInclude] public int CurrentHp { get; private set; }
 
     /**

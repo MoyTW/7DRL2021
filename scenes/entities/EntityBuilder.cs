@@ -290,7 +290,7 @@ namespace SpaceDodgeRL.scenes.entities {
     }
 
     public static Entity CreatePlayerEntity(int currentTick) {
-      var e = CreateEntity(Guid.NewGuid().ToString(), "player");
+      var e = CreateEntity(Guid.NewGuid().ToString(), "You");
 
       // TODO: modify PlayerAIComponent to it doesn't, you know...need these.
       e.AddComponent(new PlayerAIComponent());
@@ -300,9 +300,9 @@ namespace SpaceDodgeRL.scenes.entities {
       var statusEffectTrackerComponent = StatusEffectTrackerComponent.Create();
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, power: 500, meleeAttack: 9999, rangedAttack: 10)); // TODO: make player not Ares
+      e.AddComponent(AttackerComponent.Create(e.EntityId, power: 8, meleeAttack: 55, rangedAttack: 10)); // TODO: make player not Ares
       e.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: false));
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 100, maxFooting: 100, meleeDefense: 45, rangedDefense: 60, isInvincible: false));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 70, maxFooting: 95, meleeDefense: 30, rangedDefense: 60, isInvincible: false));
       e.AddComponent(DisplayComponent.Create(_texPlayerPath, "It's you!", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(FactionName.PLAYER));
       e.AddComponent(InventoryComponent.Create(inventorySize: 26));

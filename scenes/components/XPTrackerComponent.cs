@@ -73,7 +73,8 @@ namespace SpaceDodgeRL.scenes.components {
       }
 
       if (levelledUp) {
-        state.LogMessage("[b]You've levelled up![/b] You gain +5 to maximum footing and +2 to attack and defense!");
+        state.LogMessage("[b]You've levelled up![/b] You gain +5 to maximum HP and footing and +2 to attack and defense!");
+        defender.MaxHp += 5;
         attacker.MeleeAttack += 2;
         defender.MeleeDefense += 2;
         defender.MaxFooting += 5;
