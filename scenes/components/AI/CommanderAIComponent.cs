@@ -67,7 +67,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
       // Given a target lane, get the closest unit, and advance to its center
       var closestUnroutedEnemy = state.DeploymentInfo.Lanes[targetLane]
         .UnitsForFaction(unit.UnitFaction.Opposite())
-        .First((u) => state.GetUnit((u.UnitId)).StandingOrder != UnitOrder.ROUT);
+        .Last((u) => state.GetUnit((u.UnitId)).StandingOrder != UnitOrder.ROUT);
       var enemyPos = state.GetUnit(closestUnroutedEnemy.UnitId).AveragePosition;
       var vectorToEnemy = AIUtils.VectorFromCenterRotated(unit.AveragePosition, enemyPos.X, enemyPos.Y, unit.UnitFacing);
       var stepsBehind = vectorToEnemy.Item2;
@@ -78,15 +78,25 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
       // Order unit to reform perpendicular to the enemy line
       // var triggerStepsPlusFive = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + stepsBehind + 5);
+      var oldFacing = unit.UnitFacing;
       var newFacing = vectorToEnemy.Item1 < 0 ? unit.UnitFacing.LeftOf() : unit.UnitFacing.RightOf();
-      unit.RallyPoint = AIUtils.RotateAndProject(unit.AveragePosition, 0, -1 * stepsBehind - 10, unit.UnitFacing);;
+      unit.RallyPoint = AIUtils.RotateAndProject(unit.AveragePosition, 0, -1 * stepsBehind - 25, unit.UnitFacing);;
       unit.UnitFacing = newFacing;
       unit.StandingOrder = UnitOrder.REFORM;
       
       // Order unit to advance after wheeling
-      var triggerStepsPlus15 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 25);
-      var sweepOrder = new TriggeredOrder(triggerStepsPlus15, new Order(unit.UnitId, OrderType.ADVANCE));
-      return new List<TriggeredOrder>() { sweepOrder };
+      var triggerStepsPlus40 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 40);
+      var sweepOrder = new TriggeredOrder(triggerStepsPlus40, new Order(unit.UnitId, OrderType.ADVANCE));
+
+      // Order unit to face back of enemy
+      var triggerStepsPlus60 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 60);
+      var reposition = new TriggeredOrder(triggerStepsPlus60, new Order(unit.UnitId, OrderType.ROTATE_AND_REFORM, newFacing: oldFacing.Opposite()));
+
+      // Order unit to finally advance
+      var triggerStepsPlus80 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 80);
+      var advance = new TriggeredOrder(triggerStepsPlus80, new Order(unit.UnitId, OrderType.ADVANCE));
+
+      return new List<TriggeredOrder>() { sweepOrder, reposition, advance };
     }
   }
 
