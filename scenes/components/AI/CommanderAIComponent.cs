@@ -36,11 +36,6 @@ namespace SpaceDodgeRL.scenes.components.AI {
           closestLane = lane;
         }
       }
-      /* // I don't know how this happens
-      if (closestLane == null) {
-        GD.PrintErr("ClosestLane=null in ExecutePREPARE_SWEEP_NEXT_LANE!");
-        return null;
-      } */
       
       // Find a target lane
       int targetLane = -1;
@@ -64,7 +59,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
           break;
         }
       }
-      GD.Print("IN PREPPING NO OTHER LANE FOUND!");
+      GD.Print("CHOSEN LANE: ", targetLane);
       if (targetLane == -1) {
         return null;
       }
@@ -75,21 +70,23 @@ namespace SpaceDodgeRL.scenes.components.AI {
         .First((u) => state.GetUnit((u.UnitId)).StandingOrder != UnitOrder.ROUT);
       var enemyPos = state.GetUnit(closestUnroutedEnemy.UnitId).AveragePosition;
       var vectorToEnemy = AIUtils.VectorFromCenterRotated(unit.AveragePosition, enemyPos.X, enemyPos.Y, unit.UnitFacing);
-      var stepsBehind = -1 * vectorToEnemy.Item2;
-      GD.Print("UNIT IS BEHIND THE ENEMY UNIT BY: ", stepsBehind, " unit pos: ", unit.AveragePosition, " enemy pos: ", enemyPos);
+      var stepsBehind = vectorToEnemy.Item2;
+      GD.Print("UNIT IS BEHIND THE ENEMY UNIT BY: ", stepsBehind, " unit pos: ", unit.AveragePosition, " enemy pos: ", enemyPos, "facing: ", unit.UnitFacing);
 
       // Order unit to march steps + 5
-      unit.StandingOrder = UnitOrder.ADVANCE;
+      // unit.StandingOrder = UnitOrder.ADVANCE;
 
-      // Order unit to wheel once it reaches the target point
-      var triggerStepsPlusFive = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + stepsBehind + 5);
+      // Order unit to reform perpendicular to the enemy line
+      // var triggerStepsPlusFive = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + stepsBehind + 5);
       var newFacing = vectorToEnemy.Item1 < 0 ? unit.UnitFacing.LeftOf() : unit.UnitFacing.RightOf();
-      var wheelOrder = new TriggeredOrder(triggerStepsPlusFive, new Order(unit.UnitId, OrderType.ROTATE_AND_REFORM, newFacing));
-
+      unit.RallyPoint = AIUtils.RotateAndProject(unit.AveragePosition, 0, -1 * stepsBehind - 10, unit.UnitFacing);;
+      unit.UnitFacing = newFacing;
+      unit.StandingOrder = UnitOrder.REFORM;
+      
       // Order unit to advance after wheeling
       var triggerStepsPlus15 = new OrderTrigger(OrderTriggerType.ACTIVATE_ON_OR_AFTER_TURN, false, activateOnTurn: state.CurrentTurn + Math.Max(0, stepsBehind) + 25);
       var sweepOrder = new TriggeredOrder(triggerStepsPlus15, new Order(unit.UnitId, OrderType.ADVANCE));
-      return new List<TriggeredOrder>() { wheelOrder, sweepOrder };
+      return new List<TriggeredOrder>() { sweepOrder };
     }
   }
 
