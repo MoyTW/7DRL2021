@@ -100,17 +100,17 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
         // We don't allow underflow damage, though that could be a pretty comical mechanic...
         int weaponDamage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
         int shieldedByFooting = (int)Math.Floor(weaponDamage * defenderComponent.PercentageFooting);
-        int damage = weaponDamage - shieldedByFooting;
+        int hpDamage = weaponDamage - shieldedByFooting;
         int footingDamage = shieldedByFooting * 3;
 
         hit = true;
-        defenderComponent.RemoveHp(damage);
+        defenderComponent.RemoveHp(hpDamage);
         defenderComponent.RemoveFooting(footingDamage);
 
         if (defenderComponent.CurrentHp <= 0) {
           killed = true;
           var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, killing it! ({3}% chance to hit)",
-            attacker.EntityName, defender.EntityName, weaponDamage, attackReport.Item1);
+            attacker.EntityName, defender.EntityName, hpDamage, attackReport.Item1);
 
           // Assign XP to the entity that fired the projectile
           var attackerId = state.GetEntityById(attackerComponent.SourceEntityId);
@@ -124,7 +124,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           ResolveAction(new DestroyAction(defender.EntityId), state);
         } else {
           var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} HP damage and {3} footing damage! ({4}% chance to hit)",
-            attacker.EntityName, defender.EntityName, weaponDamage, shieldedByFooting, attackReport.Item1);
+            attacker.EntityName, defender.EntityName, hpDamage, shieldedByFooting, attackReport.Item1);
             LogAttack(attacker, defender, defenderComponent, logMessage, state);
         }
 
