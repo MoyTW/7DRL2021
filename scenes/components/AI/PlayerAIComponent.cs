@@ -168,20 +168,27 @@ namespace SpaceDodgeRL.scenes.components.AI {
             return HandleMoveCommand(state, actionMapping);
           }
         } else if (actionMapping == AUTOPILOT) {
+          var playerComponent = state.Player.GetComponent<PlayerComponent>();
+
           var actions = AIUtils.ActionsForUnitAdvanceInLine(state, parent, unit);
-          // Check the stating autopilot
-          if (AIUtils.AdjacentHostiles(state, FactionName.PLAYER, parent.GetComponent<PositionComponent>().EncounterPosition).Count > 0) {
-            state.Player.GetComponent<PlayerComponent>().StartOfLevel = false;
-            return null;
-          }
-          foreach (var action in actions) {
-            if (action.ActionType == ActionType.MOVE) {
-              if (AIUtils.AdjacentHostiles(state, FactionName.PLAYER, ((MoveAction)action).TargetPosition).Count > 0) {
-                state.Player.GetComponent<PlayerComponent>().StartOfLevel = false;
-                return null;
+
+          // Termination for startoflevel
+          if (playerComponent.StartOfLevel) {
+            var anyHostilesAdjacent = AIUtils.AdjacentHostiles(state, FactionName.PLAYER, parent.GetComponent<PositionComponent>().EncounterPosition).Count > 0;
+            if (anyHostilesAdjacent) {
+              state.Player.GetComponent<PlayerComponent>().StartOfLevel = false;
+              return null;
+            }
+            foreach (var action in actions) {
+              if (action.ActionType == ActionType.MOVE) {
+                if (AIUtils.AdjacentHostiles(state, FactionName.PLAYER, ((MoveAction)action).TargetPosition).Count > 0) {
+                  state.Player.GetComponent<PlayerComponent>().StartOfLevel = false;
+                  return null;
+                }
               }
             }
           }
+
           return actions;
         } else {
           return null;
