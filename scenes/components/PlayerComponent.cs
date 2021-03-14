@@ -26,7 +26,7 @@ namespace SpaceDodgeRL.scenes.components {
     [JsonInclude] public bool SeenIntroFormUp { get; set; }
     [JsonInclude] public bool SeenIntroBattle { get; set; }
     [JsonInclude] public bool StartOfLevel { get; set; }
-    [JsonInclude] public bool IsInFormation { get; private set; }
+    [JsonInclude] public bool IsInFormation { get; set; }
     [JsonIgnore] public int Prestige { get {
       return this._PrestigeBySource.Values.Sum();
     } }
@@ -54,11 +54,6 @@ namespace SpaceDodgeRL.scenes.components {
       component.PilaRange = pilaRange;
 
       return component;
-    }
-
-    public void JoinFormation(EncounterState state, Entity parent) {
-      this.IsInFormation = true;
-      state.GetUnit(parent.GetComponent<UnitComponent>().UnitId).NotifyEntityRallied(parent);
     }
 
     public void LeaveFormation(EncounterState state, Entity parent) {

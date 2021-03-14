@@ -116,6 +116,26 @@ namespace SpaceDodgeRL.scenes.encounter {
       { InputHandler.ActionMapping.CLAIM_VICTORY, HandleClaimVictoryAction },
     };
 
+    private static void PlayerJoinNewUnit(EncounterState state, EncounterRunner runner, InputHandler.InputAction action) {
+      var parent = state.Player;
+      var playerComponent = parent.GetComponent<PlayerComponent>();
+      
+      var friendlyUnroutedUnits = state.GetUnitsOfFaction(FactionName.PLAYER).Where((u) => u.StandingOrder != UnitOrder.ROUT);
+      var playerPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+      Unit unit = null;
+      foreach (var friendlyUnit in friendlyUnroutedUnits) {
+        if (friendlyUnit.AveragePosition.DistanceTo(playerPos) < 5) {
+          unit = friendlyUnit;
+        }
+      }
+      if (unit != null) {
+        playerComponent.AddPrestige(5, state, "Your allies recognize that you rejoined the fight, even after your unit fled. [b]You gained 5 prestige![/b]", PrestigeSource.BREAKING_FORMATION);
+        EncounterStateBuilder.AddPlayerToUnit(parent, unit, unit.OriginalUnitStrength);
+        unit.RegisterBattleReadyEntity(parent);
+        playerComponent.IsInFormation = true;
+      }
+    }
+
     private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> FreeMovementActionMappingToActionDict =
       new Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>>()
     {
@@ -128,6 +148,7 @@ namespace SpaceDodgeRL.scenes.encounter {
       { InputHandler.ActionMapping.MOVE_W, (s, r, a) => r.PlayerMove(s, -1, 0) },
       { InputHandler.ActionMapping.MOVE_NW, (s, r, a) => r.PlayerMove(s, -1, -1) },
       { InputHandler.ActionMapping.WAIT, (s, r, a) => r.PlayerWait(s) },
+      { InputHandler.ActionMapping.LEAVE_FORMATION, PlayerJoinNewUnit }
     };
 
     private void RunTurn(EncounterState state, InputHandler inputHandler) {

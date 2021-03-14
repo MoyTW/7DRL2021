@@ -5,6 +5,7 @@ using SpaceDodgeRL.scenes.encounter.state;
 using SpaceDodgeRL.scenes.entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace SpaceDodgeRL.scenes.components.AI {

@@ -456,7 +456,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
           this.RunStatus != EncounterState.RUN_STATUS_ARMY_VICTORY) {
         playerComponent.AddPrestige(-50, this, "You have fled the battlefield in disgrace! [b]You lose 50 prestige.[/b]", PrestigeSource.FLEEING);
       }
-      playerComponent.JoinFormation(this, this.Player);
+      playerComponent.LeaveFormation(this, this.Player);
       this.ResetStateForNewLevel(this.Player, this.DungeonLevel + 1);
       this.WriteToFile();
     }

@@ -67,7 +67,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       commanderAIComponent.RegisterTriggeredOrder(laneClearTrigger, new Order(unit.UnitId, OrderType.PREPARE_SWEEP_NEXT_LANE));
     }
 
-    private static void AddPlayerToUnit(Entity player, Unit unit, int formationNumber) {
+    public static void AddPlayerToUnit(Entity player, Unit unit, int formationNumber) {
       var oldUnitComponent = player.GetComponent<UnitComponent>();
       if (oldUnitComponent != null) {
         player.RemoveComponent(oldUnitComponent);
