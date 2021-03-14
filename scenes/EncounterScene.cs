@@ -146,10 +146,12 @@ namespace SpaceDodgeRL.scenes {
               newUnit = friendlyUnit;
             }
           }
-          if (newUnit == null) {
-            formationText.Text = String.Format("You are not in formation.\nYou can rejoin the battle by approaching the center of another friendly unit and pressing X!");
+          if (friendlyUnroutedUnits.Count() == 0) {
+            formationText.Text = String.Format("You are not in formation.\nNo other units are present on the field.\nYou should run now.");
+          } else if (newUnit == null) {
+            formationText.Text = String.Format("You are not in formation.\nYou can rejoin the battle by approaching the center of another friendly unit and pressing x.");
           } else {
-            formationText.Text = String.Format("You are not in formation.\nYou are close to the center of a friendly unit!\nPress X to rejoin the battle!");
+            formationText.Text = String.Format("You are not in formation.\nYou are close to the center of a friendly unit!\nPress x to rejoin the battle!");
           }
       }
     }

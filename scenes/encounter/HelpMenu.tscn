@@ -43,7 +43,7 @@ size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
 margin_right = 1268.0
-margin_bottom = 1780.0
+margin_bottom = 2052.0
 size_flags_horizontal = 3
 custom_constants/separation = 0
 
@@ -67,7 +67,7 @@ custom_fonts/font = ExtResource( 7 )
 text = "Movement: Numpad 1-4 & 4-8, or YUBNHJKL
 Rotate: r
 Wait / Restore Footing (Space, Numpad 5)
-Flee formation: x
+Flee/Join formation: x
 Zoom In: -, Zoom Out: +, Reset Zoom: Backspace
 Escape Menu: Escape, Help Menu: ?
 "
@@ -87,7 +87,7 @@ align = 1
 [node name="TitleLabel4" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
 margin_top = 315.0
 margin_right = 1268.0
-margin_bottom = 924.0
+margin_bottom = 958.0
 size_flags_horizontal = 3
 theme = ExtResource( 2 )
 custom_styles/normal = ExtResource( 5 )
@@ -96,9 +96,10 @@ text = "The goal of the game is to survive the campaign with as much prestige as
 
 +25: Participate in a winning battle
 +5: Defeat an enemy in battle
++5: Rejoin a formation (hitting x when not in formation)
 +1: Land a blow on an enemy in battle
 -2: Rotate to the back of the line (hitting r)
--10: Break formation (hitting x)
+-10: Break formation (hitting x when in formation)
 -50: Leaving the battlefield before your army is defeated
 
 You do NOT lose score if your unit is routed. If your unit is routed, the formation breaks and you are considered out of formation and cannot fight, but as you did not intentionally break formation there is not penalty.
@@ -110,9 +111,9 @@ align = 1
 autowrap = true
 
 [node name="TitleLabel8" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
-margin_top = 924.0
+margin_top = 958.0
 margin_right = 1268.0
-margin_bottom = 964.0
+margin_bottom = 998.0
 theme = ExtResource( 2 )
 custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = ExtResource( 1 )
@@ -120,24 +121,28 @@ text = "Fighting In Formation"
 align = 1
 
 [node name="FormationText" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
-margin_top = 964.0
+margin_top = 998.0
 margin_right = 1268.0
-margin_bottom = 1233.0
+margin_bottom = 1505.0
 size_flags_horizontal = 3
 theme = ExtResource( 2 )
 custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = ExtResource( 7 )
 text = "While in formation, you can only do actions that will keep you in formation. That means you can only move forwards or to your sides, rotate backwards, or wait. If you fall too far behind your formation, you will only be allowed to move forwards.
 
-You can break formation at any time, but it will cost you some prestige. Once you have broken formation you can move freely, even through allies and enemies, but cannot fight. You cannot rejoin a formation once broken.
+You can break formation at any time, but it will cost you some prestige. Once you have broken formation you can move freely, even through allies and enemies, but cannot fight. 
+
+If your unit routs, you will automatically be ejected from the formation (as a routing unit has no formation).
+
+You can rejoin a formation or join a different unit's formation by approaching its center and pressing x. The screen overlay text will tell you when you are close enough.
 "
 align = 1
 autowrap = true
 
 [node name="TitleLabel6" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
-margin_top = 1233.0
+margin_top = 1505.0
 margin_right = 1268.0
-margin_bottom = 1273.0
+margin_bottom = 1545.0
 theme = ExtResource( 2 )
 custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = ExtResource( 1 )
@@ -145,9 +150,9 @@ text = "Combat Mechanics"
 align = 1
 
 [node name="TitleLabel7" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
-margin_top = 1273.0
+margin_top = 1545.0
 margin_right = 1268.0
-margin_bottom = 1780.0
+margin_bottom = 2052.0
 size_flags_horizontal = 3
 theme = ExtResource( 2 )
 custom_styles/normal = ExtResource( 5 )
