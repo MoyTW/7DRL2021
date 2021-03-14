@@ -125,7 +125,6 @@ namespace SpaceDodgeRL.scenes {
         }
       } else if (@event is InputEventKey) {
         GetNode<Sprite>("MovementIndicator").Hide();
-        Input.SetMouseMode(Input.MouseMode.Hidden);
       }
     }
 

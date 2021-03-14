@@ -18,7 +18,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           this._lastHovered.GrabFocus();
         }
       } else if (@event is InputEventKey && Input.GetMouseMode() == Input.MouseMode.Visible) {
-        Input.SetMouseMode(Input.MouseMode.Hidden);
         if (this.GetFocusOwner() == null && this._lastHovered != null) {
           this._lastHovered.GrabFocus();
         } else if (this.GetFocusOwner() == null && this._lastHovered == null) {
