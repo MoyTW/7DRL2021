@@ -86,7 +86,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
 
         var attackReport = AttackHits(state.EncounterRand, attackerComponent.MeleeAttack, attackerDefenderComponent.FootingPenalty,
           defenderComponent.MeleeDefense, defenderComponent.FootingPenalty);
-        attackerDefenderComponent.NotifyParentHasAttacked();
+        attackerDefenderComponent.NotifyParentHasAttacked(opportunity: false);
         if (!attackReport.Item3) {
           var logMessage = string.Format("[b]{0}[/b] attacks [b]{1}[/b], but misses! ({2}% chance to hit)",
             attacker.EntityName, defender.EntityName, attackReport.Item1);
@@ -121,7 +121,77 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           ResolveAction(new DestroyAction(defender.EntityId), state);
         } else {
           var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} HP damage and {3} footing damage! ({4}% chance to hit)",
-            attacker.EntityName, defender.EntityName, hpDamage, shieldedByFooting, attackReport.Item1);
+            attacker.EntityName, defender.EntityName, hpDamage, footingDamage, attackReport.Item1);
+            LogAttack(attacker, defender, defenderComponent, logMessage, state);
+        }
+
+        // Finally, assign player prestige
+        if (isPlayer && killed) {
+          var logMessage = string.Format("Your allies witness you slaying the [b]{0}[/b]. [b]You gain 5 prestige![/b]", defender.EntityName);
+          attacker.GetComponent<PlayerComponent>().AddPrestige(5, state, logMessage, PrestigeSource.DEFEATING_FOES);
+        } else if (isPlayer && hit) {
+          var logMessage = string.Format("Your allies will remember that injured the [b]{0}[/b]. [b]You gain 1 prestige![/b]", defender.EntityName);
+          attacker.GetComponent<PlayerComponent>().AddPrestige(1, state, logMessage, PrestigeSource.LANDING_HITS);
+        }
+      }
+      return true;
+    }
+
+    private static bool ResolveAttackOfOpportunity(MeleeAttackAction action, EncounterState state) {
+      Entity attacker = state.GetEntityById(action.ActorId);
+      Entity defender = action.TargetEntity;
+
+      var attackerComponent = attacker.GetComponent<AttackerComponent>();
+      var attackerDefenderComponent = attacker.GetComponent<DefenderComponent>();
+      var defenderComponent = defender.GetComponent<DefenderComponent>();
+
+      if(defenderComponent.IsInvincible) {
+        var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b], but the attack has no effect!",
+          attacker.EntityName, defender.EntityName);
+        LogAttack(attacker, defender, defenderComponent, logMessage, state);
+      } else {
+        bool isPlayer = attacker == state.Player;
+        bool hit = false;
+        bool killed = false;
+
+        var attackReport = AttackHits(state.EncounterRand, attackerComponent.MeleeAttack - 15, attackerDefenderComponent.FootingPenalty,
+          defenderComponent.MeleeDefense, defenderComponent.FootingPenalty);
+        attackerDefenderComponent.NotifyParentHasAttacked(opportunity: true);
+        if (!attackReport.Item3) {
+          var logMessage = string.Format("[b]{0}[/b] attacks [b]{1}[/b] with an attack of opportunity, but misses! ({2}% chance to hit)",
+            attacker.EntityName, defender.EntityName, attackReport.Item1);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
+          return true;
+        }
+
+        // We don't allow underflow damage, though that could be a pretty comical mechanic...
+        int weaponDamage = Math.Max(0, Mathf.CeilToInt((float)attackerComponent.Power * (float)3 / (float)2)  - defenderComponent.Defense);
+        int shieldedByFooting = (int)Math.Floor(weaponDamage * defenderComponent.PercentageFooting);
+        int hpDamage = weaponDamage - shieldedByFooting;
+        int footingDamage = shieldedByFooting * 3;
+
+        hit = true;
+        defenderComponent.RemoveHp(hpDamage);
+        defenderComponent.RemoveFooting(footingDamage);
+
+        if (defenderComponent.CurrentHp <= 0) {
+          killed = true;
+          var logMessage = string.Format("[b]{0}[/b] hits with an attack of opportunity [b]{1}[/b] for {2} damage, killing it! ({3}% chance to hit)",
+            attacker.EntityName, defender.EntityName, hpDamage, attackReport.Item1);
+
+          // Assign XP to the entity that fired the projectile
+          var attackerId = state.GetEntityById(attackerComponent.SourceEntityId);
+          var xpValueComponent = defender.GetComponent<XPValueComponent>();
+          if (attackerId != null && xpValueComponent != null && attackerId.GetComponent<XPTrackerComponent>() != null) {
+            attackerId.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue, attackerComponent, defenderComponent, state);
+            logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", attackerId.EntityName, xpValueComponent.XPValue);
+          }
+
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
+          ResolveAction(new DestroyAction(defender.EntityId), state);
+        } else {
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] with an attack of opportunity for {2} HP damage and {3} footing damage! ({4}% chance to hit)",
+            attacker.EntityName, defender.EntityName, hpDamage, footingDamage, attackReport.Item1);
             LogAttack(attacker, defender, defenderComponent, logMessage, state);
         }
 
@@ -150,23 +220,38 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       if (positionComponent.EncounterPosition == action.TargetPosition) {
         GD.PrintErr(string.Format("Entity {0}:{1} tried to move to its current position {2}", actor.EntityName, actor.EntityId, action.TargetPosition));
         return false;
-      } else {
-        state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: false);
-        var unitComponent = actor.GetComponent<UnitComponent>();
-        if (unitComponent != null) {
-          state.GetUnit(unitComponent.UnitId).NotifyEntityMoved(oldPosition, action.TargetPosition);
-        }
-        // If you go into the retreat zone you insta-die
-        if (IsInRetreatZone(state, action.TargetPosition)) {
-          if (actor.GetComponent<PlayerComponent>() != null) {
-            state.NotifyPlayerRetreat();
-            return false;
-          } else {
-            ResolveAction(new DestroyAction(action.ActorId), state);
+      }
+
+      // If you have less 100% footing, provoke attacks of opportunity from adjacent enemies to old square
+      var defenderComponent = actor.GetComponent<DefenderComponent>();
+      if (defenderComponent != null && defenderComponent.CurrentFooting != defenderComponent.MaxFooting) {
+        var hostiles = AIUtils.AdjacentHostiles(state, actor.GetComponent<FactionComponent>().Faction, oldPosition);
+        foreach (var hostile in hostiles) {
+          if (actor.GetComponent<PositionComponent>() != null) {
+            ResolveAttackOfOpportunity(new MeleeAttackAction(hostile.EntityId, actor), state);
           }
         }
+      }
+      var isStillOnMap = actor.GetComponent<PositionComponent>();
+      if (isStillOnMap == null) {
         return true;
       }
+
+      state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: false);
+      var unitComponent = actor.GetComponent<UnitComponent>();
+      if (unitComponent != null) {
+        state.GetUnit(unitComponent.UnitId).NotifyEntityMoved(oldPosition, action.TargetPosition);
+      }
+      // If you go into the retreat zone you insta-die
+      if (IsInRetreatZone(state, action.TargetPosition)) {
+        if (actor.GetComponent<PlayerComponent>() != null) {
+          state.NotifyPlayerRetreat();
+          return false;
+        } else {
+          ResolveAction(new DestroyAction(action.ActorId), state);
+        }
+      }
+      return true;
     }
 
     private static bool ResolveOnDeathEffect(DestroyAction action, string effectType, EncounterState state) {

@@ -107,8 +107,10 @@ namespace SpaceDodgeRL.scenes.components {
       this.CurrentHp -= hp;
     }
 
-    public void NotifyParentHasAttacked() {
-      this.CurrentFooting -= 5;
+    public void NotifyParentHasAttacked(bool opportunity) {
+      if (!opportunity) {
+        this.CurrentFooting -= 5;
+      }
     }
 
     public void RemoveFooting(int footing) {
