@@ -155,8 +155,8 @@ namespace SpaceDodgeRL.scenes.components {
     public void PlaySpeechBubble(string speech) {
       var timer = GetNode<Timer>("SpeechBubbleTimer");
       if (timer.IsStopped()) {
-        var bubble = GetNode<NinePatchRect>("Sprite/NinePatchRect");
-        var speechLabel = GetNode<Label>("Sprite/NinePatchRect/SpeechLabel");
+        var bubble = GetNode<NinePatchRect>("Sprite/Node2D/NinePatchRect");
+        var speechLabel = GetNode<Label>("Sprite/Node2D/NinePatchRect/SpeechLabel");
         speechLabel.Text = speech;
         var newSize = new Vector2(10, speechLabel.RectSize.y);
         speechLabel.RectSize = newSize;
@@ -167,7 +167,7 @@ namespace SpaceDodgeRL.scenes.components {
     }
 
     private void OnSpeechBubbleTimerTimeout() {
-      var bubble = GetNode<NinePatchRect>("Sprite/NinePatchRect");
+      var bubble = GetNode<NinePatchRect>("Sprite/Node2D/NinePatchRect");
       bubble.Hide();
       var timer = GetNode<Timer>("SpeechBubbleTimer");
       timer.Stop();

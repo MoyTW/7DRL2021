@@ -75,7 +75,7 @@ namespace SpaceDodgeRL.scenes.components.AI {
 
       if (unit.StandingOrder == UnitOrder.REFORM) {
         if (state.CurrentTurn < EncounterStateBuilder.ADVANCE_AT_TURN) {
-            if (state.EncounterRand.Next(200) == 0) {
+            if (state.EncounterRand.Next(750) == 0) {
               parent.GetComponent<PositionComponent>().PlaySpeechBubble(Quips[state.EncounterRand.Next(Quips.Length)]);
             }
           }
