@@ -54,7 +54,7 @@ size_flags_horizontal = 3
 custom_styles/normal = ExtResource( 5 )
 custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
-text = "Flee Formation (x)"
+text = "Toggle Formtn (x)"
 
 [node name="WaitButton" type="Button" parent="VBoxContainer/TopButtonBar"]
 margin_left = 416.0

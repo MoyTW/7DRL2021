@@ -134,6 +134,23 @@ namespace SpaceDodgeRL.scenes {
 
           formationText.Text = String.Format("{0}\nApproved Moves: {1}\n{2}", actionText, String.Join(", ", moveStrings), String.Join(" ", nonMoveStrings));
         }
+      } else {
+          var formationText = this.GetNode<Label>("CanvasLayer/FormationText");
+          formationText.Show();
+
+          var friendlyUnroutedUnits = this.EncounterState.GetUnitsOfFaction(FactionName.PLAYER).Where((u) => u.StandingOrder != UnitOrder.ROUT);
+          var playerPos = player.GetComponent<PositionComponent>().EncounterPosition;
+          Unit newUnit = null;
+          foreach (var friendlyUnit in friendlyUnroutedUnits) {
+            if (friendlyUnit.AveragePosition.DistanceTo(playerPos) < 5) {
+              newUnit = friendlyUnit;
+            }
+          }
+          if (newUnit == null) {
+            formationText.Text = String.Format("You are not in formation.\nYou can rejoin the battle by approaching the center of another friendly unit and pressing X!");
+          } else {
+            formationText.Text = String.Format("You are not in formation.\nYou are close to the center of a friendly unit!\nPress X to rejoin the battle!");
+          }
       }
     }
 
