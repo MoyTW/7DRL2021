@@ -227,7 +227,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       var commanderAI = CreateAndPlaceCommander(state);
 
-      var numLanes = seededRand.Next(2) + 1;
+      var numLanes = seededRand.Next(4) + 1;
       var deploymentInfo = DeploymentInfo.Create(width, height, seededRand, numLanes);
       state.DeploymentInfo = deploymentInfo;
 
