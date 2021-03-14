@@ -59,9 +59,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: 50, rangedAttack: 30));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 50, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 45, maxFooting: 80, meleeDefense: 10, rangedDefense: 25));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 30, maxFooting: 80, meleeDefense: 10, rangedDefense: 25));
       e.AddComponent(DisplayComponent.Create(_texHastatusPath, "A young and eager soldier.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -85,9 +85,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 55, rangedAttack: 30));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 55, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 65, maxFooting: 100, meleeDefense: 15, rangedDefense: 30));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 3, maxHp: 40, maxFooting: 100, meleeDefense: 15, rangedDefense: 30));
       e.AddComponent(DisplayComponent.Create(_texPrincepsPath, "An experienced swordsman with good equipment.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -111,9 +111,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, startingMorale));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 70, rangedAttack: 30));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 10, meleeAttack: 70, rangedAttack: 30));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 3, maxHp: 85, maxFooting: 120, meleeDefense: 30, rangedDefense: 45));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 3, maxHp: 50, maxFooting: 120, meleeDefense: 30, rangedDefense: 45));
       e.AddComponent(DisplayComponent.Create(_texTriariusPath, "An elite spearman of the legion.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -135,9 +135,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 5, meleeAttack: 55, rangedAttack: 10));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 6, meleeAttack: 55, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 1, maxHp: 40, maxFooting: 75, meleeDefense: 15, rangedDefense: 5));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 1, maxHp: 25, maxFooting: 75, meleeDefense: 15, rangedDefense: 5));
       e.AddComponent(DisplayComponent.Create(_texIberianLightInfantryPath, "A fast, deatly, and barely armored Iberian swordsman.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -160,9 +160,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 45, rangedAttack: 10));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 9, meleeAttack: 40, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 35, maxFooting: 60, meleeDefense: 25, rangedDefense: 45));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 0, maxHp: 20, maxFooting: 60, meleeDefense: 30, rangedDefense: 45));
       e.AddComponent(DisplayComponent.Create(_texGallicLightInfantryPath, "A fast and strong Gallic soldier. Fights defensively, but hits hard.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -185,9 +185,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 9, meleeAttack: 50, rangedAttack: 10));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 11, meleeAttack: 45, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 55, maxFooting: 110, meleeDefense: 30, rangedDefense: 45));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 30, maxFooting: 110, meleeDefense: 30, rangedDefense: 45));
       e.AddComponent(DisplayComponent.Create(_texGallicVeteranInfantryPath, "An armored Gallic veteran. Fights defensively, but hits hard.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -210,9 +210,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 8, meleeAttack: 55, rangedAttack: 10));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 10, meleeAttack: 55, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 60, maxFooting: 100, meleeDefense: 20, rangedDefense: 35));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 2, maxHp: 40, maxFooting: 100, meleeDefense: 20, rangedDefense: 35));
       e.AddComponent(DisplayComponent.Create(_texPunicVeteranInfantryPath, "Hardened, armored Punic mercenaries.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
@@ -235,9 +235,9 @@ namespace SpaceDodgeRL.scenes.entities {
       e.AddComponent(AIMoraleComponent.Create(100, 90));
 
       e.AddComponent(ActionTimeComponent.Create(currentTick));
-      e.AddComponent(AttackerComponent.Create(e.EntityId, 11, meleeAttack: 55, rangedAttack: 10));
+      e.AddComponent(AttackerComponent.Create(e.EntityId, 14, meleeAttack: 55, rangedAttack: 10));
       e.AddComponent(CollisionComponent.CreateDefaultActor());
-      e.AddComponent(DefenderComponent.Create(baseDefense: 4, maxHp: 80, maxFooting: 140, meleeDefense: 40, rangedDefense: 45));
+      e.AddComponent(DefenderComponent.Create(baseDefense: 4, maxHp: 55, maxFooting: 140, meleeDefense: 40, rangedDefense: 45));
       e.AddComponent(DisplayComponent.Create(_texPunicHeavyInfantryPath, "Carthage's very best heavy infantry.", false, ENTITY_Z_INDEX));
       e.AddComponent(FactionComponent.Create(faction));
       e.AddComponent(OnDeathComponent.Create(new List<string>() { OnDeathEffectType.REMOVE_FROM_UNIT }));
