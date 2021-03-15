@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   public class AttackerComponent : Component {
     public static readonly string ENTITY_GROUP = "ATTACKER_COMPONENT_GROUP";
@@ -10,12 +10,16 @@ namespace SpaceDodgeRL.scenes.components {
 
     [JsonInclude] public string SourceEntityId { get; private set; }
     [JsonInclude] public int Power { get; private set; }
+    [JsonInclude] public int MeleeAttack { get; set; }
+    [JsonInclude] public int RangedAttack { get; private set; }
 
-    public static AttackerComponent Create(string sourceEntityId, int power) {
+    public static AttackerComponent Create(string sourceEntityId, int power, int meleeAttack, int rangedAttack) {
       var component = new AttackerComponent();
 
       component.SourceEntityId = sourceEntityId;
       component.Power = power;
+      component.MeleeAttack = meleeAttack;
+      component.RangedAttack = rangedAttack;
 
       return component;
     }

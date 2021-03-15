@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace SpaceDodgeRL.library {
+namespace MTW7DRL2021.library {
 
   // Shamelessly stolen from Stack Overflow:
   // https://stackoverflow.com/questions/7343465/compression-decompression-string-with-c-sharp

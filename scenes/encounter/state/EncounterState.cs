@@ -1,9 +1,9 @@
 using Godot;
-using SpaceDodgeRL.library;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.library;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 
-namespace SpaceDodgeRL.scenes.encounter.state {
+namespace MTW7DRL2021.scenes.encounter.state {
 
   public class EncounterState : Control {
     private static PackedScene _encounterPrefab = GD.Load<PackedScene>("res://scenes/encounter/state/EncounterState.tscn");
@@ -22,7 +22,9 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     // tiles maybe I will add it back.
     public static int PLAYER_VISION_RADIUS = 12;
     public static int EncounterLogSize = 50;
-    public static string RUN_STATUS_RUNNING = "ENCOUNTER_RUN_STATUS_RUNNING";
+    public static string RUN_STATUS_RUNNING = "Fighting!";
+    public static string RUN_STATUS_ARMY_VICTORY = "Victorious!";
+    public static string RUN_STATUS_ARMY_DEFEAT = "Defeated!";
     public static string RUN_STATUS_PLAYER_VICTORY = "ENCOUNTER_RUN_STATUS_PLAYER_VICTORY";
     public static string RUN_STATUS_PLAYER_DEFEAT = "ENCOUNTER_RUN_STATUS_PLAYER_DEFEAT";
 
@@ -41,15 +43,18 @@ namespace SpaceDodgeRL.scenes.encounter.state {
     public EncounterTile[,] _encounterTiles;
     public int LevelsInDungeon { get => 10; } // TODO: Properly pass this in!
     public int DungeonLevel { get; private set; }
+    public DeploymentInfo DeploymentInfo { get; set; } 
 
     // Entity tracking
     private Dictionary<string, Unit> _unitTracker;
+    private Dictionary<FactionName, List<Unit>> _unitsByFaction = null;
     private Dictionary<string, Entity> _entitiesById;
 
     // Time & runner state
     public string RunStatus { get; private set; }
     private ActionTimeline _actionTimeline;
     public int CurrentTick { get => _actionTimeline.CurrentTick; }
+    public int CurrentTurn { get => Mathf.FloorToInt(_actionTimeline.CurrentTick / 100); }
     public Entity NextEntity { get => _actionTimeline.NextEntity; }
     public Entity Player { get; private set; }
 
@@ -161,6 +166,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       return IsPositionBlocked(position.X, position.Y);
     }
 
+    // TODO: entities can run off the map lol
     public ReadOnlyCollection<Entity> EntitiesAtPosition(int x, int y) {
       if (!IsInBounds(x, y)) {
         throw new NotImplementedException("out of bounds");
@@ -192,7 +198,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
     public void PlaceEntity(Entity entity, EncounterPosition targetPosition, bool ignoreCollision = false) {
       if (!IsInBounds(targetPosition)) {
-        throw new NotImplementedException("out of bounds");
+        throw new NotImplementedException(String.Format("({0}, {1}) out of bounds", targetPosition.X, targetPosition.Y));
       }
       if (!ignoreCollision && IsPositionBlocked(targetPosition)) {
         throw new NotImplementedException("probably handle this more gracefully than exploding");
@@ -200,7 +206,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
 
       // Add the position component
       var spriteData = entity.GetComponent<DisplayComponent>();
-      var positionComponent = PositionComponent.Create(targetPosition, spriteData.TexturePath, spriteData.ZIndex);
+      var positionComponent = PositionComponent.Create(targetPosition, spriteData.TexturePath, spriteData.ZIndex, spriteData.Visible);
       entity.AddComponent(positionComponent);
 
       var entityPosition = positionComponent.EncounterPosition;
@@ -269,26 +275,22 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       return this._unitTracker[unitId];
     }
 
+    public List<Unit> GetUnitsOfFaction(FactionName faction) {
+      if (this._unitsByFaction == null) {
+        this._unitsByFaction = new Dictionary<FactionName, List<Unit>>();
+        foreach (var kvp in this._unitTracker) {
+          if (!this._unitsByFaction.ContainsKey(kvp.Value.UnitFaction)) {
+            this._unitsByFaction[kvp.Value.UnitFaction] = new List<Unit>();
+          }
+          this._unitsByFaction[kvp.Value.UnitFaction].Add(kvp.Value);
+        }
+      }
+      return this._unitsByFaction[faction];
+    }
+
     #endregion
     // ##########################################################################################################################
     #region Display caches
-
-    public void UpdatePlayerOverlays() {
-      var overlaysMap = GetNode<TileMap>("PlayerOverlays");
-      overlaysMap.Clear();
-
-      // Update the range indicator
-      var laserRange = this.Player.GetComponent<PlayerComponent>().CuttingLaserRange;
-      var playerPos = this.Player.GetComponent<PositionComponent>().EncounterPosition;
-      for (int x = playerPos.X - laserRange; x <= playerPos.X + laserRange; x++) {
-        for (int y = playerPos.Y - laserRange; y <= playerPos.Y + laserRange; y++) {
-          var distance = playerPos.DistanceTo(x, y);
-          if (distance <= laserRange && distance > laserRange - 1 && IsInBounds(x, y)) {
-            overlaysMap.SetCell(x, y, 0);
-          }
-        }
-      }
-    }
 
     #endregion
     // ##########################################################################################################################
@@ -349,18 +351,27 @@ namespace SpaceDodgeRL.scenes.encounter.state {
         this.Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(camera);
       }
 
-      // Set the background image - stretch it out so that it covers visible OOB areas too.
-      var background = GetNode<Sprite>("Background");
-      var pixelsWidth = PositionComponent.STEP_X * this.MapWidth + PositionComponent.START_X;
-      var pixelsHeight = PositionComponent.STEP_Y * this.MapWidth + PositionComponent.START_Y;
-      background.Position = new Vector2(pixelsWidth / 2, pixelsHeight / 2);
-      background.RegionEnabled = true;
-      background.RegionRect = new Rect2(new Vector2(0, 0), pixelsWidth * 2, pixelsHeight * 2);
+      // TODO: Set up the TileMap for the terrain
+      
+      var terrainMap = GetNode<TileMap>("MapTiles");
+      terrainMap.Clear();
+
+      // Update the range indicator
+      var mapTilesRand = new Random(1);
+      for (int x = 0; x <= this.MapWidth; x++) {
+        for (int y = 0; y <= this.MapHeight; y++) {
+          // 16 options
+          var selection = mapTilesRand.Next(80);
+          if (selection > 15) {
+            selection = 0;
+          }
+          terrainMap.SetCell(x, y, selection);
+        }
+      }
     }
 
     // TODO: Move into map gen & save/load
     public void ResetStateForNewLevel(Entity player, int dungeonLevel) {
-
       string ENCOUNTER_CAMERA_GROUP = "ENCOUNTER_CAMERA_GROUP";
       // TODO: Rather than re-using a state when we switch levels, I'd rather sub in a new one, but I think I need to think
       // about how that'd work in Godot, since we'd need to do some rewiring and the state has the camera, which is ugh.
@@ -382,7 +393,12 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       this._encounterLog = new List<string>();
       this._entitiesById = new Dictionary<string, Entity>();
       this._unitTracker = new Dictionary<string, Unit>();
-      this.RunStatus = EncounterState.RUN_STATUS_RUNNING;
+      this._unitsByFaction = null;
+      if (dungeonLevel == 10) {
+        this.RunStatus = EncounterState.RUN_STATUS_PLAYER_VICTORY;
+      } else {
+        this.RunStatus = EncounterState.RUN_STATUS_RUNNING;
+      }
       this._actionTimeline = new ActionTimeline(0);
       // We also need to reset the player's action time
       player.GetComponent<ActionTimeComponent>().SetNextTurnAtTo(0);
@@ -404,12 +420,45 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       }
 
       // Populate all our initial caches
-      this.LogMessage(string.Format("Level {0} started!", dungeonLevel));
-      this.UpdatePlayerOverlays();
+      this.LogMessage(string.Format("Battle {0} has commenced!", dungeonLevel));
+      // This is a deeply dumb, possibly redundant hack to get the camera to work properly, not gonna think on it
+      // since it's 7DRL and I'm running outta time
+      if (dungeonLevel > 1) {
+        if (GetTree().GetNodesInGroup(ENCOUNTER_CAMERA_GROUP).Count > 0) {
+          Camera2D cam = (Camera2D)GetTree().GetNodesInGroup("ENCOUNTER_CAMERA_GROUP")[0];
+          cam.Current = true;
+          cam.GetParent().RemoveChild(cam);
+          Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(cam);
+        }
+      }
     }
 
+    // Refers to "manage to not die for 12 battles"
     public void NotifyPlayerVictory() {
       this.RunStatus = EncounterState.RUN_STATUS_PLAYER_VICTORY;
+    }
+
+    // Refers to "army declares victory"
+    public void NotifyArmyVictory() {
+      var playerComponent = this.Player.GetComponent<PlayerComponent>();
+      playerComponent.AddPrestige(25, this, "Your army has routed the foe! [b]You gain 25 prestige.[/b]", PrestigeSource.VICTORIES);
+      this.RunStatus = EncounterState.RUN_STATUS_ARMY_VICTORY;
+    }
+
+    public void NotifyArmyDefeat() {
+      this.RunStatus = EncounterState.RUN_STATUS_ARMY_DEFEAT;
+    }
+
+    public void NotifyPlayerRetreat() {
+      var playerComponent = this.Player.GetComponent<PlayerComponent>();
+      var unit = this.GetUnit(this.Player.GetComponent<UnitComponent>().UnitId);
+      if (this.RunStatus != EncounterState.RUN_STATUS_ARMY_DEFEAT && 
+          this.RunStatus != EncounterState.RUN_STATUS_ARMY_VICTORY) {
+        playerComponent.AddPrestige(-50, this, "You have fled the battlefield in disgrace! [b]You lose 50 prestige.[/b]", PrestigeSource.FLEEING);
+      }
+      playerComponent.LeaveFormation(this, this.Player);
+      this.ResetStateForNewLevel(this.Player, this.DungeonLevel + 1);
+      this.WriteToFile();
     }
 
     public void NotifyPlayerDefeat() {
@@ -430,6 +479,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       public string PlayerId { get; set; }
       public int LevelsInDungeon { get; set; }
       public int DungeonLevel { get; set; }
+      public DeploymentInfo DeploymentInfo { get; set; }
       // For now we're just gonna...not deal with the rand; that's a whole OTHER issue. Probably solution is re-seed every
       // invocation and store the re-seed though. Or we just say "eh we don't care, it can go be random however".
       // public Random EncounterRand { get; private set; }
@@ -485,6 +535,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       state.Player = entitiesById[data.PlayerId];
       // TODO: Dungeon height
       state.DungeonLevel = data.DungeonLevel;
+      state.DeploymentInfo = data.DeploymentInfo;
 
       // TODO: save rand
       state.EncounterRand = new Random(1);
@@ -494,8 +545,6 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       camera.AddToGroup(ENCOUNTER_CAMERA_GROUP);
       camera.Current = true;
       state.Player.GetComponent<PositionComponent>().GetNode<Sprite>("Sprite").AddChild(camera);
-
-      state.UpdatePlayerOverlays();
 
       stopwatch.Stop();
       GD.Print("EncounterState saveData -> EncounterState completed, elapsed time: ", stopwatch.ElapsedMilliseconds);
@@ -544,6 +593,7 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       data.PlayerId = this.Player.EntityId;
       data.LevelsInDungeon = this.LevelsInDungeon;
       data.DungeonLevel = this.DungeonLevel;
+      data.DeploymentInfo = this.DeploymentInfo;
 
       return JsonSerializer.Serialize(data);
     }

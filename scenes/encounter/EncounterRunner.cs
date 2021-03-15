@@ -1,21 +1,23 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.library.encounter.rulebook;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.library.encounter.rulebook;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
+using MTW7DRL2021.scenes.singletons;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
   public class EncounterRunner : Node {
 
     // We use this to determine whether the UI should refresh; this will cause a comical number of UI updates since we'll be
     // sending it every end turn, but I don't want to have to go in and effectively instrument all my state changes to set up
     // "change on data update" changes.
+    [Signal] public delegate void PlayerTurnStarted();
     [Signal] public delegate void TurnEnded();
     [Signal] public delegate void PositionScanned(int x, int y, Entity scannedEntity);
 
@@ -56,7 +58,6 @@ namespace SpaceDodgeRL.scenes.encounter {
 
       // After the player executes their turn we need to update the UI
       EmitSignal(nameof(EncounterRunner.TurnEnded));
-      state.UpdatePlayerOverlays();
     }
 
     private void PlayerMove(EncounterState state, int dx, int dy) {
@@ -79,6 +80,77 @@ namespace SpaceDodgeRL.scenes.encounter {
       return state.NextEntity.IsInGroup(PlayerComponent.ENTITY_GROUP);
     }
 
+    private static void HandleScanAction(EncounterState state, EncounterRunner runner, InputHandler.InputAction action) {
+      var scanAction = action as InputHandler.ScanInputAction;
+      if (!state.IsInBounds(scanAction.X, scanAction.Y)) {
+        return;
+      }
+
+      var blockingEntity = state.BlockingEntityAtPosition(scanAction.X, scanAction.Y);
+      var allEntities = state.EntitiesAtPosition(scanAction.X, scanAction.Y);
+      if (blockingEntity != null) {
+        runner.EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, blockingEntity);
+      } else if (allEntities.Count > 0) {
+        runner.EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, allEntities[0]);
+      } else {
+        runner.EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, null);
+      }
+    }
+
+    private static void HandleClaimVictoryAction(EncounterState state, EncounterRunner runner, InputHandler.InputAction action) {
+      if (state.RunStatus == EncounterState.RUN_STATUS_ARMY_VICTORY) {
+        state.ResetStateForNewLevel(state.Player, state.DungeonLevel + 1);
+        state.WriteToFile();
+      }
+    }
+
+    private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> AlwaysAvaiableActionMappingToActionDict =
+      new Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>>()
+    {
+      { InputHandler.ActionMapping.ESCAPE_MENU, (s, r, a) => r._sceneManager.ShowEscapeMenu(s) },
+      { InputHandler.ActionMapping.HELP_MENU, (s, r, a) => r._sceneManager.ShowHelpMenu() },
+      { InputHandler.ActionMapping.ZOOM_IN, (s, r, a) => s.ZoomIn() },
+      { InputHandler.ActionMapping.ZOOM_OUT, (s, r, a) => s.ZoomOut() },
+      { InputHandler.ActionMapping.ZOOM_RESET, (s, r, a) => s.ZoomReset() },
+      { InputHandler.ActionMapping.SCAN_POSITION, HandleScanAction },
+      { InputHandler.ActionMapping.CLAIM_VICTORY, HandleClaimVictoryAction },
+    };
+
+    private static void PlayerJoinNewUnit(EncounterState state, EncounterRunner runner, InputHandler.InputAction action) {
+      var parent = state.Player;
+      var playerComponent = parent.GetComponent<PlayerComponent>();
+      
+      var friendlyUnroutedUnits = state.GetUnitsOfFaction(FactionName.PLAYER).Where((u) => u.StandingOrder != UnitOrder.ROUT);
+      var playerPos = parent.GetComponent<PositionComponent>().EncounterPosition;
+      Unit unit = null;
+      foreach (var friendlyUnit in friendlyUnroutedUnits) {
+        if (friendlyUnit.AveragePosition.DistanceTo(playerPos) < 5) {
+          unit = friendlyUnit;
+        }
+      }
+      if (unit != null) {
+        playerComponent.AddPrestige(5, state, "Your allies recognize that you rejoined the fight, even after your unit fled. [b]You gained 5 prestige![/b]", PrestigeSource.BREAKING_FORMATION);
+        EncounterStateBuilder.AddPlayerToUnit(parent, unit, unit.OriginalUnitStrength);
+        unit.RegisterBattleReadyEntity(parent);
+        playerComponent.IsInFormation = true;
+      }
+    }
+
+    private static Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>> FreeMovementActionMappingToActionDict =
+      new Dictionary<string, Action<EncounterState, EncounterRunner, InputHandler.InputAction>>()
+    {
+      { InputHandler.ActionMapping.MOVE_N, (s, r, a) => r.PlayerMove(s, 0, -1) },
+      { InputHandler.ActionMapping.MOVE_NE, (s, r, a) => r.PlayerMove(s, 1, -1) },
+      { InputHandler.ActionMapping.MOVE_E, (s, r, a) => r.PlayerMove(s, 1, 0) },
+      { InputHandler.ActionMapping.MOVE_SE, (s, r, a) => r.PlayerMove(s, 1, 1) },
+      { InputHandler.ActionMapping.MOVE_S, (s, r, a) => r.PlayerMove(s, 0, 1) },
+      { InputHandler.ActionMapping.MOVE_SW, (s, r, a) => r.PlayerMove(s, -1, 1) },
+      { InputHandler.ActionMapping.MOVE_W, (s, r, a) => r.PlayerMove(s, -1, 0) },
+      { InputHandler.ActionMapping.MOVE_NW, (s, r, a) => r.PlayerMove(s, -1, -1) },
+      { InputHandler.ActionMapping.WAIT, (s, r, a) => r.PlayerWait(s) },
+      { InputHandler.ActionMapping.LEAVE_FORMATION, PlayerJoinNewUnit }
+    };
+
     private void RunTurn(EncounterState state, InputHandler inputHandler) {
       if (state.RunStatus == EncounterState.RUN_STATUS_PLAYER_DEFEAT) {
         this._sceneManager.ShowDefeatMenu(state);
@@ -92,67 +164,63 @@ namespace SpaceDodgeRL.scenes.encounter {
       var actionTimeComponent = entity.GetComponent<ActionTimeComponent>();
 
       if (entity.IsInGroup(PlayerComponent.ENTITY_GROUP)) {
-        // We force the player to pick a level-up if they have any available.
-        if (entity.GetComponent<XPTrackerComponent>().UnusedLevelUps.Count > 0) {
-          this._sceneManager.ShowCharacterMenu(state);
+        var playerComponent = entity.GetComponent<PlayerComponent>();
+        // If intro not played, play intro
+        if (!playerComponent.SeenIntroFormUp) {
+          playerComponent.SeenIntroFormUp = true;
+          this._sceneManager.ShowIntroFormUpMenu();
+          return;
+        }
+        if (!playerComponent.SeenIntroBattle && !playerComponent.StartOfLevel) {
+          playerComponent.SeenIntroBattle = true;
+          this._sceneManager.ShowIntroBattleMenu();
+          return;
         }
 
+        // Update the player options text
+        EmitSignal(nameof(EncounterRunner.PlayerTurnStarted));
+        
         var action = inputHandler.PopQueue();
 
-        // Super not a fan of the awkwardness of checking this twice! Switch string -> enum, maybe?
-        // TODO: this is a jank if & the conditions are hard to read
-        if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_N) {
-          PlayerMove(state, 0, -1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_NE) {
-          PlayerMove(state, 1, -1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_E) {
-          PlayerMove(state, 1, 0);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_SE) {
-          PlayerMove(state, 1, 1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_S) {
-          PlayerMove(state, 0, 1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_SW) {
-          PlayerMove(state, -1, 1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_W) {
-          PlayerMove(state, -1, 0);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.MOVE_NW) {
-          PlayerMove(state, -1, -1);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.WAIT) {
-          PlayerWait(state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.CHARACTER) {
-          this._sceneManager.ShowCharacterMenu(state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.ESCAPE_MENU) {
-          this._sceneManager.ShowEscapeMenu(state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.HELP_MENU) {
-          this._sceneManager.ShowHelpMenu();
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.INVENTORY) {
-          this._sceneManager.ShowInventoryMenu(state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_STAIRS) {
-          PlayerExecuteTurnEndingAction(new UseStairsAction(entity.EntityId), state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.GET_ITEM) {
-          PlayerExecuteTurnEndingAction(new GetItemAction(entity.EntityId), state);
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.USE_ITEM) {
-          GD.Print("Select an item via the inventory menu instead!");
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.ZOOM_IN) {
-          state.ZoomIn();
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.ZOOM_OUT) {
-          state.ZoomOut();
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.ZOOM_RESET) {
-          state.ZoomReset();
-        } else if (action != null && action.Mapping == InputHandler.ActionMapping.SCAN_POSITION) {
-          var scanAction = action as InputHandler.ScanInputAction;
-          if (!state.IsInBounds(scanAction.X, scanAction.Y)) {
+        // Autopilot section
+        
+        var playerUnit = state.GetUnit(entity.GetComponent<UnitComponent>().UnitId);
+        var playerAI = entity.GetComponent<PlayerAIComponent>();
+        // Autopilot if beginning
+        if (playerComponent.StartOfLevel) {
+          var commands = playerAI.DecideNextActionForInput(state, entity);
+          if (commands != null) { 
+            Rulebook.ResolveActionsAndEndTurn(commands, state);
+            EmitSignal(nameof(EncounterRunner.TurnEnded));
+          } else {
             return;
           }
-
-          var blockingEntity = state.BlockingEntityAtPosition(scanAction.X, scanAction.Y);
-          var allEntities = state.EntitiesAtPosition(scanAction.X, scanAction.Y);
-          if (blockingEntity != null) {
-            EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, blockingEntity);
-          } else if (allEntities.Count > 0) {
-            EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, allEntities[0]);
+        }
+        // Autopilot if allowed actions are LEAVE & WAIT
+        var playerAllowedActions = playerAI.AllowedActions(state, entity, playerUnit.StandingOrder);
+        if (playerComponent.IsInFormation && playerAllowedActions.Count == 2 && playerAllowedActions.Contains(InputHandler.ActionMapping.WAIT)) {
+          var commands = playerAI.DecideNextActionForInput(state, entity);
+          if (commands != null) { 
+            Rulebook.ResolveActionsAndEndTurn(commands, state);
+            EmitSignal(nameof(EncounterRunner.TurnEnded));
           } else {
-            EmitSignal(nameof(PositionScanned), scanAction.X, scanAction.Y, null);
+            return;
+          }
+        }
+
+        // Super not a fan of the awkwardness of checking this twice! Switch string -> enum, maybe?
+        if (action != null && AlwaysAvaiableActionMappingToActionDict.ContainsKey(action.Mapping)) {
+          AlwaysAvaiableActionMappingToActionDict[action.Mapping].Invoke(state, this, action);
+        } else if (action != null && !playerComponent.IsInFormation && FreeMovementActionMappingToActionDict.ContainsKey(action.Mapping) ) {
+          FreeMovementActionMappingToActionDict[action.Mapping].Invoke(state, this, action);
+        } else if (action != null && playerComponent.IsInFormation) {
+          var commands = playerAI.DecideNextActionForInput(state, entity, action.Mapping);
+
+          if (commands != null) { 
+            Rulebook.ResolveActionsAndEndTurn(commands, state);
+            EmitSignal(nameof(EncounterRunner.TurnEnded));
+          } else {
+            return;
           }
         } else if (action != null) {
           GD.Print("No handler yet for ", action);
@@ -160,7 +228,7 @@ namespace SpaceDodgeRL.scenes.encounter {
       } else {
         var playerPos = state.Player.GetComponent<PositionComponent>().EncounterPosition;
 
-        int maxTurnsToRun = 1000;
+        int maxTurnsToRun = 3000;
         int numTurnsRan = 0;
 
         var firstEntity = entity;
@@ -203,11 +271,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           }
         }
       }
-    }
-
-    public void HandleUseItemSelection(string itemIdToUse) {
-      var playerId = this._encounterState.Player.EntityId;
-      PlayerExecuteTurnEndingAction(new UseAction(playerId, itemIdToUse, true), this._encounterState);
     }
   }
 }

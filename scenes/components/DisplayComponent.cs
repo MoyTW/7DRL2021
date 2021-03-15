@@ -2,9 +2,9 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   public class DisplayComponent : Component {
     public static readonly string ENTITY_GROUP = "SPRITE_DATA_COMPONENT_GROUP";
@@ -14,14 +14,16 @@ namespace SpaceDodgeRL.scenes.components {
     [JsonInclude] public string Description { get; private set; }
     [JsonInclude] public bool VisibleInFoW { get; private set; }
     [JsonInclude] public int ZIndex { get; private set; }
+    [JsonInclude] public bool Visible { get; private set; }
 
-    public static DisplayComponent Create(string texturePath, string description, bool visibleInFoW, int zIndex) {
+    public static DisplayComponent Create(string texturePath, string description, bool visibleInFoW, int zIndex, bool visible=true) {
       var component = new DisplayComponent();
 
       component.TexturePath = texturePath;
       component.Description = description;
       component.VisibleInFoW = visibleInFoW;
       component.ZIndex = zIndex;
+      component.Visible = visible;
 
       return component;
     }

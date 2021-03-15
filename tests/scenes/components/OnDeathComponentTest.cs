@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using SpaceDodgeRL.scenes.components;
+using MTW7DRL2021.scenes.components;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace SpaceDodgeRL.tests.scenes.components {
+namespace MTW7DRL2021.tests.scenes.components {
 
   public class OnDeathComponentTest {
 

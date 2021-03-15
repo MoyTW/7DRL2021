@@ -1,27 +1,24 @@
 using Godot;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.components.use;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.components.use;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SpaceDodgeRL.library.encounter.rulebook {
+namespace MTW7DRL2021.library.encounter.rulebook {
 
   public static class Rulebook {
     // ...can't I just do <> like I can in Kotlin? C# why you no let me do this. Probably because "evolving languages are hard".
     private static Dictionary<ActionType, Func<EncounterAction, EncounterState, bool>> _actionMapping = new Dictionary<ActionType, Func<EncounterAction, EncounterState, bool>>() {
       { ActionType.MELEE_ATTACK, (a, s) => ResolveMeleeAttack(a as MeleeAttackAction, s) },
       { ActionType.MOVE, (a, s) => ResolveMove(a as MoveAction, s) },
-      { ActionType.FIRE_PROJECTILE, (a, s) => ResolveFireProjectile(a as FireProjectileAction, s) },
-      { ActionType.GET_ITEM, (a, s) => ResolveGetItem(a as GetItemAction, s) },
       { ActionType.DESTROY, (a, s) => ResolveDestroy(a as DestroyAction, s) },
       { ActionType.RANGED_ATTACK, (a, s) => ResolveRangedAttack(a as RangedAttackAction, s) },
       { ActionType.SPAWN_ENTITY, (a, s) => ResolveSpawnEntity(a as SpawnEntityAction, s) },
-      { ActionType.USE, (a, s) => ResolveUse(a as UseAction, s) },
       { ActionType.USE_STAIRS, (a, s) => ResolveUseStairs(a as UseStairsAction, s) },
       { ActionType.WAIT, (a, s) => ResolveWait(a as WaitAction, s) }
     };
@@ -57,10 +54,17 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       }
     }
 
-    private static void LogAttack(DefenderComponent defenderComponent, string message, EncounterState state) {
-      if (defenderComponent.ShouldLogDamage) {
+    private static void LogAttack(Entity attacker, Entity defender, DefenderComponent defenderComponent, string message, EncounterState state) {
+      if (defenderComponent.ShouldLogDamage && (attacker == state.Player || defender == state.Player)) {
         state.LogMessage(message);
       }
+    }
+
+    private static Tuple<int, int, bool> AttackHits(Random encounterRand, int attackStat, int attackerFootingPenalty,
+        int defenseStat, int defenderFootingPenalty) {
+      var chanceToHit = ((attackStat - attackerFootingPenalty) - (defenseStat - defenderFootingPenalty));
+      var rolled = encounterRand.Next(100) + 1;
+      return new Tuple<int, int, bool>(chanceToHit, rolled, chanceToHit > rolled);
     }
 
     private static bool ResolveMeleeAttack(MeleeAttackAction action, EncounterState state) {
@@ -68,119 +72,113 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       Entity defender = action.TargetEntity;
 
       var attackerComponent = attacker.GetComponent<AttackerComponent>();
+      var attackerDefenderComponent = attacker.GetComponent<DefenderComponent>();
       var defenderComponent = defender.GetComponent<DefenderComponent>();
 
       if(defenderComponent.IsInvincible) {
         var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b], but the attack has no effect!",
           attacker.EntityName, defender.EntityName);
-        LogAttack(defenderComponent, logMessage, state);
+        LogAttack(attacker, defender, defenderComponent, logMessage, state);
       } else {
+        bool isPlayer = attacker == state.Player;
+        bool hit = false;
+        bool killed = false;
+
+        var attackReport = AttackHits(state.EncounterRand, attackerComponent.MeleeAttack, attackerDefenderComponent.FootingPenalty,
+          defenderComponent.MeleeDefense, defenderComponent.FootingPenalty);
+        attackerDefenderComponent.NotifyParentHasAttacked();
+        if (!attackReport.Item3) {
+          var logMessage = string.Format("[b]{0}[/b] attacks [b]{1}[/b], but misses! ({2}% chance to hit)",
+            attacker.EntityName, defender.EntityName, attackReport.Item1);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
+          return true;
+        }
+
         // We don't allow underflow damage, though that could be a pretty comical mechanic...
-        int damage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
-        defenderComponent.RemoveHp(damage);
+        int weaponDamage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
+        int shieldedByFooting = (int)Math.Floor(weaponDamage * defenderComponent.PercentageFooting);
+        int hpDamage = weaponDamage - shieldedByFooting;
+        int footingDamage = shieldedByFooting * 3;
+
+        hit = true;
+        defenderComponent.RemoveHp(hpDamage);
+        defenderComponent.RemoveFooting(footingDamage);
+
         if (defenderComponent.CurrentHp <= 0) {
-          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, destroying it!",
-            attacker.EntityName, defender.EntityName, damage);
+          killed = true;
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage, killing it! ({3}% chance to hit)",
+            attacker.EntityName, defender.EntityName, hpDamage, attackReport.Item1);
 
           // Assign XP to the entity that fired the projectile
-          var projectileSource = state.GetEntityById(attackerComponent.SourceEntityId);
+          var attackerId = state.GetEntityById(attackerComponent.SourceEntityId);
           var xpValueComponent = defender.GetComponent<XPValueComponent>();
-          if (projectileSource != null && xpValueComponent != null && projectileSource.GetComponent<XPTrackerComponent>() != null) {
-            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue);
-            logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", projectileSource.EntityName, xpValueComponent.XPValue);
+          if (attackerId != null && xpValueComponent != null && attackerId.GetComponent<XPTrackerComponent>() != null) {
+            attackerId.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue, attackerComponent, defenderComponent, state);
+            logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", attackerId.EntityName, xpValueComponent.XPValue);
           }
 
-          LogAttack(defenderComponent, logMessage, state);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
           ResolveAction(new DestroyAction(defender.EntityId), state);
         } else {
-          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage!",
-            attacker.EntityName, defender.EntityName, damage);
-            LogAttack(defenderComponent, logMessage, state);
+          var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} HP damage and {3} footing damage! ({4}% chance to hit)",
+            attacker.EntityName, defender.EntityName, hpDamage, shieldedByFooting, attackReport.Item1);
+            LogAttack(attacker, defender, defenderComponent, logMessage, state);
+        }
+
+        // Finally, assign player prestige
+        if (isPlayer && killed) {
+          var logMessage = string.Format("Your allies witness you slaying the [b]{0}[/b]. [b]You gain 5 prestige![/b]", defender.EntityName);
+          attacker.GetComponent<PlayerComponent>().AddPrestige(5, state, logMessage, PrestigeSource.DEFEATING_FOES);
+        } else if (isPlayer && hit) {
+          var logMessage = string.Format("Your allies will remember that injured the [b]{0}[/b]. [b]You gain 1 prestige![/b]", defender.EntityName);
+          attacker.GetComponent<PlayerComponent>().AddPrestige(1, state, logMessage, PrestigeSource.LANDING_HITS);
         }
       }
       return true;
+    }
+
+    // Last 5 items are "retreat zone" - TODO: color them yellow, or something
+    private static bool IsInRetreatZone(EncounterState state, EncounterPosition position) {
+      return !(5 <= position.X && state.MapWidth - 5 >= position.X && 5 <= position.Y && state.MapHeight - 5 >= position.Y);
     }
 
     private static bool ResolveMove(MoveAction action, EncounterState state) {
       Entity actor = state.GetEntityById(action.ActorId);
       var positionComponent = state.GetEntityById(action.ActorId).GetComponent<PositionComponent>();
+      var oldPosition = positionComponent.EncounterPosition;
 
       if (positionComponent.EncounterPosition == action.TargetPosition) {
         GD.PrintErr(string.Format("Entity {0}:{1} tried to move to its current position {2}", actor.EntityName, actor.EntityId, action.TargetPosition));
         return false;
-      }
-      // else if (state.IsPositionBlocked(action.TargetPosition)) {
-      //   var blocker = state.BlockingEntityAtPosition(action.TargetPosition.X, action.TargetPosition.Y);
-      //   var actorCollision = actor.GetComponent<CollisionComponent>();
-
-      //   if (actorCollision.OnCollisionAttack) {
-      //     Attack(actor, blocker, state);
-      //   }
-      //   if (actorCollision.OnCollisionSelfDestruct) {
-      //     state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: true);
-      //     positionComponent.PlayExplosion();
-      //     ResolveAction(new DestroyAction(action.ActorId), state);
-      //   }
-      //   return true;
-      // } 
-      else {
+      } else {
         state.TeleportEntity(actor, action.TargetPosition, ignoreCollision: false);
-        return true;
-      }
-    }
-
-    private static bool ResolveFireProjectile(FireProjectileAction action, EncounterState state) {
-      var actorPosition = state.GetEntityById(action.ActorId).GetComponent<PositionComponent>().EncounterPosition;
-      Entity projectile = EntityBuilder.CreateProjectileEntity(
-        state.GetEntityById(action.ActorId),
-        action.ProjectileType,
-        action.Power,
-        action.PathFunction(actorPosition),
-        action.Target,
-        action.Speed,
-        state.CurrentTick
-      );
-      state.PlaceEntity(projectile, actorPosition, true);
-      return true;
-    }
-
-    private static bool ResolveGetItem(GetItemAction action, EncounterState state) {
-      var actor = state.GetEntityById(action.ActorId);
-      var inventoryComponent = actor.GetComponent<InventoryComponent>();
-      var actorPosition = actor.GetComponent<PositionComponent>().EncounterPosition;
-      var item = state.EntitiesAtPosition(actorPosition.X, actorPosition.Y)
-                      .FirstOrDefault(e => e.GetComponent<StorableComponent>() != null);
-
-      if (item == null) {
-        state.LogMessage("No item found!", failed: true);
-        return false;
-      } else if (item.GetComponent<UsableComponent>() != null && item.GetComponent<UsableComponent>().UseOnGet) {
-        // The responsibility for removing/not removing the usable from the EncounterState is in the usage code.
-        bool successfulUsage = ResolveUse(new UseAction(actor.EntityId, item.EntityId, false), state);
-        if (!successfulUsage) {
-          GD.PrintErr(string.Format("Item {0} was not successfully used after being picked up!", item.EntityName));
+        var unitComponent = actor.GetComponent<UnitComponent>();
+        if (unitComponent != null) {
+          state.GetUnit(unitComponent.UnitId).NotifyEntityMoved(oldPosition, action.TargetPosition);
+        }
+        // If you go into the retreat zone you insta-die
+        if (IsInRetreatZone(state, action.TargetPosition)) {
+          if (actor.GetComponent<PlayerComponent>() != null) {
+            state.NotifyPlayerRetreat();
+            return false;
+          } else {
+            ResolveAction(new DestroyAction(action.ActorId), state);
+          }
         }
         return true;
-      } else if (!inventoryComponent.CanFit(item)) {
-        state.LogMessage(string.Format("[b]{0}[/b] can't fit the [b]{1}[/b] in its inventory!",
-          actor.EntityName, item.EntityName), failed: true);
-        return false;
-      } else {
-        state.RemoveEntity(item);
-        actor.GetComponent<InventoryComponent>().AddEntity(item);
-
-        var logMessage = string.Format("[b]{0}[/b] has taken the [b]{1}[/b]", actor.EntityName, item.EntityName);
-        state.LogMessage(logMessage);
-        return true;
       }
     }
 
-    private static bool ResolveOnDeathEffect(string effectType, EncounterState state) {
+    private static bool ResolveOnDeathEffect(DestroyAction action, string effectType, EncounterState state) {
       if (effectType == OnDeathEffectType.PLAYER_VICTORY) {
         state.NotifyPlayerVictory();
-        return false;
+        return true;
       } else if (effectType == OnDeathEffectType.PLAYER_DEFEAT) {
         state.NotifyPlayerDefeat();
+        return true;
+      } else if (effectType == OnDeathEffectType.REMOVE_FROM_UNIT) {
+        var unit = state.GetUnit(state.GetEntityById(action.ActorId).GetComponent<UnitComponent>().UnitId);
+        unit.NotifyEntityDestroyed(state.GetEntityById(action.ActorId));
         return false;
       } else {
         throw new NotImplementedException(String.Format("Don't know how to resolve on death effect type {0}", effectType));
@@ -195,7 +193,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       bool shouldRemoveEntity = true;
       if (onDeathComponent != null) {
         foreach (var effectType in onDeathComponent.ActiveEffectTypes) {
-          var effectStopsRemoval = !ResolveOnDeathEffect(effectType, state);
+          var effectStopsRemoval = ResolveOnDeathEffect(action, effectType, state);
           if (effectStopsRemoval) {
             shouldRemoveEntity = false;
           }
@@ -220,7 +218,7 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       if(defenderComponent.IsInvincible) {
         var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b], but the attack has no effect!",
           attacker.EntityName, defender.EntityName);
-        LogAttack(defenderComponent, logMessage, state);
+        LogAttack(attacker, defender, defenderComponent, logMessage, state);
       } else {
         // We don't allow underflow damage, though that could be a pretty comical mechanic...
         int damage = Math.Max(0, attackerComponent.Power - defenderComponent.Defense);
@@ -233,16 +231,16 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
           var projectileSource = state.GetEntityById(attackerComponent.SourceEntityId);
           var xpValueComponent = defender.GetComponent<XPValueComponent>();
           if (projectileSource != null && xpValueComponent != null && projectileSource.GetComponent<XPTrackerComponent>() != null) {
-            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue);
+            projectileSource.GetComponent<XPTrackerComponent>().AddXP(xpValueComponent.XPValue, attackerComponent, defenderComponent, state);
             logMessage += String.Format(" [b]{0}[/b] gains {1} XP!", projectileSource.EntityName, xpValueComponent.XPValue);
           }
 
-          LogAttack(defenderComponent, logMessage, state);
+          LogAttack(attacker, defender, defenderComponent, logMessage, state);
           ResolveAction(new DestroyAction(defender.EntityId), state);
         } else {
           var logMessage = string.Format("[b]{0}[/b] hits [b]{1}[/b] for {2} damage!",
             attacker.EntityName, defender.EntityName, damage);
-            LogAttack(defenderComponent, logMessage, state);
+            LogAttack(attacker, defender, defenderComponent, logMessage, state);
         }
       }
       return true;
@@ -260,13 +258,6 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       if (useEffectHeal != null) {
         var restored = user.GetComponent<DefenderComponent>().RestoreHP(useEffectHeal.Healpower);
         state.LogMessage(string.Format("{0} restored {1} HP to {2}!", usable.EntityName, restored, user.EntityName));
-      }
-
-      var useEffectAddIntel = usable.GetComponent<UseEffectAddIntelComponent>();
-      if (useEffectAddIntel != null) {
-        // Kinda funny because player's the only one for which this effect is meaningful so we just grab player it's fiiiiiine
-        state.Player.GetComponent<PlayerComponent>().RegisterIntel(useEffectAddIntel.TargetDungeonLevel);
-        state.LogMessage(string.Format("Discovered intel for [b]sector {0}[/b]!", useEffectAddIntel.TargetDungeonLevel));
       }
 
       var useEffectBoostPower = usable.GetComponent<UseEffectBoostPowerComponent>();
@@ -318,42 +309,6 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
       }
     }
 
-    // Currently, each use effect is its own component. If we run into a case where we have too many effects, we can push the
-    // effects into the usable component itself, similarly to status effects (though status effects are their own mess right now)
-    // which would probably be better for building on.
-    private static bool ResolveUse(UseAction action, EncounterState state) {
-      var user = state.GetEntityById(action.ActorId);
-
-      // This is another issue that'd be solved with a global Entity lookup - though not the removal part.
-      Entity usable = null;
-      if (action.FromInventory) {
-        var userInventory = user.GetComponent<InventoryComponent>();
-        usable = userInventory.StoredEntityById(action.UsableId);
-        if (usable.GetComponent<UsableComponent>() == null) {
-          state.LogMessage(string.Format("{0} is not usable!", usable.EntityName), failed: true);
-          return false;
-        } else {
-          userInventory.RemoveEntity(usable);
-        }
-      } else {
-        usable = state.GetEntityById(action.UsableId);
-        if (usable.GetComponent<UsableComponent>() == null) {
-          state.LogMessage(string.Format("{0} is not usable!", usable.EntityName), failed: true);
-          return false;
-        } else {
-          state.RemoveEntity(usable);
-        }
-      }
-
-      state.LogMessage(string.Format("{0} used {1}!", user.EntityName, usable.EntityName));
-
-      ResolveUseEffects(user, usable, state);
-
-      // We assume all items are single-use; this will change if I deviate from the reference implementation!
-      usable.QueueFree();
-      return true;
-    }
-
     private static bool ResolveUseStairs(UseStairsAction action, EncounterState state) {
       var actorPosition = state.GetEntityById(action.ActorId).GetComponent<PositionComponent>().EncounterPosition;
       var stairs = state.EntitiesAtPosition(actorPosition.X, actorPosition.Y)
@@ -369,6 +324,10 @@ namespace SpaceDodgeRL.library.encounter.rulebook {
     }
 
     private static bool ResolveWait(WaitAction action, EncounterState state) {
+      var defenderComponent = state.GetEntityById(action.ActorId).GetComponent<DefenderComponent>();
+      if (defenderComponent != null) {
+        defenderComponent.RestoreFooting();
+      }
       return true;
     }
   }

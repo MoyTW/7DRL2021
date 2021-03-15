@@ -11,3 +11,6 @@ test_results.log
 # Mono-specific ignores
 .mono/
 data_*/
+
+# Project
+bin/

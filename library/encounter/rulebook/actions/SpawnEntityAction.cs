@@ -1,6 +1,6 @@
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.library.encounter.rulebook.actions {
+namespace MTW7DRL2021.library.encounter.rulebook.actions {
 
   public class SpawnEntityAction : EncounterAction {
 

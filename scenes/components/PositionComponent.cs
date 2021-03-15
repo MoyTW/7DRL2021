@@ -1,13 +1,13 @@
 using Godot;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
+using MTW7DRL2021.scenes.singletons;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   [JsonConverter(typeof(PositionConverter))]
   public class PositionComponent : Node, Component {
@@ -39,7 +39,7 @@ namespace SpaceDodgeRL.scenes.components {
       return GetNode<Sprite>("Sprite").Position != encounterPosition || GetNode<AnimatedSprite>("ExplosionSprite").Visible == true;
     } }
 
-    public static PositionComponent Create(EncounterPosition position, string texturePath, int zIndex) {
+    public static PositionComponent Create(EncounterPosition position, string texturePath, int zIndex, bool visible) {
       var component = _scenePrefab.Instance() as PositionComponent;
 
       component._encounterPosition = position;
@@ -50,21 +50,27 @@ namespace SpaceDodgeRL.scenes.components {
 
       var explosionSprite = component.GetNode<AnimatedSprite>("ExplosionSprite");
       explosionSprite.Connect("animation_finished", component, nameof(OnExplosionAnimationFinished));
+      var timer = component.GetNode<Timer>("SpeechBubbleTimer");
+      timer.Connect("timeout", component, nameof(OnSpeechBubbleTimerTimeout));
 
-      component.Show();
+      if (visible) {
+        component.Show();
+      } else {
+        component.Hide();
+      }
 
       return component;
     }
 
     public static PositionComponent Create(string saveData) {
       var loaded = JsonSerializer.Deserialize<SaveData>(saveData);
-      return PositionComponent.Create(loaded.EncounterPosition, loaded.TexturePath, loaded.ZIndex);
+      return PositionComponent.Create(loaded.EncounterPosition, loaded.TexturePath, loaded.ZIndex, loaded.Visible);
     }
 
     public void SetEncounterPosition(EncounterPosition position, bool show) {
       var dx = position.X - _encounterPosition.X;
       var dy = position.Y - _encounterPosition.Y;
-      RotateSpriteTowards(dx, dy);
+      //RotateSpriteTowards(dx, dy); don't rotate anymore
 
       _encounterPosition = position;
       Tween(IndexToVector(position.X, position.Y));
@@ -146,6 +152,27 @@ namespace SpaceDodgeRL.scenes.components {
       explosionSprite.Visible = false;
     }
 
+    public void PlaySpeechBubble(string speech) {
+      var timer = GetNode<Timer>("SpeechBubbleTimer");
+      if (timer.IsStopped()) {
+        var bubble = GetNode<NinePatchRect>("Sprite/Node2D/NinePatchRect");
+        var speechLabel = GetNode<Label>("Sprite/Node2D/NinePatchRect/SpeechLabel");
+        speechLabel.Text = speech;
+        var newSize = new Vector2(10, speechLabel.RectSize.y);
+        speechLabel.RectSize = newSize;
+        bubble.RectMinSize = new Vector2(speech.Length * 10 + 25, bubble.RectSize.y);
+        bubble.Show();
+        timer.Start(1);
+      }
+    }
+
+    private void OnSpeechBubbleTimerTimeout() {
+      var bubble = GetNode<NinePatchRect>("Sprite/Node2D/NinePatchRect");
+      bubble.Hide();
+      var timer = GetNode<Timer>("SpeechBubbleTimer");
+      timer.Stop();
+    }
+
     public static EncounterPosition VectorToIndex(float x, float y) {
       return new EncounterPosition((int)(x / STEP_X), (int)(y / STEP_Y));
     }
@@ -159,6 +186,7 @@ namespace SpaceDodgeRL.scenes.components {
       public EncounterPosition EncounterPosition { get; set; }
       public string TexturePath { get; set; }
       public int ZIndex { get; set; }
+      public bool Visible { get; set; }
 
       public SaveData() { }
 
@@ -169,6 +197,7 @@ namespace SpaceDodgeRL.scenes.components {
         this.EncounterPosition = component.EncounterPosition;
         this.TexturePath = sprite.Texture.ResourcePath;
         this.ZIndex = sprite.ZIndex;
+        this.Visible = sprite.Visible;
       }
     }
 

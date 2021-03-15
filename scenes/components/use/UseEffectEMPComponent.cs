@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components.use {
+namespace MTW7DRL2021.scenes.components.use {
 
   // In the original game, it disabled for [n turns], so if you disabled a scout it'd come online fast and if you disabled a
   // cruiser it'd come online slow. That seems a little bizarre, but it's replicated here for faithfulness; I can rip it out

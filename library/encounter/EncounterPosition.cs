@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.library.encounter {
+namespace MTW7DRL2021.library.encounter {
 
   public struct EncounterPosition: IEquatable<EncounterPosition> {
     [JsonInclude] public int X { get; private set; }

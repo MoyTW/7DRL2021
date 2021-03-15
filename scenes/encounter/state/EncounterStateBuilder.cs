@@ -1,20 +1,23 @@
-using SpaceDodgeRL.library;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.resources.gamedata;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.entities;
+using Godot;
+using MTW7DRL2021.library;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.resources.gamedata;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.encounter.state {
+namespace MTW7DRL2021.scenes.encounter.state {
 
   public static class EncounterStateBuilder {
 
     public static int ZONE_MIN_SIZE = 20;
     public static int ZONE_MAX_SIZE = 40;
 
-    private static void InitializeMapAndAddBorderWalls(EncounterState state, int width, int height) {
+    private static void InitializeMap(EncounterState state, int width, int height) {
       // Initialize the map with empty tiles
       state.MapWidth = width;
       state.MapHeight = height;
@@ -24,22 +27,16 @@ namespace SpaceDodgeRL.scenes.encounter.state {
           state._encounterTiles[x, y] = new EncounterTile();
         }
       }
-
-      // Create border walls to prevent objects running off the map
-      for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-          if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-            state.PlaceEntity(EntityBuilder.CreateEdgeBlockerEntity(), new EncounterPosition(x, y));
-          }
-        }
-      }
     }
 
-    private static void CreateUnit(Random seededRand, EncounterState state, string unitId, FactionName faction,
-        EncounterPosition center, UnitOrder order, FormationType type, FormationFacing facing, int size,
-        Func<int, Unit, Entity> entityFn, bool leftFlank, bool rightFlank) {
-      var unit = new Unit(unitId, center, order, type, facing, leftFlank, rightFlank);
+    private static Unit CreateAndDeployUnit(Random seededRand, EncounterState state, FactionName faction,
+        Lane lane, int lanePosition, UnitOrder order, FormationType type, FormationFacing facing, int size,
+        Func<int, Unit, Entity> entityFn, CommanderAIComponent commanderAI) {
+      var center = lane.PositionFor(facing, lanePosition);
+      var unit = new Unit(Guid.NewGuid().ToString(), faction, center, order, type, facing);
       state.AddUnit(unit);
+      commanderAI.RegisterUnit(unit);
+      lane.RegisterUnitAtPosition(unit, lanePosition);
 
       var width = (int)Math.Ceiling(Math.Sqrt(size));
       
@@ -54,45 +51,190 @@ namespace SpaceDodgeRL.scenes.encounter.state {
       for (int i = 0; i < size; i++) {
         var entity = entityFn(i, unit);
         state.PlaceEntity(entity, new EncounterPosition(center.X + positions[i].X, center.Y + positions[i].Y));
+        unit.RegisterBattleReadyEntity(entity);
+      }
+
+      return unit;
+    }
+
+    private static void RegisterRoutAtPercentage(CommanderAIComponent commanderAIComponent, Unit unit, float percentage) {
+      var trigger = new OrderTrigger(OrderTriggerType.UNIT_BELOW_STRENGTH_PERCENT, false,
+        watchedUnitIds: new List<string>() { unit.UnitId }, belowStrengthPercent: percentage);
+      commanderAIComponent.RegisterTriggeredOrder(trigger, new Order(unit.UnitId, OrderType.ROUT));
+
+      var laneClearTrigger = new OrderTrigger(OrderTriggerType.LANE_CLEAR_OF_UNITS_FROM_FACTION, false,
+        watchedUnitIds: new List<string>() { unit.UnitId }, triggerFaction: unit.UnitFaction.Opposite());
+      commanderAIComponent.RegisterTriggeredOrder(laneClearTrigger, new Order(unit.UnitId, OrderType.PREPARE_SWEEP_NEXT_LANE));
+    }
+
+    public static void AddPlayerToUnit(Entity player, Unit unit, int formationNumber) {
+      var oldUnitComponent = player.GetComponent<UnitComponent>();
+      if (oldUnitComponent != null) {
+        player.RemoveComponent(oldUnitComponent);
+      }
+      player.AddComponent(UnitComponent.Create(unit.UnitId, formationNumber));
+    }
+
+    private static CommanderAIComponent CreateAndPlaceCommander(EncounterState state) {
+      var commanderUnitId = "Invisible Commander AI Unit";
+      var commander = EntityBuilder.CreateCommanderEntity(state.CurrentTick, FactionName.NEUTRAL);
+      var commanderAI = commander.GetComponent<CommanderAIComponent>();
+      state.PlaceEntity(commander, new EncounterPosition(1, 1)); // Invisible and unreachable but you CAN mouse over it, lol. it's fiiine
+
+      // Commander unit is required for non-targeted commands to resolve properly
+      var commanderUnit = new Unit(commanderUnitId, FactionName.NEUTRAL, commander.GetComponent<PositionComponent>().EncounterPosition,
+        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.SOUTH);
+      state.AddUnit(commanderUnit);
+      commanderAI.RegisterUnit(commanderUnit);
+      
+      // Boilerplate conditions
+      var playerRouted = new OrderTrigger(OrderTriggerType.ALL_UNITS_OF_FACTION_ROUTED, false, triggerFaction: FactionName.PLAYER);
+      commanderAI.RegisterTriggeredOrder(playerRouted, new Order(commanderUnitId, OrderType.DECLARE_DEFEAT));
+      var enemyRouted = new OrderTrigger(OrderTriggerType.ALL_UNITS_OF_FACTION_ROUTED, false, triggerFaction: FactionName.ENEMY);
+      commanderAI.RegisterTriggeredOrder(enemyRouted, new Order(commanderUnitId, OrderType.DECLARE_VICTORY));
+      
+      return commanderAI;
+    }
+
+    private static Func<int, Unit, Entity> WrapWithPlayerFn(EncounterState state, Func<int, Unit, Entity> unitFn, int playerFormationNum) {
+      return delegate(int formationNum, Unit unit) {
+        if (formationNum == playerFormationNum) {
+          AddPlayerToUnit(state.Player, unit, playerFormationNum);
+          return state.Player;
+        } else {
+          return EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
+        }
+      };
+    }
+
+    public static int ADVANCE_AT_TURN = 50;
+
+    private static void PopulatePlayerFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
+        DeploymentInfo deploymentInfo, CommanderAIComponent commanderAI, Lane lane) {
+      var numLines = seededRand.Next(3) + 1;
+      // var numLines = 2;
+
+      Unit hastatusUnit = null;
+      if (numLines > 0) {
+        var numHastati = seededRand.Next(80, 120);
+        Func<int, Unit, Entity> hastatusFn = (formationNum, unit) => EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
+        if (lane.LaneIdx == deploymentInfo.NumLanes / 2) {
+          hastatusFn = WrapWithPlayerFn(state, hastatusFn, numHastati-3);
+          // hastatusFn = WrapWithPlayerFn(state, hastatusFn, 9);
+        }
+        hastatusUnit = CreateAndDeployUnit(seededRand, state, FactionName.PLAYER,
+            lane, 1, UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
+            deploymentInfo.PlayerFacing, 
+            numHastati,
+            hastatusFn, commanderAI);
+        commanderAI.RegisterDeploymentOrder(20, new Order(hastatusUnit.UnitId, OrderType.OPEN_MANIPULE));
+        commanderAI.RegisterDeploymentOrder(ADVANCE_AT_TURN, new Order(hastatusUnit.UnitId, OrderType.ADVANCE));
+        RegisterRoutAtPercentage(commanderAI, hastatusUnit, .80f);
+      }
+      Unit princepsUnit = null;
+      if (numLines > 1) {
+        Func<int, Unit, Entity> princepsFn = (formationNum, unit) => EntityBuilder.CreatePrincepsEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
+        princepsUnit = CreateAndDeployUnit(seededRand, state, FactionName.PLAYER,
+            lane, 2, UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
+            deploymentInfo.PlayerFacing,
+            seededRand.Next(80, 120),
+            // 20,
+            princepsFn, commanderAI);
+        commanderAI.RegisterDeploymentOrder(30, new Order(princepsUnit.UnitId, OrderType.OPEN_MANIPULE));
+        commanderAI.RegisterTriggeredOrder(TriggeredOrder.AdvanceIfUnitRetreatsRoutsOrWithdraws(hastatusUnit, princepsUnit));
+        RegisterRoutAtPercentage(commanderAI, princepsUnit, .60f);
+      }
+      Unit triariusUnit = null;
+      if (numLines > 2) {
+        Func<int, Unit, Entity> triariusFn = (formationNum, unit) => EntityBuilder.CreateTriariusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
+        triariusUnit = CreateAndDeployUnit(seededRand, state, FactionName.PLAYER,
+            lane, 3, UnitOrder.REFORM, FormationType.MANIPULE_CLOSED,
+            deploymentInfo.PlayerFacing, seededRand.Next(40, 60), triariusFn, commanderAI);
+        commanderAI.RegisterDeploymentOrder(40, new Order(triariusUnit.UnitId, OrderType.OPEN_MANIPULE));
+        commanderAI.RegisterTriggeredOrder(TriggeredOrder.AdvanceIfUnitRetreatsRoutsOrWithdraws(princepsUnit, triariusUnit));
+        RegisterRoutAtPercentage(commanderAI, triariusUnit, .40f);
+      }
+    }
+
+    private static Func<int, Unit, Entity> FirstLineEnemyFn(EncounterState state, Random seededRand) {
+      if (seededRand.Next(2) == 0) {
+        return (formationNum, unit) => EntityBuilder.CreateIberianLightInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
+      } else {
+        return (formationNum, unit) => EntityBuilder.CreateGallicLightInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
+      }
+    }
+
+    private static Func<int, Unit, Entity> SecondLineEnemyFn(EncounterState state, Random seededRand) {
+      if (seededRand.Next(2) == 0) {
+        return (formationNum, unit) => EntityBuilder.CreateGallicVeteranInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
+      } else {
+        return (formationNum, unit) => EntityBuilder.CreatePunicVeteranInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
+      }
+    }
+
+    private static Func<int, Unit, Entity> ThirdLineEnemyFn(EncounterState state, Random seededRand) {
+      return (formationNum, unit) => EntityBuilder.CreatePunicHeavyInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
+    }
+
+    private static void PopulateEnemyFactionLane(int dungeonLevel, EncounterState state, Random seededRand,
+        DeploymentInfo deploymentInfo, CommanderAIComponent commanderAI, Lane lane) {
+      var numLines = seededRand.Next(3) + 1;
+      // var numLines = 1;
+
+      Unit firstRankUnit = null;
+      if (numLines > 0) {
+        var enemyFn = FirstLineEnemyFn(state, seededRand);
+        firstRankUnit = CreateAndDeployUnit(seededRand, state, FactionName.ENEMY,
+            lane, 1, UnitOrder.REFORM, FormationType.LINE_20,
+            deploymentInfo.EnemyFacing,
+            seededRand.Next(80, 120),
+            // 20,
+            enemyFn, commanderAI);
+        commanderAI.RegisterDeploymentOrder(ADVANCE_AT_TURN - 5, new Order(firstRankUnit.UnitId, OrderType.ADVANCE));
+        RegisterRoutAtPercentage(commanderAI, firstRankUnit, .80f);
+      }
+      Unit secondRankUnit = null;
+      if (numLines > 1) {
+        var enemyFn = SecondLineEnemyFn(state, seededRand);
+        secondRankUnit = CreateAndDeployUnit(seededRand, state, FactionName.ENEMY,
+            lane, 2, UnitOrder.REFORM, FormationType.LINE_20,
+            deploymentInfo.EnemyFacing,
+            seededRand.Next(80, 120),
+            // 20,
+            enemyFn, commanderAI);
+        commanderAI.RegisterTriggeredOrder(TriggeredOrder.AdvanceIfUnitRetreatsRoutsOrWithdraws(firstRankUnit, secondRankUnit));
+        RegisterRoutAtPercentage(commanderAI, secondRankUnit, .60f);
+      }
+      Unit thirdRankUnit = null;
+      if (numLines > 2) {
+        var enemyFn = ThirdLineEnemyFn(state, seededRand);
+        thirdRankUnit = CreateAndDeployUnit(seededRand, state, FactionName.ENEMY,
+            lane, 3, UnitOrder.REFORM, FormationType.LINE_20,
+            deploymentInfo.EnemyFacing, seededRand.Next(40, 60), enemyFn, commanderAI);
+        commanderAI.RegisterTriggeredOrder(TriggeredOrder.AdvanceIfUnitRetreatsRoutsOrWithdraws(secondRankUnit, thirdRankUnit));
+        RegisterRoutAtPercentage(commanderAI, thirdRankUnit, .40f);
       }
     }
 
     public static void PopulateStateForLevel(Entity player, int dungeonLevel, EncounterState state, Random seededRand,
         int width = 300, int height = 300, int maxZoneGenAttempts = 100) {
-      InitializeMapAndAddBorderWalls(state, width, height);
+      InitializeMap(state, width, height);
 
-      // Add the player to the map
-      var playerPos = new EncounterPosition(width / 2, height / 2);
-      state.PlaceEntity(player, playerPos);
+      // Reset player's start
+      // Heal the player
+      player.GetComponent<PlayerComponent>().StartOfLevel = true;
+      player.GetComponent<DefenderComponent>().RestoreHP(9999);
 
-      Func<int, Unit, Entity> hastatusFn = (formationNum, unit) => EntityBuilder.CreateHastatusEntity(state.CurrentTick, formationNum, unit, FactionName.PLAYER);
-      Func<int, Unit, Entity> iberianLightInfantryFn = (formationNum, unit) => EntityBuilder.CreateIberianLightInfantry(state.CurrentTick, formationNum, unit, FactionName.ENEMY);
+      var commanderAI = CreateAndPlaceCommander(state);
 
-      CreateUnit(seededRand, state, "test player center", FactionName.PLAYER, new EncounterPosition(playerPos.X, playerPos.Y - 15),
-        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 98, hastatusFn, leftFlank: false, rightFlank: false);
-      CreateUnit(seededRand, state, "test player left", FactionName.PLAYER, new EncounterPosition(playerPos.X + 20, playerPos.Y - 15),
-        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 95, hastatusFn, leftFlank: true, rightFlank: false);
-      CreateUnit(seededRand, state, "test player right", FactionName.PLAYER, new EncounterPosition(playerPos.X - 20, playerPos.Y - 15),
-        UnitOrder.REFORM, FormationType.MANIPULE_CLOSED, FormationFacing.SOUTH, 34, hastatusFn, leftFlank: false, rightFlank: true);
-      
-      CreateUnit(seededRand, state, "test enemy center", FactionName.ENEMY, new EncounterPosition(playerPos.X, playerPos.Y + 40),
-        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 81, iberianLightInfantryFn, leftFlank: false, rightFlank: false);
-      CreateUnit(seededRand, state, "test enemy left", FactionName.ENEMY, new EncounterPosition(playerPos.X - 20, playerPos.Y + 40),
-        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 70, iberianLightInfantryFn, leftFlank: true, rightFlank: false);
-      CreateUnit(seededRand, state, "test enemy right", FactionName.ENEMY, new EncounterPosition(playerPos.X + 20, playerPos.Y + 40),
-        UnitOrder.REFORM, FormationType.LINE_20, FormationFacing.NORTH, 57, iberianLightInfantryFn, leftFlank: false, rightFlank: true);
+      var numLanes = seededRand.Next(4) + 1;
+      var deploymentInfo = DeploymentInfo.Create(width, height, seededRand, numLanes);
+      state.DeploymentInfo = deploymentInfo;
 
-      
-      /*
-      var nextToPlayer = new EncounterPosition(zones[playerZoneIdx].Center.X + 2, zones[playerZoneIdx].Center.Y + 1);
-      state.PlaceEntity(EntityBuilder.CreateItemByEntityDefId(EntityDefId.ITEM_RED_PAINT), nextToPlayer);
-      nextToPlayer = new EncounterPosition(zones[playerZoneIdx].Center.X + 1, zones[playerZoneIdx].Center.Y + 1);
-      state.PlaceEntity(EntityBuilder.CreateItemByEntityDefId(EntityDefId.ITEM_EMP), nextToPlayer);
-      for (int i = 0; i < 26; i++) {
-        nextToPlayer = new EncounterPosition(zones[playerZoneIdx].Center.X + i, zones[playerZoneIdx].Center.Y + 3);
-        state.PlaceEntity(EntityBuilder.CreateItemByEntityDefId(EntityDefId.ITEM_EXTRA_BATTERY), nextToPlayer);
+      foreach (var lane in deploymentInfo.Lanes) {
+        PopulatePlayerFactionLane(dungeonLevel, state, seededRand, deploymentInfo, commanderAI, lane);
+        PopulateEnemyFactionLane(dungeonLevel, state, seededRand, deploymentInfo, commanderAI, lane);
       }
-      */
     }
   }
 }

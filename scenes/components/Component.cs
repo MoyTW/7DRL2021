@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   // Thanks to https://github.com/dlyz as per https://github.com/dotnet/runtime/issues/33112
   /**

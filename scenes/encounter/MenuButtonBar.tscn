@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://resources/ui/button_bar.png" type="Texture" id=1]
 [ext_resource path="res://scenes/encounter/MenuButtonBar.cs" type="Script" id=2]
 [ext_resource path="res://resources/menu_theme.tres" type="Theme" id=3]
+[ext_resource path="res://resources/fonts/Fira_Code_v5.2/ttf/FiraCode_Bold.tres" type="DynamicFont" id=4]
+[ext_resource path="res://resources/StyleBoxRedLabel.tres" type="StyleBox" id=5]
 
 [node name="MenuButtonBar" type="TextureRect"]
 theme = ExtResource( 3 )
@@ -33,31 +35,37 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="GetButton" type="Button" parent="VBoxContainer/TopButtonBar"]
+[node name="RotateButton" type="Button" parent="VBoxContainer/TopButtonBar"]
 margin_right = 192.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
-text = "Get Item (g)"
+text = "Rotate (r)"
 
-[node name="JumpButton" type="Button" parent="VBoxContainer/TopButtonBar"]
+[node name="ExitFormationButton" type="Button" parent="VBoxContainer/TopButtonBar"]
 margin_left = 208.0
 margin_right = 400.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
-text = "Use Jump Point (<)"
+text = "Toggle Formtn (x)"
 
-[node name="ExploreZoneButton" type="Button" parent="VBoxContainer/TopButtonBar"]
+[node name="WaitButton" type="Button" parent="VBoxContainer/TopButtonBar"]
 margin_left = 416.0
 margin_right = 608.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
-text = "Explore Zone (x)"
+text = "Wait (Space, N5)"
 
 [node name="HelpButton" type="Button" parent="VBoxContainer/TopButtonBar"]
 margin_left = 624.0
@@ -65,6 +73,8 @@ margin_right = 816.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Help (?)"
 
@@ -80,31 +90,37 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="AutopilotButton" type="Button" parent="VBoxContainer/BottomButtonBar"]
+[node name="ZoomOutButton" type="Button" parent="VBoxContainer/BottomButtonBar"]
 margin_right = 192.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
-text = "Autopilot (a)"
+text = "Zoom Out (-)"
 
-[node name="CharacterButton" type="Button" parent="VBoxContainer/BottomButtonBar"]
+[node name="ZoomInButton" type="Button" parent="VBoxContainer/BottomButtonBar"]
 margin_left = 208.0
 margin_right = 400.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
-text = "Character (c)"
+text = "Zoom In (=)"
 
-[node name="InventoryButton" type="Button" parent="VBoxContainer/BottomButtonBar"]
+[node name="ResetZoomButton" type="Button" parent="VBoxContainer/BottomButtonBar"]
 margin_left = 416.0
 margin_right = 608.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
-text = "Inventory (i)"
+text = "Reset Zoom (Bksp)"
 
 [node name="EscapeButton" type="Button" parent="VBoxContainer/BottomButtonBar"]
 margin_left = 624.0
@@ -112,5 +128,7 @@ margin_right = 816.0
 margin_bottom = 32.0
 focus_mode = 0
 size_flags_horizontal = 3
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 4 )
 enabled_focus_mode = 0
 text = "Menu (esc)"

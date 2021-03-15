@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   public static class LevelUpBonus {
     public static string MAX_HP = "LEVEL_UP_BONUS_MAX_HP";
@@ -61,7 +62,7 @@ namespace SpaceDodgeRL.scenes.components {
     /**
      * Adds XP and returns true if the entity has levelled up.
      */
-    public bool AddXP(int xp) {
+    public bool AddXP(int xp, AttackerComponent attacker, DefenderComponent defender, EncounterState state) {
       bool levelledUp = false;
       this.XP += xp;
       while (this.XP >= this.NextLevelAtXP) {
@@ -70,6 +71,15 @@ namespace SpaceDodgeRL.scenes.components {
         this._UnusedLevelUps.Add(this.Level);
         levelledUp = true;
       }
+
+      if (levelledUp) {
+        state.LogMessage("[b]You've levelled up![/b] You gain +5 to maximum HP and footing and +2 to attack and defense!");
+        defender.MaxHp += 5;
+        attacker.MeleeAttack += 2;
+        defender.MeleeDefense += 2;
+        defender.MaxFooting += 5;
+      }
+
       return levelledUp;
     }
 
@@ -81,7 +91,7 @@ namespace SpaceDodgeRL.scenes.components {
         // TODO: We can model persistent level-ups as status effects, can't we?
         entity.GetComponent<DefenderComponent>().AddBaseMaxHp(LevelUpBonus.MAX_HP_BONUS);
       } else if (chosenLevelUp == LevelUpBonus.ATTACK_POWER) {
-        entity.GetComponent<PlayerComponent>().AddBaseCuttingLaserPower(LevelUpBonus.ATTACK_POWER_BONUS);
+        throw new NotImplementedException("lol level ups");
       } else if (chosenLevelUp == LevelUpBonus.REPAIR) {
         var defenderComponent = entity.GetComponent<DefenderComponent>();
         int repairValue = (int)((double)defenderComponent.MaxHp * LevelUpBonus.REPAIR_PERCENTAGE);

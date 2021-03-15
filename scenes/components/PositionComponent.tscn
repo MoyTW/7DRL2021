@@ -1,7 +1,9 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://scenes/components/PositionComponent.cs" type="Script" id=1]
 [ext_resource path="res://resources/sprites/M484ExplosionRedCrescent_24x24.png" type="Texture" id=2]
+[ext_resource path="res://resources/fonts/Fira_Code_v5.2/ttf/FiraCode_Bold.tres" type="DynamicFont" id=3]
+[ext_resource path="res://resources/sprites/speechbubble.png" type="Texture" id=4]
 
 [sub_resource type="AtlasTexture" id=1]
 flags = 4
@@ -52,8 +54,37 @@ script = ExtResource( 1 )
 [node name="Tween" type="Tween" parent="."]
 
 [node name="Sprite" type="Sprite" parent="."]
+
+[node name="Node2D" type="Node2D" parent="Sprite"]
+z_index = 5
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Sprite/Node2D"]
 visible = false
+margin_top = -40.0
+margin_right = 40.0
+texture = ExtResource( 4 )
+patch_margin_left = 20
+patch_margin_top = 20
+patch_margin_right = 20
+patch_margin_bottom = 20
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SpeechLabel" type="Label" parent="Sprite/Node2D/NinePatchRect"]
+margin_left = 11.0
+margin_top = 7.0
+margin_right = 71.0
+margin_bottom = 27.0
+custom_fonts/font = ExtResource( 3 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "HUPHUP"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="ExplosionSprite" type="AnimatedSprite" parent="."]
 visible = false
 frames = SubResource( 8 )
+
+[node name="SpeechBubbleTimer" type="Timer" parent="."]

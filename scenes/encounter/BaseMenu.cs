@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
   abstract public class BaseMenu : Control {
     private bool _currentlyHovered;
     private Button _lastHovered;
@@ -18,7 +18,6 @@ namespace SpaceDodgeRL.scenes.encounter {
           this._lastHovered.GrabFocus();
         }
       } else if (@event is InputEventKey && Input.GetMouseMode() == Input.MouseMode.Visible) {
-        Input.SetMouseMode(Input.MouseMode.Hidden);
         if (this.GetFocusOwner() == null && this._lastHovered != null) {
           this._lastHovered.GrabFocus();
         } else if (this.GetFocusOwner() == null && this._lastHovered == null) {

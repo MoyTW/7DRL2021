@@ -2,13 +2,25 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
+  public static class FactionNameExtensions {
+    public static FactionName Opposite(this FactionName faction) {
+      if (faction == FactionName.PLAYER) {
+        return FactionName.ENEMY;
+      } else if (faction == FactionName.ENEMY) {
+        return FactionName.PLAYER;
+      } else {
+        throw new NotImplementedException();
+      }
+    }
+  }
   public enum FactionName {
     PLAYER,
-    ENEMY
+    ENEMY,
+    NEUTRAL
   }
 
   public class FactionComponent : Component {

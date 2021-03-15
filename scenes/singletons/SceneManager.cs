@@ -1,24 +1,25 @@
 using Godot;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.encounter;
-using SpaceDodgeRL.scenes.encounter.state;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.encounter;
+using MTW7DRL2021.scenes.encounter.state;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace SpaceDodgeRL.scenes.singletons {
+namespace MTW7DRL2021.scenes.singletons {
 
   public class SceneManager : Node {
 
     private Viewport root;
     private List<Node> sceneStack;
 
-    private CharacterMenu _characterMenu;
+    private IntroFormUpMenu _introFormUpMenu;
+    private IntroBattleMenu _introBattleMenu;
+
     private CreditsMenu _creditsMenu;
     private DefeatMenu _defeatMenu;
     private EscapeMenu _escapeMenu;
     private HelpMenu _helpMenu;
-    private InventoryMenu _inventoryMenu;
     private SettingsMenu _settingsMenu;
     private VictoryMenu _victoryMenu;
 
@@ -26,35 +27,32 @@ namespace SpaceDodgeRL.scenes.singletons {
       root = GetTree().Root;
       sceneStack = new List<Node>();
 
-      _characterMenu = GD.Load<PackedScene>("res://scenes/encounter/CharacterMenu.tscn").Instance() as CharacterMenu;
+      _introFormUpMenu = GD.Load<PackedScene>("res://scenes/encounter/IntroFormUpMenu.tscn").Instance() as IntroFormUpMenu;
+      _introBattleMenu = GD.Load<PackedScene>("res://scenes/encounter/IntroBattleMenu.tscn").Instance() as IntroBattleMenu;
+
       _creditsMenu = GD.Load<PackedScene>("res://scenes/CreditsMenu.tscn").Instance() as CreditsMenu;
       _defeatMenu = GD.Load<PackedScene>("res://scenes/encounter/DefeatMenu.tscn").Instance() as DefeatMenu;
       _escapeMenu = GD.Load<PackedScene>("res://scenes/encounter/EscapeMenu.tscn").Instance() as EscapeMenu;
       _helpMenu = GD.Load<PackedScene>("res://scenes/encounter/HelpMenu.tscn").Instance() as HelpMenu;
-      _inventoryMenu = GD.Load<PackedScene>("res://scenes/encounter/InventoryMenu.tscn").Instance() as InventoryMenu;
       _settingsMenu = GD.Load<PackedScene>("res://scenes/SettingsMenu.tscn").Instance() as SettingsMenu;
       _victoryMenu = GD.Load<PackedScene>("res://scenes/encounter/VictoryMenu.tscn").Instance() as VictoryMenu;
     }
 
-    #region Character Menu
-
-    public void ShowCharacterMenu(EncounterState state) {
-      CallDeferred(nameof(DeferredShowCharacterMenu), state);
+    public void ShowIntroFormUpMenu() {
+      CallDeferred(nameof(DeferredIntroFormUpMenu));
     }
 
-    private void DeferredShowCharacterMenu(EncounterState state) {
-      DeferredSwitchScene(_characterMenu);
-      _characterMenu.PrepMenu(state);
+    private void DeferredIntroFormUpMenu() {
+      DeferredSwitchScene(_introFormUpMenu);
     }
 
-    // Definitely an awkward call structuring here that could be nicer with signals
-    public void HandleLevelUpSelected(string levelUpSelection) {
-      var previousScene = sceneStack[sceneStack.Count - 1] as EncounterScene;
-      previousScene.HandleLevelUpSelected(previousScene.EncounterState.Player, levelUpSelection);
-      _characterMenu.PrepMenu(previousScene.EncounterState);
+    public void ShowIntroBattleMenu() {
+      CallDeferred(nameof(DeferredIntroBattleMenu));
     }
 
-    #endregion
+    private void DeferredIntroBattleMenu() {
+      DeferredSwitchScene(_introBattleMenu);
+    }
 
     #region Credits Menu
 
@@ -116,29 +114,6 @@ namespace SpaceDodgeRL.scenes.singletons {
 
     private void DeferredShowEncounterScene(EncounterScene scene) {
       DeferredSwitchScene(scene);
-    }
-
-    #endregion
-
-    #region Inventory Menu
-
-    public void ShowInventoryMenu(EncounterState state) {
-      CallDeferred(nameof(DeferredShowInventoryMenu), state);
-    }
-
-    private void DeferredShowInventoryMenu(EncounterState state) {
-      DeferredSwitchScene(_inventoryMenu);
-      _inventoryMenu.PrepMenu(state.Player.GetComponent<InventoryComponent>());
-    }
-
-    public void HandleItemToUseSelected(string itemIdToUse) {
-      CallDeferred(nameof(DeferredHandleItemToUseSelected), itemIdToUse);
-    }
-
-    private void DeferredHandleItemToUseSelected(string itemIdToUse) {
-      var previousScene = sceneStack[sceneStack.Count - 1] as EncounterScene;
-      DeferredReturnToPreviousScene();
-      previousScene.HandleItemToUseSelected(itemIdToUse);
     }
 
     #endregion

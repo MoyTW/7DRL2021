@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SpaceDodgeRL.library {
+namespace MTW7DRL2021.library {
 
   public static class GameUtils {
     public static void Shuffle<T>(Random seededRand, List<T> target) {

@@ -1,5 +1,111 @@
 Commenced at Saturday March 6, 8pm Pacific time.
 
+* Schedule
+
+** Tuesday <- Formations & Combat
+1. DONE: Troops rotate in & out
+2. DONE: Units backpedal & advance (lines shift)
+3. PARTIAL: Units break & reform
+4. DONE: Units can rout off the field
+5. PARTIAL: Add in the armor, stamina, & footing
+
+** Wednesday <- Full Game Loop
+1. PARTIAL: Add a scoring system for the player
+2. DONE: Add a placeholder battle generator
+3. PARTIAL: String together battles to make a campaign
+4. PARTIAL: Update the UI
+
+*** How does the game *play*?
+
+**** Controls
+
++ When you're "in formation" you basically are on autopilot. You can:
+  - TODO: Choose whether to advance forwards, to the left, or the right
+  - TODO: Choose when to rotate out
+  - TODO: Choose what enemies to attack when engaged
+  - TODO: Choose to break formation, which counts as routing and loses you points
+
++ When you're "out of formation" you can move freely.
+  - TODO: You can still fight
+  - TODO: You can re-enter formation by reaching your unit (press R to rally)
+
+**** Scoring
+
+Game ends when you die, obviously.
+
++ Actions +Points
+  - Injuring an enemy
+  - Killing an enemy
+  - Saving an injured soldier <- complex
+
++ Actions -Points
+  - Breaking formation
+  - Rotating too often <- complex
+  - Failing to advance <- complex
+
+Most of the gameplay will be trying to not get stabbed to death. You're gonna
+need to have to keep an eye on the morale of your troops, because if you're in
+the front line when the unit breaks you're gonna be at high risk of getting
+caught out and stabbed to death by angry enemies.
+
+** Thursday <- Content
+1. Add a variety of troops
+2. Add a variety of different battles
+3. Playtest!
+4. Possibly add in nice-to-haves
+  a. Skirmishers
+  b. Cavalry
+
+*** Bugs
++ 2 units can get hung up on each other due to the "enemy unit 2 squares in
+  front" code; this means they can hold up the entire advance by sitting way
+  back! you should, you know...fix this.
++ FIXED (probably): Enemies never seem to advance Westwards? something to do with...line formation...?
++ Bind ESCAPE to exit help menu
+
+*** MUST do
+
++ Better tutorializing
++ What is FOOTING?
++ Pictures lol
+  - https://www.kenney.nl/assets/bit-pack
+
+*** Battle Generation
+
++ You ALWAYS have [n lanes]
+  - Every lane always has at LEAST 1 unit on each side
+  - TODO: You need to have some way for lines that rout their enemies off to sweep the sides
+  - Trivial generation is randomly pick units on each side, and throw them together
+  - Complex gen is create harder enemies the more levels you go on
+
+** Friday <- Playtesting & Fixing
+*** Issues
++ DONE: player autowaits
++ DONE (& it caused a LOTTA bugs): decouple "wait" from "give control to the AI"
++ DONE: Intro screen
++ Description of footing
++ Melee & defense stats show footing penalty
++ DONE: HELP menu update
++ escape exits help menu
++ DONE: units can mysteriously lag way behind their units; put a "if you're
+  behind your unit go towards center" safeguard in it
++ maybe also put a side drift safeguard?
++ make units sweep other lanes after completing their lane
++ make "wait" restore % of footing & change rotation to a stamina system
++ DONE: remove ranged weapons altogether
++ make the UI clearer
++ commit to the speech bubbles
++ DONE: It freezes when player's unit routs? (when player's out of unit and it routs?)
+
+** Saturday <- Playtesting & Fixing (ends 8pm)
+*** Issues
+
++ Units sweep other lanes after completing their lane (until 10am)
++ You can rejoin another unit (until 11am)
++ Prestige & Victory & Defeat Screens
++ Reword objectives
++ Find a way to make the game less repetitive
+
 * Summary
 
 A roguelike where you're one participant of many. Think a single footsoldier in

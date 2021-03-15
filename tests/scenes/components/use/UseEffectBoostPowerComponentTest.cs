@@ -1,9 +1,9 @@
 using System.Text.Json;
-using SpaceDodgeRL.scenes.components.use;
+using MTW7DRL2021.scenes.components.use;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace SpaceDodgeRL.tests.scenes.components.use {
+namespace MTW7DRL2021.tests.scenes.components.use {
 
   public class UseEffectBoostPowerComponentTest {
 

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.library.encounter {
+namespace MTW7DRL2021.library.encounter {
 
   /**
    * Data class to represent a series of [x, y] coordinate pairs over a time period.

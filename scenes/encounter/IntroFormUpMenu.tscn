@@ -1,0 +1,80 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://resources/fonts/Fira_Code_v5.2/ttf/FiraCode-Bold.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://resources/menu_theme.tres" type="Theme" id=2]
+[ext_resource path="res://resources/fonts/fira_24.tres" type="DynamicFont" id=3]
+[ext_resource path="res://scenes/encounter/IntroFormUpMenu.cs" type="Script" id=4]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.498039, 0, 0, 1 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 64
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 32
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 32
+font_data = ExtResource( 1 )
+
+[node name="IntroFormUpMenu" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 0
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeaderLabel" type="Label" parent="."]
+margin_right = 1280.0
+margin_bottom = 80.0
+theme = ExtResource( 2 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = SubResource( 2 )
+text = "In A Roman War Camp"
+align = 1
+valign = 1
+
+[node name="HeaderLabel2" type="Label" parent="."]
+margin_top = 80.0
+margin_right = 1280.0
+margin_bottom = 120.0
+theme = ExtResource( 2 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = SubResource( 3 )
+text = "Noon, Somewhere Near Carthage"
+align = 1
+valign = 1
+
+[node name="TextLabel" type="Label" parent="."]
+margin_top = 120.0
+margin_right = 1280.0
+margin_bottom = 984.0
+size_flags_vertical = 7
+theme = ExtResource( 2 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = ExtResource( 3 )
+text = "\"The enemy has been sighted! Prepare for battle! The enemy has been sighted! Prepare...\"
+
+You sigh and begin wrapping up your half-eaten bread. And it was such nice bread, too, the first proper bread you'd had in months! Around you your fellow soldiers are busily preparing for battle, repacking their cookware and filling their waterskins.
+
+Your Optio, second-in-command to the Centurion, stomps towards you. \"Form up for the march!\" he cries. \"Form up! Ten wide! Form up for the march!\" He passes you, and his voice vanishes into the clamor of an army preparing for battle.
+
+You finish wrapping your bread and stand up."
+align = 1
+valign = 1
+autowrap = true
+
+[node name="Button" type="Button" parent="."]
+margin_top = 984.0
+margin_right = 1280.0
+margin_bottom = 1024.0
+theme = ExtResource( 2 )
+custom_fonts/font = SubResource( 4 )
+text = "Prepare For Battle"

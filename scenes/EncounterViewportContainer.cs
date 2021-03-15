@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Godot;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes {
+namespace MTW7DRL2021.scenes {
   public class EncounterViewportContainer : Godot.ViewportContainer {
     private Texture moveNCursor = ResourceLoader.Load<Texture>("res://resources/cursors/move_n_24x24.png");
     private Texture moveNECursor = ResourceLoader.Load<Texture>("res://resources/cursors/move_ne_24x24.png");
@@ -125,7 +125,6 @@ namespace SpaceDodgeRL.scenes {
         }
       } else if (@event is InputEventKey) {
         GetNode<Sprite>("MovementIndicator").Hide();
-        Input.SetMouseMode(Input.MouseMode.Hidden);
       }
     }
 

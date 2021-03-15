@@ -1,10 +1,10 @@
 using Godot;
-using SpaceDodgeRL.library.encounter.rulebook;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.library.encounter.rulebook;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.singletons;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
 
   public class MenuButtonBar : TextureRect {
     public SceneManager _sceneManager { get => (SceneManager)GetNode("/root/SceneManager"); }
@@ -18,32 +18,42 @@ namespace SpaceDodgeRL.scenes.encounter {
     }
 
     public override void _Ready() {
-      this.GetNode<Button>("VBoxContainer/TopButtonBar/GetButton").Connect("pressed", this, nameof(OnGetButtonPressed));
-      this.GetNode<Button>("VBoxContainer/TopButtonBar/JumpButton").Connect("pressed", this, nameof(OnJumpButtonPressed));
+      this.GetNode<Button>("VBoxContainer/TopButtonBar/RotateButton").Connect("pressed", this, nameof(OnRotateButtonPressed));
+      this.GetNode<Button>("VBoxContainer/TopButtonBar/ExitFormationButton").Connect("pressed", this, nameof(OnLeaveFormationButtonPressed));
+      this.GetNode<Button>("VBoxContainer/TopButtonBar/WaitButton").Connect("pressed", this, nameof(OnWaitButtonPressed));
       this.GetNode<Button>("VBoxContainer/TopButtonBar/HelpButton").Connect("pressed", this, nameof(OnHelpButtonPressed));
-      this.GetNode<Button>("VBoxContainer/BottomButtonBar/CharacterButton").Connect("pressed", this, nameof(OnCharacterButtonPressed));
-      this.GetNode<Button>("VBoxContainer/BottomButtonBar/InventoryButton").Connect("pressed", this, nameof(OnInventoryButtonPressed));
+      this.GetNode<Button>("VBoxContainer/BottomButtonBar/ZoomOutButton").Connect("pressed", this, nameof(OnZoomOutButtonPressed));
+      this.GetNode<Button>("VBoxContainer/BottomButtonBar/ZoomInButton").Connect("pressed", this, nameof(OnZoomInButtonPressed));
+      this.GetNode<Button>("VBoxContainer/BottomButtonBar/ResetZoomButton").Connect("pressed", this, nameof(ResetZoomButtonPressed));
       this.GetNode<Button>("VBoxContainer/BottomButtonBar/EscapeButton").Connect("pressed", this, nameof(OnEscapeButtonPressed));
     }
 
-    private void OnGetButtonPressed() {
-      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.GET_ITEM));
+    private void OnRotateButtonPressed() {
+      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.ROTATE));
     }
 
-    private void OnJumpButtonPressed() {
-      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.USE_STAIRS));
+    private void OnLeaveFormationButtonPressed() {
+      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.LEAVE_FORMATION));
+    }
+
+    private void OnWaitButtonPressed() {
+      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.WAIT));
     }
 
     private void OnHelpButtonPressed() {
       this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.HELP_MENU));
     }
 
-    private void OnCharacterButtonPressed() {
-      this._sceneManager.ShowCharacterMenu(this._state);
+    private void OnZoomOutButtonPressed() {
+      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.ZOOM_OUT));
     }
 
-    private void OnInventoryButtonPressed() {
-      this._sceneManager.ShowInventoryMenu(this._state);
+    private void OnZoomInButtonPressed() {
+      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.ZOOM_IN));
+    }
+
+    private void ResetZoomButtonPressed() {
+      this._inputHandler.TryInsertInputAction(new InputHandler.InputAction(InputHandler.ActionMapping.ZOOM_RESET));
     }
 
     private void OnEscapeButtonPressed() {

@@ -1,11 +1,11 @@
 using Godot;
-using SpaceDodgeRL.scenes.components;
+using MTW7DRL2021.scenes.components;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.entities {
+namespace MTW7DRL2021.scenes.entities {
 
   [JsonConverter(typeof(EntityConverter))]
   public class Entity : Node {
@@ -14,6 +14,7 @@ namespace SpaceDodgeRL.scenes.entities {
 
     [JsonInclude] public string EntityId { get; private set; }
     [JsonInclude] public string EntityName { get; private set; }
+    [JsonInclude] public bool IsPlayer { get; private set; }
 
     // Currently we make the assumption that an Entity can have 1 and only 1 of each node of any particular inheritance tree. So,
     // a node can only have 1 AIComponent, for example. This might change if we model, I don't know, a status effect as a node -
@@ -28,11 +29,26 @@ namespace SpaceDodgeRL.scenes.entities {
     private Entity Init(string entityId, string entityName) {
       this.EntityId = entityId;
       this.EntityName = entityName;
+      this.IsPlayer = false;
       this._Components = new List<Component>();
       this._childTypeToComponent = new Dictionary<Type, Component>();
       this._childComponentToTypes = new Dictionary<Component, List<Type>>();
       this.AddToGroup(ENTITY_GROUP);
       return this;
+    }
+
+    // #################### JANK 7DRL HACK CONVENIENCE FNS ####################
+    public bool IsRotating() {
+      // hack: player's always rotating if they're in free move mode
+      if (IsPlayer && !this.GetComponent<PlayerComponent>().IsInFormation) {
+        return true;
+      }
+      var rotationComponent = this.GetComponent<AIRotationComponent>();
+      if (rotationComponent != null) {
+        return rotationComponent.IsRotating;
+      } else {
+        return false;
+      }
     }
 
     public static Entity Create(string entityId, string entityName) {
@@ -50,13 +66,13 @@ namespace SpaceDodgeRL.scenes.entities {
       // TODO: Formalize this into a "template" concept
       if (entity.EntityName == "boundary sign") {
         entity.AddComponent(CollisionComponent.Create(true, false));
-        entity.AddComponent(DefenderComponent.Create(0, 100, logDamage: false, isInvincible: true));
+        entity.AddComponent(DefenderComponent.Create(9999, 9999, 9999, 9999, 9999, logDamage: false, isInvincible: true));
         entity.AddComponent(DisplayComponent.Create("res://resources/sprites/edge_blocker.png", "Trying to run away, eh? Get back to your mission!", true, 2));
-      } else if (entity.EntityName == "satellite") {
+      }/* else if (entity.EntityName == "satellite") {
         entity.AddComponent(CollisionComponent.Create(blocksMovement: true, blocksVision: true));
         entity.AddComponent(DefenderComponent.Create(baseDefense: int.MaxValue, maxHp: int.MaxValue, isInvincible: true, logDamage: false));
         entity.AddComponent(DisplayComponent.Create("res://resources/sprites/asteroid.png", "Space junk. Blocks movement and projectiles. Cannot be destroyed.", true, 2));
-      }
+      }*/
 
       return entity;
     }
@@ -76,6 +92,8 @@ namespace SpaceDodgeRL.scenes.entities {
     }
 
     public void AddComponent(Component component, bool legibleUniqueName = false) {
+      if (component is PlayerComponent) { this.IsPlayer = true; }
+
       if (!(component is Component)) {
         throw new NotImplementedException();
       }

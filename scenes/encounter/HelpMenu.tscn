@@ -1,12 +1,12 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://resources/fonts/Fira_Code_v5.2/ttf/FiraCode-Bold.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://resources/fonts/fira_32_bold.tres" type="DynamicFont" id=1]
 [ext_resource path="res://resources/menu_theme.tres" type="Theme" id=2]
 [ext_resource path="res://scenes/encounter/HelpMenu.cs" type="Script" id=3]
-
-[sub_resource type="DynamicFont" id=1]
-size = 32
-font_data = ExtResource( 1 )
+[ext_resource path="res://resources/fonts/fira_32.tres" type="DynamicFont" id=4]
+[ext_resource path="res://resources/StyleBoxRedLabel.tres" type="StyleBox" id=5]
+[ext_resource path="res://resources/fonts/fira_64.tres" type="DynamicFont" id=6]
+[ext_resource path="res://resources/fonts/fira_24.tres" type="DynamicFont" id=7]
 
 [node name="Background" type="TextureRect"]
 anchor_right = 1.0
@@ -20,53 +20,158 @@ __meta__ = {
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+custom_constants/separation = -2
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 margin_right = 1280.0
-margin_bottom = 40.0
-custom_fonts/font = SubResource( 1 )
+margin_bottom = 80.0
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 6 )
 text = "HELP"
 align = 1
 
-[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer"]
-margin_top = 44.0
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+margin_top = 78.0
 margin_right = 1280.0
-margin_bottom = 1000.0
+margin_bottom = 986.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-bbcode_enabled = true
-bbcode_text = "[b]Controls[/b]
-Movement: Numpads 1-4, 6-9 or yubnhjkl
-Wait: Numpad 5 or Space
-Autopilot: a
-Get Item: g
-Jump to next sector: <, >
-Character Menu: c
-Inventory Menu: i
-Help Menu: /, ?
-Exit Menu: Escape
-Zoom In: =, PageDown
-Zoom Out: -, PageUp
-Zoom Reset: Backspace, Home"
-text = "Controls
-Movement: Numpads 1-4, 6-9 or yubnhjkl
-Wait: Numpad 5 or Space
-Autopilot: a
-Get Item: g
-Jump to next sector: <, >
-Character Menu: c
-Inventory Menu: i
-Help Menu: /, ?
-Exit Menu: Escape
-Zoom In: =, PageDown
-Zoom Out: -, PageUp
-Zoom Reset: Backspace, Home"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
+margin_right = 1268.0
+margin_bottom = 2052.0
+size_flags_horizontal = 3
+custom_constants/separation = 0
+
+[node name="TitleLabel2" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_right = 1268.0
+margin_bottom = 40.0
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 1 )
+text = "Controls"
+align = 1
+
+[node name="TitleLabel3" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 40.0
+margin_right = 1268.0
+margin_bottom = 275.0
+size_flags_horizontal = 3
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 7 )
+text = "Movement: Numpad 1-4 & 4-8, or YUBNHJKL
+Rotate: r
+Wait / Restore Footing (Space, Numpad 5)
+Flee/Join formation: x
+Zoom In: -, Zoom Out: +, Reset Zoom: Backspace
+Escape Menu: Escape, Help Menu: ?
+"
+align = 1
+autowrap = true
+
+[node name="TitleLabel5" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 275.0
+margin_right = 1268.0
+margin_bottom = 315.0
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 1 )
+text = "Objective"
+align = 1
+
+[node name="TitleLabel4" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 315.0
+margin_right = 1268.0
+margin_bottom = 958.0
+size_flags_horizontal = 3
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 7 )
+text = "The goal of the game is to survive the campaign with as much prestige as possible. Prestige functions as the score. The prestige modifiers are:
+
++25: Participate in a winning battle
++5: Defeat an enemy in battle
++5: Rejoin a formation (hitting x when not in formation)
++1: Land a blow on an enemy in battle
+-2: Rotate to the back of the line (hitting r)
+-10: Break formation (hitting x when in formation)
+-50: Leaving the battlefield before your army is defeated
+
+You do NOT lose score if your unit is routed. If your unit is routed, the formation breaks and you are considered out of formation and cannot fight, but as you did not intentionally break formation there is not penalty.
+You do NOT lose score if you retreat after every unit in your army is routed.
+
+To maximize your prestige, you should attempt to defeat as many enemies in battle as you can, and avoid breaking formation until your unit loses cohesion.
+"
+align = 1
+autowrap = true
+
+[node name="TitleLabel8" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 958.0
+margin_right = 1268.0
+margin_bottom = 998.0
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 1 )
+text = "Fighting In Formation"
+align = 1
+
+[node name="FormationText" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 998.0
+margin_right = 1268.0
+margin_bottom = 1505.0
+size_flags_horizontal = 3
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 7 )
+text = "While in formation, you can only do actions that will keep you in formation. That means you can only move forwards or to your sides, rotate backwards, or wait. If you fall too far behind your formation, you will only be allowed to move forwards.
+
+You can break formation at any time, but it will cost you some prestige. Once you have broken formation you can move freely, even through allies and enemies, but cannot fight. 
+
+If your unit routs, you will automatically be ejected from the formation (as a routing unit has no formation).
+
+You can rejoin a formation or join a different unit's formation by approaching its center and pressing x. The screen overlay text will tell you when you are close enough.
+"
+align = 1
+autowrap = true
+
+[node name="TitleLabel6" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 1505.0
+margin_right = 1268.0
+margin_bottom = 1545.0
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 1 )
+text = "Combat Mechanics"
+align = 1
+
+[node name="TitleLabel7" type="Label" parent="VBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 1545.0
+margin_right = 1268.0
+margin_bottom = 2052.0
+size_flags_horizontal = 3
+theme = ExtResource( 2 )
+custom_styles/normal = ExtResource( 5 )
+custom_fonts/font = ExtResource( 7 )
+text = "You fight enemies by moving into them. The attack formula is:
+(modified melee attack - modified melee defense) < 1d100
+Melee attack and defense are modified by the footing penalty.
+
+Footing is a value that represents the balance and stamina of the combatant. Each attack made by a combatant reduces their footing by 5. Once footing drops to less than 70% of the max, the combatant gets a penalty to all attack and defense rolls. The penalty starts at -10 and goes down to -30 at 20%. If it drops below 20%, the penalty goes to 9999.
+
+Footing can also absorb some of the damage dealt to a fighter. If a fighter would take damage, the fighter will instead take some percentage of the damage as footing damage, depending on how much footing they currently have.
+
+You regain footing by using the Wait command, which restores 33% of your footing."
+align = 1
+autowrap = true
 
 [node name="CloseButton" type="Button" parent="VBoxContainer"]
-margin_top = 1004.0
+margin_top = 984.0
 margin_right = 1280.0
 margin_bottom = 1024.0
+custom_fonts/font = ExtResource( 4 )
 text = "Close"

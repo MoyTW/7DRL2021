@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components.use {
+namespace MTW7DRL2021.scenes.components.use {
 
   public class UseEffectBoostPowerComponent : Component {
     public static readonly string ENTITY_GROUP = "USE_EFFECT_BOOST_POWER_COMPONENT_GROUP";

@@ -1,8 +1,8 @@
 using Godot;
-using SpaceDodgeRL.library;
-using SpaceDodgeRL.scenes;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.library;
+using MTW7DRL2021.scenes;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.singletons;
 using System;
 using System.Diagnostics;
 

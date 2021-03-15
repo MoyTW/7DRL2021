@@ -7,7 +7,7 @@ using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace SpaceDodgeRL.tests {
+namespace MTW7DRL2021.tests {
 
   public class TestRunnerOutput : ITestOutputHelper {
 
