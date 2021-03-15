@@ -1,12 +1,12 @@
 using Godot;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.encounter;
-using SpaceDodgeRL.scenes.encounter.state;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.encounter;
+using MTW7DRL2021.scenes.encounter.state;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace SpaceDodgeRL.scenes.singletons {
+namespace MTW7DRL2021.scenes.singletons {
 
   public class SceneManager : Node {
 

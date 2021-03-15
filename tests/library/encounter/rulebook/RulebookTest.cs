@@ -1,12 +1,12 @@
 using Godot;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.library.encounter.rulebook;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.encounter;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.library.encounter.rulebook;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.encounter;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Linq;
 using Xunit;
@@ -22,7 +22,7 @@ public class RulebookTest {
   /**
     * Crash via NPE on 3a6c655cd26edb289da3390d656770784c737837
     *
-    * NPE on SpaceDodgeRL\library\encounter\rulebook\Rulebook.cs:124, occuring when:
+    * NPE on MTW7DRL2021\library\encounter\rulebook\Rulebook.cs:124, occuring when:
     * 1: Entity A fires Projectile A
     * 2: Entity A is destroyed
     * 3: Projectile A destroys Entity B

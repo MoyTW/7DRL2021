@@ -1,8 +1,8 @@
 using Godot;
-using SpaceDodgeRL.library.encounter;
+using MTW7DRL2021.library.encounter;
 using System.Collections.Generic;
 
-namespace SpaceDodgeRL.scenes {
+namespace MTW7DRL2021.scenes {
 
   public class InputHandler : Node {
     public class InputAction {

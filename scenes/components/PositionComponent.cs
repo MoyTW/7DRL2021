@@ -1,13 +1,13 @@
 using Godot;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
+using MTW7DRL2021.scenes.singletons;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   [JsonConverter(typeof(PositionConverter))]
   public class PositionComponent : Node, Component {

@@ -1,11 +1,11 @@
 using Godot;
-using SpaceDodgeRL.scenes.components;
+using MTW7DRL2021.scenes.components;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.entities {
+namespace MTW7DRL2021.scenes.entities {
 
   [JsonConverter(typeof(EntityConverter))]
   public class Entity : Node {

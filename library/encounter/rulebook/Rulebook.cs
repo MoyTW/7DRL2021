@@ -1,15 +1,15 @@
 using Godot;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.components.use;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.components.use;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SpaceDodgeRL.library.encounter.rulebook {
+namespace MTW7DRL2021.library.encounter.rulebook {
 
   public static class Rulebook {
     // ...can't I just do <> like I can in Kotlin? C# why you no let me do this. Probably because "evolving languages are hard".

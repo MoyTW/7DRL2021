@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.resources.gamedata;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.components.use;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.resources.gamedata;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.components.use;
 
-namespace SpaceDodgeRL.scenes.entities {
+namespace MTW7DRL2021.scenes.entities {
 
   public static class EntityBuilder {
     private static int ENTITY_Z_INDEX = 2;

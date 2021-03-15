@@ -1,5 +1,5 @@
 using Godot;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   public class ActionTimeComponent : Component {
     public static readonly string ENTITY_GROUP = "ACTION_TIME_COMPONENT_GROUP";

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Godot;
 
-namespace SpaceDodgeRL.scenes.singletons {
+namespace MTW7DRL2021.scenes.singletons {
 
   public class GameSettings : Node {
 

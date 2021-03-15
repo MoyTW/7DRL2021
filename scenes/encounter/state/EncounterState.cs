@@ -1,9 +1,9 @@
 using Godot;
-using SpaceDodgeRL.library;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.library;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 
-namespace SpaceDodgeRL.scenes.encounter.state {
+namespace MTW7DRL2021.scenes.encounter.state {
 
   public class EncounterState : Control {
     private static PackedScene _encounterPrefab = GD.Load<PackedScene>("res://scenes/encounter/state/EncounterState.tscn");

@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.library.encounter.rulebook;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.library.encounter.rulebook;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
+using MTW7DRL2021.scenes.singletons;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
   public class EncounterRunner : Node {
 
     // We use this to determine whether the UI should refresh; this will cause a comical number of UI updates since we'll be

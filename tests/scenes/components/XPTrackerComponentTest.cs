@@ -1,10 +1,10 @@
 using System.Text.Json;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.entities;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace SpaceDodgeRL.tests.scenes.components {
+namespace MTW7DRL2021.tests.scenes.components {
 
   public class XPTrackerComponentTest {
 

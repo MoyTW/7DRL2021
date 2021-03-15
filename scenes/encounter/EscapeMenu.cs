@@ -1,6 +1,6 @@
 using Godot;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.singletons;
 using System;
 
 public class EscapeMenu : Control {

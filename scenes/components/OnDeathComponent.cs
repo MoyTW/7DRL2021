@@ -1,11 +1,11 @@
 using Godot;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   public static class OnDeathEffectType {
     public static string PLAYER_VICTORY = "ON_DEATH_EFFECT_TYPE_PLAYER_VICTORY";

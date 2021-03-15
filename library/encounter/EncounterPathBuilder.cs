@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SpaceDodgeRL.library.encounter {
+namespace MTW7DRL2021.library.encounter {
 
   public static class EncounterPathBuilder {
 

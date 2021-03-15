@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Godot;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.encounter;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.encounter;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes {
+namespace MTW7DRL2021.scenes {
 
   public class EncounterScene : Container {
     public EncounterState EncounterState { get; private set; }

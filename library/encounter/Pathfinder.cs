@@ -1,9 +1,9 @@
 using Priority_Queue;
 using System.Collections.Generic;
 using System.Linq;
-using SpaceDodgeRL.scenes.encounter.state;
+using MTW7DRL2021.scenes.encounter.state;
 
-namespace SpaceDodgeRL.library.encounter {
+namespace MTW7DRL2021.library.encounter {
 
   public class Pathfinder {
 

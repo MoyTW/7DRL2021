@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SpaceDodgeRL.resources.gamedata {
+namespace MTW7DRL2021.resources.gamedata {
 
   public static class EntityDefId {
     // Enemies

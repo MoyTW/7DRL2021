@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Godot;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
 
   abstract public class EntryButton : Button {
 

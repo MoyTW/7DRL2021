@@ -1,10 +1,10 @@
 using Godot;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   public class StorableComponent : Component {
     public static readonly string ENTITY_GROUP = "STORABLE_COMPONENT_GROUP";

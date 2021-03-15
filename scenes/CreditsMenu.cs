@@ -1,5 +1,5 @@
 using Godot;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.scenes.singletons;
 using System;
 
 public class CreditsMenu : VBoxContainer {

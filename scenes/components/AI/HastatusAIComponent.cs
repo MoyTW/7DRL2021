@@ -1,15 +1,15 @@
-using SpaceDodgeRL.library;
-using SpaceDodgeRL.library.encounter;
-using SpaceDodgeRL.library.encounter.rulebook;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.library;
+using MTW7DRL2021.library.encounter;
+using MTW7DRL2021.library.encounter.rulebook;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SpaceDodgeRL.scenes.components.AI {
+namespace MTW7DRL2021.scenes.components.AI {
 
   public class HastatusAIComponent : DeciderAIComponent {
     public static readonly string ENTITY_GROUP = "HASTATUS_AI_COMPONENT_GROUP";

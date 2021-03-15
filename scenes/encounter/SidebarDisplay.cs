@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Text;
 using Godot;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
 
   public class SidebarDisplay : TextureRect {
 

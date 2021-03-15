@@ -1,8 +1,8 @@
 using Godot;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.scenes.singletons;
 using System;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
   public class HelpMenu : BaseMenu {
 
     private Button _closeButton;

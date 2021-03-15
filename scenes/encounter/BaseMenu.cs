@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
   abstract public class BaseMenu : Control {
     private bool _currentlyHovered;
     private Button _lastHovered;

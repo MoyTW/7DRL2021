@@ -1,10 +1,10 @@
 using Godot;
-using SpaceDodgeRL.library.encounter.rulebook;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.singletons;
+using MTW7DRL2021.library.encounter.rulebook;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.singletons;
 
-namespace SpaceDodgeRL.scenes.encounter {
+namespace MTW7DRL2021.scenes.encounter {
 
   public class MenuButtonBar : TextureRect {
     public SceneManager _sceneManager { get => (SceneManager)GetNode("/root/SceneManager"); }

@@ -2,10 +2,10 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   public enum MoraleState {
     CONFIDENT = 4, // pushes forwards

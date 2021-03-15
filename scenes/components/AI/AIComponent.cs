@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using SpaceDodgeRL.library.encounter.rulebook;
-using SpaceDodgeRL.library.encounter.rulebook.actions;
-using SpaceDodgeRL.scenes.encounter.state;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.library.encounter.rulebook;
+using MTW7DRL2021.library.encounter.rulebook.actions;
+using MTW7DRL2021.scenes.encounter.state;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.components.AI {
+namespace MTW7DRL2021.scenes.components.AI {
 
   interface AIComponent: Component {
     List<EncounterAction> DecideNextAction(EncounterState state, Entity parent);

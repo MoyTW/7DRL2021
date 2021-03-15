@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.scenes.encounter.state {
+namespace MTW7DRL2021.scenes.encounter.state {
 
   public class EncounterTile {
     public bool BlocksMovement {

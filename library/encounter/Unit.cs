@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Godot;
-using SpaceDodgeRL.scenes.components;
-using SpaceDodgeRL.scenes.components.AI;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.components;
+using MTW7DRL2021.scenes.components.AI;
+using MTW7DRL2021.scenes.entities;
 
-namespace SpaceDodgeRL.library.encounter {
+namespace MTW7DRL2021.library.encounter {
 
   public enum FormationType {
     MANIPULE_CLOSED,

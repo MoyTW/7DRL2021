@@ -1,9 +1,9 @@
 using Godot;
-using SpaceDodgeRL.scenes.entities;
+using MTW7DRL2021.scenes.entities;
 using System;
 using System.Text.Json;
 
-namespace SpaceDodgeRL.scenes.components {
+namespace MTW7DRL2021.scenes.components {
 
   public class StairsComponent : Component {
     public static readonly string ENTITY_GROUP = "STAIRS_COMPONENT_GROUP";

@@ -1,4 +1,4 @@
-namespace SpaceDodgeRL.library.encounter.rulebook {
+namespace MTW7DRL2021.library.encounter.rulebook {
 
   public class EncounterAction {
     protected string _actorId;

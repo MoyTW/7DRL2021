@@ -1,4 +1,4 @@
-namespace SpaceDodgeRL.library.encounter.rulebook {
+namespace MTW7DRL2021.library.encounter.rulebook {
 
   public enum ActionType {
     MELEE_ATTACK,
